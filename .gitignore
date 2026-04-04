@@ -23,6 +23,6 @@ cabal.project.local~
 .ghc.environment.*
 _cache/
 _tmp/
-.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 node_modules/
 package-lock.json
