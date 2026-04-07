@@ -34,7 +34,6 @@ main = hakyllWith hakyllConfig $ do
             route   $ constRoute "css/default.css"
             compile sassCompiler
 
-    -- TypeScript
     match "src/ts/main.ts" $ do
         route   $ constRoute "js/main.js"
         compile tsCompiler
