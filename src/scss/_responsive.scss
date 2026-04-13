@@ -122,32 +122,6 @@
 }
 
 @media (max-width: $breakpoint-menu) {
-  .hamburger {
-    display: block;
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-  }
-
-  #nav-menu {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    position: absolute;
-    top: 4.5rem;
-    right: 1rem;
-    background: var(--base-color);
-    border: 1px solid var(--base-text-color);
-    padding: 1rem;
-    width: 60%;
-    max-width: 250px;
-    z-index: 1000;
-
-    &.active {
-      display: flex;
-    }
-  }
-
   nav a {
     display: block;
     margin: 0.5rem 0;

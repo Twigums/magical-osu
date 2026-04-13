@@ -46,6 +46,10 @@ html body.home-page {
   z-index: 10;
 }
 
+.home-lang {
+  align-self: flex-start;
+}
+
 .home-title {
   display: flex;
   flex-direction: column;

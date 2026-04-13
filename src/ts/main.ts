@@ -1,14 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const hamburger = document.getElementById("hamburger-button");
-  if (hamburger) {
-    hamburger.addEventListener("click", function () {
-      const nav = document.getElementById("nav-menu");
-      if (nav) {
-        nav.classList.toggle("active");
-      }
-    });
-  }
-
   initLangToggle();
 
   if (document.getElementById("layout-original")) {

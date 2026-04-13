@@ -26,7 +26,7 @@ main = hakyllWith hakyllConfig $ do
         route   $ gsubRoute "static/" (const "")
         compile copyFileCompiler
 
-    -- SCSS: track partials so changes to _*.scss trigger recompile of entry point
+    -- track scss
     scssPartialDep <- makePatternDependency "src/scss/_*.scss"
     match "src/scss/_*.scss" $ compile getResourceBody
     rulesExtraDependencies [scssPartialDep] $
@@ -54,11 +54,8 @@ main = hakyllWith hakyllConfig $ do
             >>= relativizeUrls
 
     match "src/tabs/info.md" $ do
-        route   $ constRoute "info/index.html"
         compile $ pandocCompiler
             >>= saveSnapshot "content"
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "default.html") defaultContext
-            >>= relativizeUrls
 
     match "src/tabs/song1.md" $ do
         route   $ constRoute "song1/index.html"
