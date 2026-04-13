@@ -13,9 +13,7 @@ html body.home-page {
   overflow: hidden;
   z-index: -1;
 
-  // Blurred background layer
-  // Placeholder: replace with gameplay gif when available
-  //   background: url('/images/gameplay.gif') center / cover no-repeat;
+  // background: url('/images/gameplay.gif') center / cover no-repeat;
   &::before {
     content: '';
     position: absolute;
@@ -24,7 +22,6 @@ html body.home-page {
     filter: blur(8px);
   }
 
-  // Darkening overlay
   &::after {
     content: '';
     position: absolute;
