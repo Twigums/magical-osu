@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang = "en">
+    <head>
+        <meta charset = "utf-8">
+        <meta http-equiv = "x-ua-compatible" content = "ie=edge">
+        <meta name = "viewport" content = "width=device-width, initial-scale=1">
+        <title>magical-osu - $title$</title>
+        $partial("src/templates/imports.html")$
+    </head>
+
+    <body class = "song-page">
+
+        <div class = "bg-overlay"></div>
+
+        <div class = "song-progress-bar">
+            <div class = "song-progress-fill" id = "progress-fill"></div>
+        </div>
+
+        <div class = "song-lang">
+            $partial("src/templates/lang_toggle.html")$
+        </div>
+
+        <div class = "song-controls">
+            <button class = "btn-play-song" id = "btn-play-song"
+                data-title-en = "Play" data-title-jp = "プレイ"
+                title = "Play"><img src = "/images/start-button.svg" alt = "Play"></button>
+            <button class = "btn-stop-song" id = "btn-stop-song"
+                data-title-en = "Stop" data-title-jp = "ストップ"
+                title = "Stop"><img src = "/images/stop-button.svg" alt = "Stop"></button>
+        </div>
+
+        <div class = "song-info">
+            <a href = "/" class = "site-name-link">magical-osu</a>
+            <span class = "song-name" data-en = "$song-name$" data-jp = "$song-name-jp$">$song-name$</span>
+            <span class = "song-author" data-en = "$song-author$" data-jp = "$song-author-jp$">$song-author$</span>
+            <span class = "song-mapper">$song-mapper$</span>
+        </div>
+
+        <div class = "game-area" id = "game-area"></div>
+
+        <div class = "song-page-footer">
+            <a href = "/" class = "btn-back" data-en = "Back" data-jp = "戻る">Back</a>
+        </div>
+
+        <script src = "/js/main.js"></script>
+
+    </body>
+</html>

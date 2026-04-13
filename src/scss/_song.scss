@@ -1,0 +1,146 @@
+html body.song-page {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: transparent;
+  color: #fff;
+}
+
+
+.song-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 100;
+
+  .song-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: rgba(255, 255, 255, 0.85);
+    transition: width 0.1s linear;
+  }
+}
+
+.song-lang {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 100;
+}
+
+.song-controls {
+  position: fixed;
+  top: 4rem;
+  right: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
+
+  button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.song-info {
+  position: fixed;
+  top: 1rem;
+  left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 100;
+
+  .site-name-link {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    opacity: 0.85;
+
+    &:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  }
+
+  .song-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .song-author,
+  .song-mapper {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+}
+
+.game-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 4 / 3;
+  height: calc(100vh - 6rem);
+  max-width: calc((100vh - 6rem) * 4 / 3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+}
+
+.song-page-footer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.song-page .btn-back {
+  padding: 0.6rem 1.6rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    text-decoration: none;
+  }
+}

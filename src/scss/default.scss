@@ -1,5 +1,7 @@
 @use 'variables' as *;
-@use 'fonts';
 @use 'base';
-@use 'dark-mode';
+@use 'lang-toggle';
 @use 'responsive';
+@use 'home';
+@use 'song';
+@use 'tutorial';

@@ -25,9 +25,10 @@ The objects in the page fits the screen perfectly. Users across all supported di
 
 - The background is a storyboard animation for the song. The TextAlive API is used to present the lyrics as it chronologically appears in the song. After completing a line, the entire line will disappear and a new line will begin. The entire storyboard background should be slightly dim and not blurred.
 - The immediate top of the page is a slightly opaque but mostly transparent, thin, white bar for the progress of the song. In the beginning, this is 0% and will fill up proportionally as the song progresses, and the filled portion is the same white but significantly more opaque.
-- Below the progress bar, on the right side, are two buttons:
-    - The first button is a play button with the triangular play symbol. When pressing this, the song, storyboard, and progress bar begins and the button becomes dimmed and unclickable until the stop button is pressed.
-    - The second button is a stop button with a square pause button. When pressing this, the song, storyboard, and progress bar stops and both reset to the beginning. The play button will be enabled once this button is clicked.
+- Below the progress bar, on the right side, are three items:
+    - The first button/switch is the same language change from English to Japanese. It should be the same as the home tab's button and be placed in the same location.
+    - The second button is a play button with the triangular play symbol. When pressing this, the song, storyboard, and progress bar begins and the button becomes dimmed and unclickable until the stop button is pressed.
+    - The third button is a stop button with a square pause button. When pressing this, the song, storyboard, and progress bar stops and both reset to the beginning. The play button will be enabled once this button is clicked.
 - Below the progress bar, on the left, is a description of the song: the song name, the author's name, and the mapper's name.
 - In the center of the screen is the gameplay. There is a faint, slightly more opaque, white outline for where the game will take place. When the play button is pressed, the game will begin and not stop until the song is completed or the stop button is pressed.
     - Relative to the screen size, for tablet and monitor displays, the game sits at an aspect ratio of 4:3 inside the page. There is a small gap between the borders of the game and the top and bottom of the page. For phone displays, the aspect ratio is still 4:3. However, the gap between the borders is miniscule, and the described play, stop, and back buttons are now pushed more towards the center to give the game area more space.

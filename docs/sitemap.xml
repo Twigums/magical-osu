@@ -14,20 +14,6 @@
   </url>
 
   <url>
-    <loc>https://example.com/blogs/example_post_title.html</loc>
-    <lastmod>March  9, 1990</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://example.com/blog/index.html</loc>
-    <lastmod></lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://example.com/index.html</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
@@ -35,21 +21,21 @@
   </url>
 
   <url>
-    <loc>https://example.com/tab1/index.html</loc>
+    <loc>https://example.com/info/index.html</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://example.com/tab2/index.html</loc>
+    <loc>https://example.com/song1/index.html</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://example.com/tab3/index.html</loc>
+    <loc>https://example.com/tutorial/index.html</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

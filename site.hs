@@ -4,9 +4,9 @@ import System.FilePath ((</>))
 import Hakyll
 
 import Compilers (sassCompiler, tsCompiler)
-import Config    (blogsDir, hakyllConfig, siteRoot, tabPaths, templateDir)
+import Config    (hakyllConfig, siteRoot, tabPaths, templateDir)
 import Context   (postCtx)
-import Routes    (titleRoute)
+
 
 --------------------------------------------------------------------------------
 
@@ -40,46 +40,37 @@ main = hakyllWith hakyllConfig $ do
 
     match "src/tabs/home.md" $ do
         route   $ constRoute "index.html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "default.html") defaultContext
-            >>= relativizeUrls
-
-    match "src/tabs/blog.md" $ do
-        route $ gsubRoute "src/tabs/" (const "") `composeRoutes`
-                gsubRoute "\\.md$" (const "/index.html")
         compile $ do
-            blogs <- recentFirst =<< loadAll (makePattern blogsDir "*")
-            let indexCtx =
-                    listField "blogs" postCtx (return blogs) <>
-                    defaultContext
+            infoContent <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
+            let homeCtx = constField "info-content" infoContent <> defaultContext
             pandocCompiler
-                >>= applyAsTemplate indexCtx
-                >>= loadAndApplyTemplate (makeIdentifier templateDir "default.html") indexCtx
+                >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
                 >>= relativizeUrls
 
-    match (fromList ["src/tabs/tab1.md", "src/tabs/tab2.md", "src/tabs/tab3.md"]) $ do
-        route $ gsubRoute "src/tabs/" (const "") `composeRoutes`
-                gsubRoute "\\.md$" (const "/index.html")
+    match "src/tabs/tutorial.md" $ do
+        route   $ constRoute "tutorial/index.html"
         compile $ pandocCompiler
+            >>= loadAndApplyTemplate (makeIdentifier templateDir "tutorial.html") defaultContext
+            >>= relativizeUrls
+
+    match "src/tabs/info.md" $ do
+        route   $ constRoute "info/index.html"
+        compile $ pandocCompiler
+            >>= saveSnapshot "content"
             >>= loadAndApplyTemplate (makeIdentifier templateDir "default.html") defaultContext
             >>= relativizeUrls
 
-    match (makePattern blogsDir "*") $ do
-        let ctx = constField "type" "article" <> postCtx
-        route   $ metadataRoute (titleRoute "blogs/")
+    match "src/tabs/song1.md" $ do
+        route   $ constRoute "song1/index.html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "blog_post.html") ctx
-            >>= saveSnapshot "content"
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "default.html")   ctx
+            >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") defaultContext
             >>= relativizeUrls
 
     create ["sitemap.xml"] $ do
         route idRoute
         compile $ do
-            blogs       <- recentFirst =<< loadAll (makePattern blogsDir "*")
-            singlePages <- loadAll (fromList $ map (makeIdentifier "") tabPaths)
-            let pages      = blogs <> singlePages
-                sitemapCtx =
+            pages <- loadAll (fromList $ map (makeIdentifier "") tabPaths)
+            let sitemapCtx =
                     constField "root" siteRoot <>
                     listField "pages" postCtx (return pages)
             makeItem ""

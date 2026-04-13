@@ -18,23 +18,11 @@
 
         $partial("src/templates/imports.html")$
 
-        <script>if (localStorage.getItem("theme") === "dark") { document.documentElement.classList.add("dark-mode"); }</script>
-
     </head>
 
     <body>
 
         $partial("src/templates/header.html")$
-
-        <div class = "dark-mode-container">
-            <button class = "dark-mode-button" onclick = "toggleDarkMode()">
-                <img src = "/images/moon.svg"
-                    id = "theme-icon"
-                    style = "height = 1.5rem;"
-                    alt = "Dark Mode"
-                />
-            </button>
-        </div>
 
         <main role = "main">
 
