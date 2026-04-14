@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>magical-osu - song1</title>
+        <link rel="stylesheet" href="../css/default.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    </head>
+
+    <body class="song-page">
+
+        <div class="bg-overlay"></div>
+
+        <div class="song-progress-bar">
+            <div class="song-progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="song-lang">
+            <button class="lang-toggle" id="lang-toggle" type="button" role="switch" aria-checked="false" aria-label="Toggle language between English and Japanese">
+    <span class="lang-option lang-en active" data-lang="en">EN</span>
+    <span class="lang-option lang-jp" data-lang="jp">日本語</span>
+</button>
+        </div>
+
+        <div class="song-controls">
+            <button class="btn-play-song" id="btn-play-song" data-title-en="Play" data-title-jp="プレイ" title="Play"><img src="../images/start-button.svg" alt="Play"></button>
+            <button class="btn-stop-song" id="btn-stop-song" data-title-en="Stop" data-title-jp="ストップ" title="Stop"><img src="../images/stop-button.svg" alt="Stop"></button>
+        </div>
+
+        <div class="song-info">
+            <a href="../" class="site-name-link">magical-osu</a>
+            <span class="song-name" data-en="Placeholder Song 1" data-jp="プレースホルダー曲1">Placeholder Song 1</span>
+            <span class="song-author" data-en="Artist" data-jp="アーティスト">Artist</span>
+            <span class="song-mapper">Mapper</span>
+        </div>
+
+        <div class="game-area" id="game-area"></div>
+
+        <div class="song-page-footer">
+            <a href="../" class="btn-back" data-en="Back" data-jp="戻る">Back</a>
+        </div>
+
+        <script src="../js/main.js"></script>
+
+    </body>
+</html>

@@ -26,6 +26,3 @@ _tmp/
 **/.ipynb_checkpoints/
 node_modules/
 package-lock.json
-
-# hakyll will send completed files to /docs; remove below if actually deploying
-docs/
