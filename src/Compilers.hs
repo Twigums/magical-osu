@@ -10,5 +10,14 @@ sassCompiler = getResourceString >>= withItemBody
     (unixFilter "npx" ["sass", "--stdin", "--load-path=src/scss", "--no-source-map"])
 
 tsCompiler :: Compiler (Item String)
-tsCompiler = getResourceString >>= withItemBody
-    (unixFilter "npx" ["esbuild", "--loader=ts", "--target=es2020"])
+tsCompiler = do
+    path   <- getResourceFilePath
+    output <- unixFilter "npx"
+        [ "esbuild"
+        , path
+        , "--bundle"
+        , "--loader:.ts=ts"
+        , "--target=es2020"
+        , "--format=iife"
+        ] ""
+    makeItem output

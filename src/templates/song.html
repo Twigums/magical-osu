@@ -8,9 +8,19 @@
         $partial("src/templates/imports.html")$
     </head>
 
-    <body class = "song-page">
+    <body class = "song-page"
+          data-song-url = "$song-url$"
+          data-song-chart = "$song-chart$"
+          data-textalive-token = "$textalive-token$"
+          data-textalive-beat-id = "$textalive-beat-id$"
+          data-textalive-chord-id = "$textalive-chord-id$"
+          data-textalive-repetitive-segment-id = "$textalive-repetitive-segment-id$"
+          data-textalive-lyric-id = "$textalive-lyric-id$"
+          data-textalive-lyric-diff-id = "$textalive-lyric-diff-id$">
 
+        <div id = "textalive-media"></div>
         <div class = "bg-overlay"></div>
+        <div class = "song-storyboard" id = "song-storyboard"></div>
 
         <div class = "song-progress-bar">
             <div class = "song-progress-fill" id = "progress-fill"></div>
@@ -36,12 +46,20 @@
             <span class = "song-mapper">$song-mapper$</span>
         </div>
 
-        <div class = "game-area" id = "game-area"></div>
+        <div class = "game-area" id = "game-area">
+            <canvas class = "game-canvas" id = "game-canvas"></canvas>
+            <div class = "score-display" id = "score-display">
+                <span class = "score-label translatable" data-en = "Score" data-jp = "スコア">Score</span>
+                <span class = "score-value" id = "score-value">0</span>
+            </div>
+        </div>
 
         <div class = "song-page-footer">
             <a href = "/" class = "btn-back" data-en = "Back" data-jp = "戻る">Back</a>
         </div>
 
+        <script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src = "https://unpkg.com/textalive-app-api/dist/index.js"></script>
         <script src = "/js/main.js"></script>
 
     </body>

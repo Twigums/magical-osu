@@ -12,6 +12,9 @@ The game should feel satisfying and rhythmic. The margins for the judgement wind
 
 A good analogy is comparing this gameplay to Beat Saber, where note hitting is determined by swiping (slashing in Beat Saber).
 
+The TextAlive song information should be from `/wiki/6W2N_chorus_timings.jsonc`.
+The TextAlive API token to use is: AIOQxRTzslB2Pfdb.
+
 ## Notes
 There are two different types of notes in the game:
 - Click: A red note with a specified direction. The direction can be defined in any direction in the 360 degrees around the note.

@@ -4,7 +4,7 @@ import System.FilePath ((</>))
 import Hakyll
 
 import Compilers (sassCompiler, tsCompiler)
-import Config    (hakyllConfig, siteRoot, tabPaths, templateDir)
+import Config    (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
 import Context   (postCtx)
 
 
@@ -26,6 +26,11 @@ main = hakyllWith hakyllConfig $ do
         route   $ gsubRoute "static/" (const "")
         compile copyFileCompiler
 
+    -- song data (audio, chart/timing json, etc.)
+    match "src/songs/**" $ do
+        route   $ gsubRoute "src/" (const "")
+        compile copyFileCompiler
+
     -- track scss
     scssPartialDep <- makePatternDependency "src/scss/_*.scss"
     match "src/scss/_*.scss" $ compile getResourceBody
@@ -34,9 +39,12 @@ main = hakyllWith hakyllConfig $ do
             route   $ constRoute "css/default.css"
             compile sassCompiler
 
-    match "src/ts/main.ts" $ do
-        route   $ constRoute "js/main.js"
-        compile tsCompiler
+    -- track ts module changes so main.ts re-bundles
+    tsPartialDep <- makePatternDependency "src/ts/*.ts"
+    rulesExtraDependencies [tsPartialDep] $
+        match "src/ts/main.ts" $ do
+            route   $ constRoute "js/main.js"
+            compile tsCompiler
 
     match "src/tabs/home.md" $ do
         route   $ constRoute "index.html"
@@ -57,10 +65,12 @@ main = hakyllWith hakyllConfig $ do
         compile $ pandocCompiler
             >>= saveSnapshot "content"
 
+    let songCtx = constField "textalive-token" textaliveToken <> defaultContext
+
     match "src/tabs/song1.md" $ do
         route   $ constRoute "song1/index.html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") defaultContext
+            >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") songCtx
             >>= relativizeUrls
 
     create ["sitemap.xml"] $ do

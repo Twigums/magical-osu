@@ -3,6 +3,7 @@ module Config
     , templateDir
     , tabPaths
     , hakyllConfig
+    , textaliveToken
     ) where
 
 import Hakyll (Configuration (..), defaultConfiguration)
@@ -25,3 +26,6 @@ tabPaths =
 hakyllConfig :: Configuration
 hakyllConfig = defaultConfiguration
     { destinationDirectory = "docs" }
+
+textaliveToken :: String
+textaliveToken = "N6S7A1HvahiwDLUg"
