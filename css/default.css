@@ -1,0 +1,623 @@
+:root {
+  --base-color: #f7f3f2;
+  --negative-color: #272525;
+  --base-text-color: #272525;
+  --negative-text-color: #f7f3f2;
+  --base-highlight-color: #785ef0;
+  --negative-highlight-color: #d4bbff;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  font-size: 1rem;
+  color: var(--base-text-color);
+  background-color: var(--base-color);
+  font-family: "JetBrains Mono";
+}
+
+a {
+  color: var(--base-highlight-color);
+  text-decoration: underline;
+  text-decoration-color: var(--base-highlight-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+a:hover {
+  color: var(--negative-text-color);
+  text-decoration-color: var(--negative-text-color);
+  background-color: var(--base-highlight-color);
+}
+
+header {
+  border-bottom: 0.1rem solid var(--base-text-color);
+  position: relative;
+}
+
+nav {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+}
+nav a {
+  font-size: 2rem;
+  color: var(--base-text-color);
+  text-decoration: none;
+  text-transform: lowercase;
+  position: relative;
+  padding: 0 0.1rem;
+}
+nav a::after {
+  content: "|";
+  position: absolute;
+  right: -1.8rem;
+  color: var(--base-text-color);
+  pointer-events: none;
+}
+nav a:last-child::after {
+  content: "";
+}
+nav a:hover {
+  background-color: var(--base-highlight-color);
+  color: var(--negative-text-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+hr {
+  background-color: var(--base-color);
+  margin: 2rem 0.5rem;
+  border: none;
+}
+hr::before {
+  content: "* * *";
+  display: block;
+  text-align: center;
+  color: var(--base-text-color);
+}
+
+#nav-menu {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+#email {
+  color: var(--base-highlight-color);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+footer {
+  margin-top: 3rem;
+  padding: 1.2rem 0;
+  border-top: 0.1rem solid var(--base-text-color);
+  font-size: 1.2rem;
+}
+footer a:hover {
+  background-color: transparent !important;
+  color: inherit;
+}
+
+h1 {
+  font-size: 2.4rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+mark {
+  background-color: var(--base-highlight-color);
+  color: var(--negative-text-color);
+}
+
+article .header {
+  font-size: 1.4rem;
+  font-style: italic;
+}
+
+.logo a {
+  font-weight: bold;
+  color: var(--base-text-color);
+  text-decoration: none;
+}
+.logo a:hover {
+  background-color: transparent !important;
+  color: inherit;
+}
+
+.lang-toggle {
+  display: flex;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+.lang-toggle .lang-option {
+  padding: 0.4rem 0.9rem;
+  color: #fff;
+  opacity: 0.55;
+  transition: background 0.2s, opacity 0.2s;
+}
+.lang-toggle .lang-option.active {
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 1;
+  font-weight: bold;
+}
+.lang-toggle .lang-option:not(.active):hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0.8;
+}
+
+@media (max-width: 319px) {
+  body {
+    width: 90%;
+    margin: 0;
+    padding: 0 5%;
+  }
+  header {
+    margin: 1.5rem 0;
+  }
+  nav {
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+  nav a {
+    display: block;
+    line-height: 1.6;
+  }
+  nav a:hover {
+    transition: background-color 0s, color 0s;
+  }
+  footer {
+    text-align: center;
+  }
+  .logo {
+    text-align: center;
+    margin: 1rem auto 3rem;
+  }
+  .logo a {
+    font-size: 2.4rem;
+  }
+}
+@media (min-width: 320px) {
+  body {
+    width: 90%;
+    margin: 0;
+    padding: 0 5%;
+  }
+  header {
+    margin: 1.5rem 0;
+  }
+  nav {
+    margin: 0 auto 3rem;
+    justify-content: center;
+    text-align: center;
+  }
+  nav a {
+    display: inline;
+    margin: 0 0.6rem;
+  }
+  nav a:hover {
+    transition: background-color 0s, color 0s;
+  }
+  footer {
+    text-align: center;
+  }
+  .logo {
+    text-align: center;
+    margin: 1rem auto 3rem;
+  }
+  .logo a {
+    font-size: 2.4rem;
+  }
+  a {
+    transition: background-color 0s, color 0s;
+  }
+}
+@media (min-width: 1200px) {
+  body {
+    width: 62%;
+    margin: 0 auto;
+    padding: 0;
+  }
+  header {
+    margin: 0 0 0.6rem;
+    padding: 1.2rem 0;
+  }
+  nav {
+    margin: 0;
+    justify-content: flex-end;
+    text-align: right;
+  }
+  nav a {
+    margin: 0 0 0 1.2rem;
+    display: inline;
+  }
+  footer {
+    text-align: right;
+  }
+  .logo {
+    margin: 0;
+    text-align: left;
+  }
+  .logo a {
+    float: left;
+    font-size: 1.8rem;
+  }
+}
+@media (max-width: 750px) {
+  nav a {
+    display: block;
+    margin: 0.5rem 0;
+  }
+  nav a::after {
+    content: "";
+  }
+}
+html body.home-page {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+.bg-overlay::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d1a 60%, #000 100%);
+  filter: blur(8px);
+}
+.bg-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.home-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem;
+  border-bottom: none;
+  z-index: 10;
+}
+
+.home-lang {
+  align-self: flex-start;
+}
+
+.home-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: #fff;
+}
+.home-title .site-name {
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-decoration: none;
+}
+.home-title .site-name:hover {
+  text-decoration: underline;
+}
+.home-title .site-subtitle {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.home-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.layout-container[hidden] {
+  display: none;
+}
+
+.lang-jp .btn-main {
+  font-size: 1.29rem;
+}
+
+.btn-main {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  font-family: inherit;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  letter-spacing: 0.1em;
+  box-sizing: border-box;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-main:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  text-decoration: none;
+  transform: scale(1.02);
+}
+
+.btn-back {
+  padding: 0.6rem 1.6rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  align-self: flex-end;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  text-decoration: none;
+}
+
+.song-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.placeholder-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}
+
+.info-content {
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  max-width: 480px;
+}
+.info-content p {
+  margin: 0 0 0.6rem;
+  line-height: 1.7;
+}
+
+.home-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.2rem;
+  border-top: none;
+  z-index: 10;
+}
+.home-footer img {
+  height: 1.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.home-footer img:hover {
+  opacity: 1;
+}
+
+html body.song-page {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: transparent;
+  color: #fff;
+}
+
+.song-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 100;
+}
+.song-progress-bar .song-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.85);
+  transition: width 0.1s linear;
+}
+
+.song-lang {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 100;
+}
+
+.song-controls {
+  position: fixed;
+  top: 4rem;
+  right: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
+}
+.song-controls button {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.song-controls button img {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.song-controls button {
+  transition: background 0.2s;
+}
+.song-controls button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+.song-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.song-info {
+  position: fixed;
+  top: 1rem;
+  left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 100;
+}
+.song-info .site-name-link {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+.song-info .site-name-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+.song-info .song-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+.song-info .song-author,
+.song-info .song-mapper {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.game-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 4/3;
+  height: calc(100vh - 6rem);
+  max-width: calc((100vh - 6rem) * 4 / 3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+}
+
+.song-page-footer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.song-page .btn-back {
+  padding: 0.6rem 1.6rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, color 0.2s;
+}
+.song-page .btn-back:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  text-decoration: none;
+}
+
+html body.overlay-page {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: transparent;
+  color: #fff;
+}
+
+.overlay-content {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 7rem 2rem 5rem;
+}
+.overlay-content h1, .overlay-content h2, .overlay-content h3, .overlay-content h4, .overlay-content h5, .overlay-content h6 {
+  color: #fff;
+}
+.overlay-content p, .overlay-content li {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+}
+.overlay-content a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+}
+.overlay-content a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+}
+.overlay-content hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 2rem 0;
+}
+.overlay-content hr::before {
+  content: none;
+}
+
+.overlay-footer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+}
