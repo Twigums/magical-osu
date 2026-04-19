@@ -31,7 +31,6 @@ export interface Note {
   hitResult?: HitResult;
 }
 
-
 export interface GameHandle {
   setChart(notes: Note[]): void;
   reset(): void;
@@ -39,17 +38,16 @@ export interface GameHandle {
 }
 
 export interface GameDeps {
-  canvas:    HTMLCanvasElement;
-  scoreEl:   HTMLElement;
-  gameArea:  HTMLElement;
+  canvas:     HTMLCanvasElement;
+  gameArea:   HTMLElement;
+  onScore:    (score: number) => void;
+  onFeedback: (result: HitResult, x: number, y: number) => void;
 }
 
 export function createGame(deps: GameDeps): GameHandle {
-  const { canvas, scoreEl, gameArea } = deps;
+  const { canvas, gameArea, onScore, onFeedback } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
-
-  // --- Canvas sizing -----------------------------------------------------
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();
@@ -62,8 +60,7 @@ export function createGame(deps: GameDeps): GameHandle {
 
   const getScale = (): number => canvas.width / LOGICAL_W;
 
-  // --- Input -------------------------------------------------------------
-
+  // input
   const pointer = { x: 0, y: 0, prevX: 0, prevY: 0, held: false };
   const keysHeld = new Set<string>();
   const actionHeld = (): boolean => pointer.held || keysHeld.size > 0;
@@ -87,26 +84,13 @@ export function createGame(deps: GameDeps): GameHandle {
   window.addEventListener("keydown",  e => { if (!e.repeat) keysHeld.add(e.key); });
   window.addEventListener("keyup",    e => { keysHeld.delete(e.key); });
 
-  // --- State -------------------------------------------------------------
-
+  // state
   let notes: Note[] = [];
   let score = 0;
 
-  const setScore = (v: number): void => { score = v; scoreEl.textContent = String(score); };
+  const setScore = (v: number): void => { score = v; onScore(v); };
 
-  // --- Judgement ---------------------------------------------------------
-
-  const showFeedback = (result: HitResult, x: number, y: number): void => {
-    const rect = gameArea.getBoundingClientRect();
-    const el = document.createElement("div");
-    el.className = `hit-feedback hit-${result}`;
-    el.textContent = result.toUpperCase();
-    el.style.left = `${(x / LOGICAL_W) * rect.width}px`;
-    el.style.top  = `${(y / LOGICAL_H) * rect.height}px`;
-    gameArea.appendChild(el);
-    setTimeout(() => el.remove(), 700);
-  };
-
+  // judgement
   const scoreFor = (deltaMs: number): { result: HitResult; points: number } => {
     const d = Math.abs(deltaMs);
     if (d <= PERFECT_MS) return { result: "perfect", points: PERFECT_POINTS };
@@ -114,11 +98,7 @@ export function createGame(deps: GameDeps): GameHandle {
     return { result: "miss", points: 0 };
   };
 
-  // Wiki: "moving from behind the note to past the arrow in the specified
-  // direction while a key is held. When the cursor reaches the center of the
-  // note is when the judgement is called." Modeled as crossing the line
-  // perpendicular to the note's direction through note center, passing
-  // within NOTE_RADIUS of center, with movement direction within ±45°.
+  // definition of hit
   const tryHit = (note: Note, songMs: number): void => {
     if (note.state !== "pending") return;
     if (!actionHeld()) return;
@@ -146,7 +126,7 @@ export function createGame(deps: GameDeps): GameHandle {
     note.state = "hit";
     note.hitResult = result;
     if (points > 0) setScore(score + points);
-    showFeedback(result, note.x, note.y);
+    onFeedback(result, note.x, note.y);
   };
 
   const expireMisses = (songMs: number): void => {
@@ -155,13 +135,12 @@ export function createGame(deps: GameDeps): GameHandle {
       if (songMs - n.time > GOOD_MS) {
         n.state = "missed";
         n.hitResult = "miss";
-        showFeedback("miss", n.x, n.y);
+        onFeedback("miss", n.x, n.y);
       }
     }
   };
 
-  // --- Rendering ---------------------------------------------------------
-
+  // note rendering
   const drawNote = (note: Note, appearProgress: number, scale: number): void => {
     const cx = note.x * scale;
     const cy = note.y * scale;
@@ -226,8 +205,7 @@ export function createGame(deps: GameDeps): GameHandle {
     }
   };
 
-  // --- Public API --------------------------------------------------------
-
+  // use textalive
   return {
     setChart(n: Note[]): void { notes = n; },
     reset(): void {

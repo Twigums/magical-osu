@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "lib": ["ES2020", "DOM"],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noEmit": true
   },
-  "include": ["src/ts/**/*.ts"]
+  "include": ["src/ts/**/*"],
+  "exclude": ["src/ts/.ipynb_checkpoints/**", "node_modules"]
 }

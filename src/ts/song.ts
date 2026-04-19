@@ -1,11 +1,10 @@
 // Song page: reads body data-* attributes, starts TextAlive player, and drives game elements
 
-import { createGame } from "./game";
-import type { Note } from "./game";
+import type { GameHandle, Note } from "./game";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
-export function initSongPage(): void {
+export function initSongPage(game: GameHandle): void {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
   const chart   = body.dataset.songChart ?? "";
@@ -21,14 +20,10 @@ export function initSongPage(): void {
   const btnPlay      = document.getElementById("btn-play-song")   as HTMLButtonElement | null;
   const btnStop      = document.getElementById("btn-stop-song")   as HTMLButtonElement | null;
   const progressFill = document.getElementById("progress-fill")   as HTMLElement       | null;
-  const canvas       = document.getElementById("game-canvas")     as HTMLCanvasElement | null;
-  const scoreEl      = document.getElementById("score-value")     as HTMLElement       | null;
   const storyboardEl = document.getElementById("song-storyboard") as HTMLElement       | null;
-  const gameArea     = document.getElementById("game-area")       as HTMLElement       | null;
 
-  if (!btnPlay || !btnStop || !progressFill || !canvas || !scoreEl || !gameArea) return;
+  if (!btnPlay || !btnStop || !progressFill) return;
 
-  const game = createGame({ canvas, scoreEl, gameArea });
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
 
   let player: TextAlivePlayer | null = null;
@@ -118,5 +113,6 @@ export function initSongPage(): void {
 
     requestAnimationFrame(loop);
   };
+
   requestAnimationFrame(loop);
 }

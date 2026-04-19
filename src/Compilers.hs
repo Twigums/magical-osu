@@ -17,7 +17,10 @@ tsCompiler = do
         , path
         , "--bundle"
         , "--loader:.ts=ts"
+        , "--loader:.tsx=tsx"
+        , "--jsx=automatic"
         , "--target=es2020"
         , "--format=iife"
+        , "--minify"
         ] ""
     makeItem output

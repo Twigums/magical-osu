@@ -1,14 +1,25 @@
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
 import { initLangToggle } from "./lang";
-import { initHomePage }   from "./home";
 import { initSongPage }   from "./song";
+import { HomeLayoutSwitcher } from "./react/HomeLayoutSwitcher";
+import { GameSurface }        from "./react/GameSurface";
 
 document.addEventListener("DOMContentLoaded", () => {
   initLangToggle();
 
-  if (document.getElementById("layout-original")) {
-    initHomePage();
+  const homeRoot = document.getElementById("home-root");
+  if (homeRoot) {
+    const infoContent = homeRoot.dataset.infoContent ?? "";
+    createRoot(homeRoot).render(
+      createElement(HomeLayoutSwitcher, { infoContent })
+    );
   }
-  if (document.getElementById("btn-play-song")) {
-    initSongPage();
+
+  const gameRoot = document.getElementById("game-root");
+  if (gameRoot) {
+    createRoot(gameRoot).render(
+      createElement(GameSurface, { onReady: game => initSongPage(game) })
+    );
   }
 });

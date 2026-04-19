@@ -23,28 +23,7 @@
         </header>
 
         <main class = "home-main">
-
-            <div id = "layout-original" class = "layout-container">
-                <button class = "btn-main translatable" id = "btn-play" data-en = "Play" data-jp = "プレイ">Play</button>
-                <a href = "/tutorial/" class = "btn-main translatable" data-en = "Tutorial" data-jp = "チュートリアル">Tutorial</a>
-                <button class = "btn-main translatable" id = "btn-info" data-en = "Info" data-jp = "情報">Info</button>
-            </div>
-
-            <div id = "layout-play" class = "layout-container" hidden>
-                <div class = "song-list">
-                    <a href = "/song1/" class = "btn-main translatable" data-en = "Song 1" data-jp = "ソング 1">Song 1</a>
-                    <p class = "placeholder-text translatable" data-en = "More songs will be added later." data-jp = "他の曲は後に追加されます。">More songs will be added later.</p>
-                </div>
-                <button class = "btn-back translatable" id = "back-from-play" data-en = "Back" data-jp = "戻る">Back</button>
-            </div>
-
-            <div id = "layout-info" class = "layout-container" hidden>
-                <div class = "info-content">
-                    $info-content$
-                </div>
-                <button class = "btn-back translatable" id = "back-from-info" data-en = "Back" data-jp = "戻る">Back</button>
-            </div>
-
+            <div id = "home-root" data-info-content='$info-content$'></div>
         </main>
 
         <footer class = "home-footer">

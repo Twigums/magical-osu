@@ -16,6 +16,16 @@ makePattern dir glob = fromGlob (dir </> glob)
 makeIdentifier :: FilePath -> FilePath -> Identifier
 makeIdentifier dir file = fromFilePath (dir </> file)
 
+escapeForAttr :: String -> String
+escapeForAttr = concatMap escape
+  where
+    escape '&'  = "&amp;"
+    escape '<'  = "&lt;"
+    escape '>'  = "&gt;"
+    escape '"'  = "&quot;"
+    escape '\'' = "&#39;"
+    escape c    = [c]
+
 --------------------------------------------------------------------------------
 
 main :: IO ()
@@ -39,9 +49,10 @@ main = hakyllWith hakyllConfig $ do
             route   $ constRoute "css/default.css"
             compile sassCompiler
 
-    -- track ts module changes so main.ts re-bundles
-    tsPartialDep <- makePatternDependency "src/ts/*.ts"
-    rulesExtraDependencies [tsPartialDep] $
+    -- track ts/tsx module changes so main.ts re-bundles
+    tsPartialDep  <- makePatternDependency "src/ts/*.ts"
+    tsxPartialDep <- makePatternDependency "src/ts/react/*.tsx"
+    rulesExtraDependencies [tsPartialDep, tsxPartialDep] $
         match "src/ts/main.ts" $ do
             route   $ constRoute "js/main.js"
             compile tsCompiler
@@ -50,7 +61,7 @@ main = hakyllWith hakyllConfig $ do
         route   $ constRoute "index.html"
         compile $ do
             infoContent <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
-            let homeCtx = constField "info-content" infoContent <> defaultContext
+            let homeCtx = constField "info-content" (escapeForAttr infoContent) <> defaultContext
             pandocCompiler
                 >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
                 >>= relativizeUrls
