@@ -2,49 +2,40 @@ name: Sync PR to upstream
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
       - 'pr-meta/**'
 
 jobs:
   sync-pr:
     runs-on: ubuntu-latest
+    if: github.event.repository.fork == true
     steps:
       - uses: actions/checkout@v4
-
-      - name: Fetch PR metadata
-        env:
-          BRANCH: ${{ github.ref_name }}
-        run: |
-          git fetch origin pr-meta/$BRANCH 2>/dev/null || {
-            echo "No pr-meta/$BRANCH branch found — skipping PR sync."
-            exit 0
-          }
-          git show origin/pr-meta/$BRANCH:pr-meta.json > /tmp/pr-meta.json
 
       - name: Create or update upstream PR
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
-          BRANCH: ${{ github.ref_name }}
+          FORK_OWNER: ${{ github.repository_owner }}
+          UPSTREAM_REPO: ${{ github.event.repository.parent.full_name }}
         run: |
-          [ -f /tmp/pr-meta.json ] || exit 0
+          BRANCH=${GITHUB_REF_NAME#pr-meta/}
 
-          TITLE=$(jq -r .title /tmp/pr-meta.json)
-          BODY=$(jq -r .body /tmp/pr-meta.json)
+          TITLE=$(jq -r .title pr-meta.json)
+          BODY=$(jq -r .body pr-meta.json)
 
           EXISTING=$(gh pr list \
-            --repo Twigums/magical-osu \
-            --head vekt0r-github:$BRANCH \
+            --repo $UPSTREAM_REPO \
+            --head $FORK_OWNER:$BRANCH \
             --json number -q '.[0].number')
 
           if [ -n "$EXISTING" ]; then
             gh pr edit $EXISTING \
-              --repo Twigums/magical-osu \
+              --repo $UPSTREAM_REPO \
               --title "$TITLE" --body "$BODY"
           else
             gh pr create \
-              --repo Twigums/magical-osu \
-              --head vekt0r-github:$BRANCH \
+              --repo $UPSTREAM_REPO \
+              --head $FORK_OWNER:$BRANCH \
               --base main \
               --title "$TITLE" --body "$BODY"
           fi
