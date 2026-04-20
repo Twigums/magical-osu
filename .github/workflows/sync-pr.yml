@@ -24,18 +24,18 @@ jobs:
           BODY=$(jq -r .body pr-meta.json)
 
           EXISTING=$(gh pr list \
-            --repo $UPSTREAM_REPO \
-            --head $FORK_OWNER:$BRANCH \
+            --repo "$UPSTREAM_REPO" \
+            --head "$FORK_OWNER:$BRANCH" \
             --json number -q '.[0].number')
 
           if [ -n "$EXISTING" ]; then
-            gh pr edit $EXISTING \
-              --repo $UPSTREAM_REPO \
+            gh pr edit "$EXISTING" \
+              --repo "$UPSTREAM_REPO" \
               --title "$TITLE" --body "$BODY"
           else
             gh pr create \
-              --repo $UPSTREAM_REPO \
-              --head $FORK_OWNER:$BRANCH \
+              --repo "$UPSTREAM_REPO" \
+              --head "$FORK_OWNER:$BRANCH" \
               --base main \
               --title "$TITLE" --body "$BODY"
           fi
