@@ -2,6 +2,12 @@
   "name": "magical-osu",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "setup": "npm install && stack build",
+    "build": "[ -f .env ] && . .env; stack exec site build",
+    "rebuild": "[ -f .env ] && . .env; stack exec site rebuild",
+    "watch": "[ -f .env ] && . .env; stack exec site watch"
+  },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

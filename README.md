@@ -1,26 +1,21 @@
 ## How to Build
 
-Requires `npm` (for `.ts`, `.scss`), `stack`, and `ghc`.'
+Requires `node`/`npm` and `stack`/`ghc`.
 
-1. Install node modules:
+1. Install dependencies + build haskell binary:
+   ```bash
+   npm run setup
    ```
-   npm install
+2. Generate the static site:
+   ```bash
+   npm run rebuild
    ```
-
-2. Build the Haskell executable:
+3. Preview locally (optional):
+   ```bash
+   npm run watch
    ```
-   stack build
-   ```
-3. Generate the static site:
-   ```
-   stack exec site rebuild
-   ```
-4. Preview locally (optional):
-   ```
-   stack exec site watch
-   ```
-5. Deploy to GitHub Pages:
-   ```
+4. Deploy to GitHub Pages:
+   ```bash
    git add -A
    git commit -m "publish."
    git push origin
