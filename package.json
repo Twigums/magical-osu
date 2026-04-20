@@ -5,9 +5,9 @@
   "scripts": {
     "setup": "npm install && stack build --system-ghc",
     "setup:dev": "npm run setup && git config core.hooksPath .githooks",
-    "build": "[ -f .env ] && . .env; stack exec --system-ghc site -- build",
-    "rebuild": "[ -f .env ] && . .env; stack exec --system-ghc site -- rebuild",
-    "watch": "[ -f .env ] && . .env; stack exec --system-ghc site -- watch"
+    "build": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- build",
+    "rebuild": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild",
+    "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch"
   },
   "dependencies": {
     "react": "^18.3.1",
