@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "setup": "npm install && stack build",
-    "build": "[ -f .env ] && . .env; stack exec site build",
-    "rebuild": "[ -f .env ] && . .env; stack exec site rebuild",
-    "watch": "[ -f .env ] && . .env; stack exec site watch"
+    "setup": "npm install && stack build --system-ghc",
+    "setup:dev": "npm run setup && git config core.hooksPath .githooks",
+    "build": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- build",
+    "rebuild": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild",
+    "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch"
   },
   "dependencies": {
     "react": "^18.3.1",

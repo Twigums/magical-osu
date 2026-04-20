@@ -1,0 +1,4 @@
+{
+  "title": "chore: add npm scripts, .env support, and update README",
+  "body": "## Summary\n\nAdds npm scripts as a unified interface for build/dev commands, `.env` file support for local config overrides, and updates the README.\n\n## Changes\n\n- **`package.json`** — added `setup`, `build`, `rebuild`, `watch` scripts wrapping `stack` commands; all auto-source `.env` if present\n- **`site.hs`** — reads `PREVIEW_HOST` env var to override preview server bind address (default: `127.0.0.1`)\n- **`.env.example`** — documents available env vars; copy to `.env` to override locally\n- **`.gitignore`** — added `.env`\n- **`README.md`** — rewritten to use npm scripts; concise single-section format\n\n## Testing\n\nManual — ran `npm run watch` with and without `.env` present.\n\n## Related Issues\n\nNone"
+}

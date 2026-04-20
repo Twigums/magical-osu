@@ -1,0 +1,41 @@
+name: Sync PR to upstream
+
+on:
+  push:
+    branches:
+      - 'pr-meta/**'
+
+jobs:
+  sync-pr:
+    runs-on: ubuntu-latest
+    if: github.event.repository.fork == true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create or update upstream PR
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
+          FORK_OWNER: ${{ github.repository_owner }}
+          UPSTREAM_REPO: Twigums/magical-osu
+        run: |
+          BRANCH=${GITHUB_REF_NAME#pr-meta/}
+
+          TITLE=$(jq -r .title pr-meta.json)
+          BODY=$(jq -r .body pr-meta.json)
+
+          EXISTING=$(gh pr list \
+            --repo "$UPSTREAM_REPO" \
+            --head "$FORK_OWNER:$BRANCH" \
+            --json number -q '.[0].number')
+
+          if [ -n "$EXISTING" ]; then
+            gh pr edit "$EXISTING" \
+              --repo "$UPSTREAM_REPO" \
+              --title "$TITLE" --body "$BODY"
+          else
+            gh pr create \
+              --repo "$UPSTREAM_REPO" \
+              --head "$FORK_OWNER:$BRANCH" \
+              --base main \
+              --title "$TITLE" --body "$BODY"
+          fi

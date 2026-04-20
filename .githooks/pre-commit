@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if git diff --cached --name-only | grep -q '\.hs$'; then
+    echo "[pre-commit] .hs files changed, building..."
+    stack build --system-ghc
+fi
