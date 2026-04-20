@@ -35,7 +35,10 @@ main = do
     let cfg = case host of
                 Just h  -> hakyllConfig { previewHost = h }
                 Nothing -> hakyllConfig
-    hakyllWith cfg $ do
+    hakyllWith cfg rules
+
+rules :: Rules ()
+rules = do
     match (makePattern templateDir "*") $ compile templateBodyCompiler
 
     match "static/**" $ do
