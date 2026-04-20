@@ -26,3 +26,6 @@ _tmp/
 **/.ipynb_checkpoints/
 node_modules/
 package-lock.json
+
+# let github actions handle site generation and hosting
+docs/

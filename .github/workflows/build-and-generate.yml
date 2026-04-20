@@ -1,0 +1,51 @@
+name: Build and Generate (on `docs` branch)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: haskell-actions/setup@v2.7
+      id: setup-haskell
+      with:
+        ghc-version: '9.6.6'
+        enable-stack: true
+        stack-version: 'latest'
+
+    # CACHES
+
+    - name: Cache - stack global package db
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.setup-haskell.outputs.stack-root }}
+        key: ${{ runner.os }}-stack-global-${{ hashFiles('**/*.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-global-
+
+    - name: Cache - .stack-work
+      uses: actions/cache@v4
+      with:
+        path: |
+          .stack-work
+          */.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('**/*.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-work-
+
+    - name: Build app
+      run: stack build --system-ghc
+
+    - name: Generate site
+      run: stack exec --system-ghc site build
+
+    - name: Deploy to branch
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: docs
