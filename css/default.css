@@ -35,35 +35,6 @@ header {
   position: relative;
 }
 
-nav {
-  display: flex;
-  justify-content: flex-end;
-  text-align: right;
-}
-nav a {
-  font-size: 2rem;
-  color: var(--base-text-color);
-  text-decoration: none;
-  text-transform: lowercase;
-  position: relative;
-  padding: 0 0.1rem;
-}
-nav a::after {
-  content: "|";
-  position: absolute;
-  right: -1.8rem;
-  color: var(--base-text-color);
-  pointer-events: none;
-}
-nav a:last-child::after {
-  content: "";
-}
-nav a:hover {
-  background-color: var(--base-highlight-color);
-  color: var(--negative-text-color);
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
 hr {
   background-color: var(--base-color);
   margin: 2rem 0.5rem;
@@ -74,18 +45,6 @@ hr::before {
   display: block;
   text-align: center;
   color: var(--base-text-color);
-}
-
-#nav-menu {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-}
-
-#email {
-  color: var(--base-highlight-color);
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 footer {
@@ -110,21 +69,6 @@ h2 {
 mark {
   background-color: var(--base-highlight-color);
   color: var(--negative-text-color);
-}
-
-article .header {
-  font-size: 1.4rem;
-  font-style: italic;
-}
-
-.logo a {
-  font-weight: bold;
-  color: var(--base-text-color);
-  text-decoration: none;
-}
-.logo a:hover {
-  background-color: transparent !important;
-  color: inherit;
 }
 
 .lang-toggle {
@@ -152,112 +96,6 @@ article .header {
   opacity: 0.8;
 }
 
-@media (max-width: 319px) {
-  body {
-    width: 90%;
-    margin: 0;
-    padding: 0 5%;
-  }
-  header {
-    margin: 1.5rem 0;
-  }
-  nav {
-    margin: 0 auto 3rem;
-    text-align: center;
-  }
-  nav a {
-    display: block;
-    line-height: 1.6;
-  }
-  nav a:hover {
-    transition: background-color 0s, color 0s;
-  }
-  footer {
-    text-align: center;
-  }
-  .logo {
-    text-align: center;
-    margin: 1rem auto 3rem;
-  }
-  .logo a {
-    font-size: 2.4rem;
-  }
-}
-@media (min-width: 320px) {
-  body {
-    width: 90%;
-    margin: 0;
-    padding: 0 5%;
-  }
-  header {
-    margin: 1.5rem 0;
-  }
-  nav {
-    margin: 0 auto 3rem;
-    justify-content: center;
-    text-align: center;
-  }
-  nav a {
-    display: inline;
-    margin: 0 0.6rem;
-  }
-  nav a:hover {
-    transition: background-color 0s, color 0s;
-  }
-  footer {
-    text-align: center;
-  }
-  .logo {
-    text-align: center;
-    margin: 1rem auto 3rem;
-  }
-  .logo a {
-    font-size: 2.4rem;
-  }
-  a {
-    transition: background-color 0s, color 0s;
-  }
-}
-@media (min-width: 1200px) {
-  body {
-    width: 62%;
-    margin: 0 auto;
-    padding: 0;
-  }
-  header {
-    margin: 0 0 0.6rem;
-    padding: 1.2rem 0;
-  }
-  nav {
-    margin: 0;
-    justify-content: flex-end;
-    text-align: right;
-  }
-  nav a {
-    margin: 0 0 0 1.2rem;
-    display: inline;
-  }
-  footer {
-    text-align: right;
-  }
-  .logo {
-    margin: 0;
-    text-align: left;
-  }
-  .logo a {
-    float: left;
-    font-size: 1.8rem;
-  }
-}
-@media (max-width: 750px) {
-  nav a {
-    display: block;
-    margin: 0.5rem 0;
-  }
-  nav a::after {
-    content: "";
-  }
-}
 html body.home-page {
   margin: 0;
   padding: 0;
@@ -340,10 +178,6 @@ html body.home-page {
   gap: 1.2rem;
   width: 100%;
   max-width: 320px;
-}
-
-.layout-container[hidden] {
-  display: none;
 }
 
 .lang-jp .btn-main {
@@ -437,14 +271,69 @@ html body.home-page {
   opacity: 1;
 }
 
+.textalive-banner {
+  display: none !important;
+}
+
 html body.song-page {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  background-color: transparent;
+  background-color: #000;
   color: #fff;
+}
+
+.song-page .bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+}
+
+.song-storyboard {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+}
+.song-storyboard .storyboard-line {
+  font-family: inherit;
+  font-size: clamp(1.6rem, 3.2vw, 3rem);
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.88);
+  text-align: center;
+  padding: 0 2rem;
+  max-width: 90%;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px rgba(150, 120, 255, 0.45);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.song-storyboard .storyboard-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.song-storyboard .storyboard-line .storyboard-char {
+  display: inline-block;
+  opacity: 0.25;
+  transition: opacity 0.12s ease, color 0.12s ease;
+}
+.song-storyboard .storyboard-line .storyboard-char.active {
+  opacity: 1;
+  color: #fff;
+  text-shadow: 0 0 22px rgba(200, 170, 255, 0.8);
+}
+.song-storyboard .storyboard-line .storyboard-char.sung {
+  opacity: 0.85;
 }
 
 .song-progress-bar {
@@ -547,8 +436,71 @@ html body.song-page {
   max-width: calc((100vh - 6rem) * 4 / 3);
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: transparent;
+  overflow: hidden;
+}
+.game-area .game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
 }
 
+.score-display {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+.score-display .score-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+.score-display .score-value {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.hit-feedback {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+  animation: hit-feedback-fade 0.6s ease-out forwards;
+}
+.hit-feedback.hit-perfect {
+  color: #ffd94a;
+}
+.hit-feedback.hit-good {
+  color: #8cf0ff;
+}
+.hit-feedback.hit-miss {
+  color: #ff6b6b;
+}
+
+@keyframes hit-feedback-fade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -120%) scale(1.1);
+  }
+}
 .song-page-footer {
   position: fixed;
   bottom: 1.5rem;
@@ -575,6 +527,20 @@ html body.song-page {
   text-decoration: none;
 }
 
+@media (max-width: 600px) {
+  .game-area {
+    height: calc(100vh - 0.5rem);
+    max-width: calc((100vh - 0.5rem) * 4 / 3);
+  }
+  .song-controls {
+    right: 0.75rem;
+    top: 2.5rem;
+  }
+  .song-lang {
+    right: 0.75rem;
+    top: 0.5rem;
+  }
+}
 html body.overlay-page {
   margin: 0;
   padding: 0;
