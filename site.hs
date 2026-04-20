@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+import System.Environment (lookupEnv)
 import System.FilePath ((</>))
 
 import Hakyll
@@ -29,7 +30,12 @@ escapeForAttr = concatMap escape
 --------------------------------------------------------------------------------
 
 main :: IO ()
-main = hakyllWith hakyllConfig $ do
+main = do
+    host <- lookupEnv "PREVIEW_HOST"
+    let cfg = case host of
+                Just h  -> hakyllConfig { previewHost = h }
+                Nothing -> hakyllConfig
+    hakyllWith cfg $ do
     match (makePattern templateDir "*") $ compile templateBodyCompiler
 
     match "static/**" $ do
