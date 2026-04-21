@@ -10,6 +10,24 @@ export function initSongPage(game: GameHandle): void {
   const chart   = body.dataset.songChart ?? "";
   const token   = body.dataset.textaliveToken ?? "";
 
+  const loadingScreen = document.getElementById("loading-screen");
+  const loadingBar    = document.getElementById("loading-bar-fill") as HTMLElement | null;
+
+  const dismissLoading = (): void => {
+    if (!loadingScreen) return;
+    if (loadingBar) loadingBar.style.width = "100%";
+    setTimeout(() => {
+      loadingScreen.classList.add("loaded");
+      loadingScreen.addEventListener("transitionend", () => loadingScreen.remove(), { once: true });
+    }, 400);
+  };
+
+  if (loadingBar) {
+    requestAnimationFrame(() => { loadingBar.style.width = "80%"; });
+  }
+
+  const loadingTimeout = setTimeout(dismissLoading, 15000);
+
   const beatId               = parseInt(body.dataset.textaliveBeatId ?? "");
   const chordId              = parseInt(body.dataset.textaliveChordId ?? "");
   const repetitiveSegmentId  = parseInt(body.dataset.textaliveRepetitiveSegmentId ?? "");
@@ -31,6 +49,10 @@ export function initSongPage(game: GameHandle): void {
   let songLengthMs = 0;
 
   const TextAliveApp = window.TextAliveApp;
+  if (!TextAliveApp || !songUrl || !token) {
+    clearTimeout(loadingTimeout);
+    dismissLoading();
+  }
   if (TextAliveApp && songUrl && token) {
     btnPlay.disabled = true;
 
@@ -67,6 +89,8 @@ export function initSongPage(game: GameHandle): void {
       onTimerReady() {
         playerReady = true;
         btnPlay.disabled = false;
+        clearTimeout(loadingTimeout);
+        dismissLoading();
       },
       onPlay()  { btnPlay.disabled = true;  },
       onPause() { btnPlay.disabled = false; },
