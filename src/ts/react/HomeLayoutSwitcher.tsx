@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLang } from "./useLang";
+import { withPath } from "../sitePath";
 
 type Layout = "original" | "play" | "info";
 
@@ -19,7 +20,7 @@ export function HomeLayoutSwitcher({ infoContent }: Props) {
           <button className="btn-main" onClick={() => setLayout("play")}>
             {t("Play", "プレイ")}
           </button>
-          <a href="/tutorial/" className="btn-main">
+          <a href={withPath('/tutorial/')} className="btn-main">
             {t("Tutorial", "チュートリアル")}
           </a>
           <button className="btn-main" onClick={() => setLayout("info")}>
@@ -30,7 +31,7 @@ export function HomeLayoutSwitcher({ infoContent }: Props) {
       {layout === "play" && (
         <>
           <div className="song-list">
-            <a href="/song1/" className="btn-main">
+            <a href={withPath('/song1/')} className="btn-main">
               {t("Song 1", "ソング 1")}
             </a>
             <p className="placeholder-text">

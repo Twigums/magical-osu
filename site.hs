@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-import System.Environment (lookupEnv)
-import System.FilePath ((</>))
+import Data.List            (dropWhileEnd)
+import Data.Maybe           (fromMaybe)
+import System.Environment   (getArgs, lookupEnv, withArgs)
+import System.FilePath      ((</>))
 
 import Hakyll
 
@@ -28,18 +30,43 @@ escapeForAttr = concatMap escape
     escape '\'' = "&#39;"
     escape c    = [c]
 
+-- Extract --path VALUE from args, returning (path, remaining args).
+-- Falls back to empty string if not present; caller supplies env-var fallback.
+extractSitePath :: [String] -> (String, [String])
+extractSitePath = go []
+  where
+    go acc []                    = ("", reverse acc)
+    go acc ("--path" : p : rest) = (p, reverse acc ++ rest)
+    go acc (a : rest)            = go (a : acc) rest
+
+normalizeSitePath :: String -> String
+normalizeSitePath ""   = ""
+normalizeSitePath path =
+    let stripped = dropWhile (== '/') path
+        trimmed  = dropWhileEnd (== '/') stripped
+    in "/" ++ trimmed
+
 --------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-    host <- lookupEnv "PREVIEW_HOST"
-    let cfg = case host of
-                Just h  -> hakyllConfig { previewHost = h }
-                Nothing -> hakyllConfig
-    hakyllWith cfg rules
+    args           <- getArgs
+    let (pathArg, remainingArgs) = extractSitePath args
+    pathEnv        <- fromMaybe "" <$> lookupEnv "SITE_PATH"
+    let sitePath = normalizeSitePath (if null pathArg then pathEnv else pathArg)
+    host           <- lookupEnv "PREVIEW_HOST"
+    let baseCfg = case host of
+                    Just h  -> hakyllConfig { previewHost = h }
+                    Nothing -> hakyllConfig
+        cfg = if null sitePath
+                then baseCfg
+                else baseCfg { destinationDirectory = "docs" ++ sitePath }
+    withArgs remainingArgs $ hakyllWith cfg (rules sitePath)
 
-rules :: Rules ()
-rules = do
+rules :: String -> Rules ()
+rules sitePath = do
+    let baseCtx = constField "path" sitePath <> defaultContext
+
     match (makePattern templateDir "*") $ compile templateBodyCompiler
 
     match "static/**" $ do
@@ -76,28 +103,28 @@ rules = do
         route   $ constRoute "index.html"
         compile $ do
             infoContent <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
-            let homeCtx = constField "info-content" (escapeForAttr infoContent) <> defaultContext
+            let homeCtx = constField "info-content" (escapeForAttr infoContent) <> baseCtx
             pandocCompiler
                 >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
-                >>= relativizeUrls
 
     match "src/tabs/tutorial.md" $ do
         route   $ constRoute "tutorial/index.html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "tutorial.html") defaultContext
-            >>= relativizeUrls
+            >>= loadAndApplyTemplate (makeIdentifier templateDir "tutorial.html") baseCtx
 
     match "src/tabs/info.md" $ do
         compile $ pandocCompiler
             >>= saveSnapshot "content"
 
-    let songCtx = constField "textalive-token" textaliveToken <> defaultContext
+    let songCtx =
+          constField "textalive-token" textaliveToken <>
+          constField "song-chart" (sitePath ++ "/songs/song1/chart.json") <>
+          baseCtx
 
     match "src/tabs/song1.md" $ do
         route   $ constRoute "song1/index.html"
         compile $ pandocCompiler
             >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") songCtx
-            >>= relativizeUrls
 
     create ["sitemap.xml"] $ do
         route idRoute
@@ -105,6 +132,7 @@ rules = do
             pages <- loadAll (fromList $ map (makeIdentifier "") tabPaths)
             let sitemapCtx =
                     constField "root" siteRoot <>
+                    constField "path" sitePath <>
                     listField "pages" postCtx (return pages)
             makeItem ""
                 >>= loadAndApplyTemplate (makeIdentifier templateDir "sitemap.xml") sitemapCtx

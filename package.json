@@ -7,7 +7,8 @@
     "setup:dev": "npm run setup && git config core.hooksPath .githooks",
     "build": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- build",
     "rebuild": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild",
-    "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch"
+    "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch",
+    "rebuild:pages": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild --path /magical-osu"
   },
   "dependencies": {
     "react": "^18.3.1",

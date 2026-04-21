@@ -27,6 +27,10 @@ npm run rebuild
 
 # Watch for changes and rebuild
 npm run watch
+
+# Rebuild with sub-path (e.g. for GitHub Pages); also accepts --path /sub-path flag
+SITE_PATH=/magical-osu npm run rebuild
+# or: npm run rebuild:pages
 ```
 
 ### Haskell

@@ -23,6 +23,8 @@ Requires `node`/`npm` and `stack`/`ghc`.
 
 The compiled site outputs to `./docs`. Configure GitHub Pages to serve from the `docs` folder on your main branch.
 
+Set `SITE_PATH=/sub-path` (or pass `--path /sub-path`) when hosting at a sub-path. The CI workflow sets this automatically from the repo name.
+
 ## Common Issues
 
 While building, `The program 'pkg-config' version >= ??? is required but it could not be found.`: This indicates that you need to install `pkg-config`.
