@@ -1,5 +1,46 @@
 .textalive-banner { display: none !important; }
 
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  transition: opacity 0.4s ease;
+
+  &.loaded {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.loading-bar-track {
+  width: min(320px, 60vw);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loading-text {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 html body.song-page {
   margin: 0;
   padding: 0;

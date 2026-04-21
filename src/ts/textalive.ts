@@ -1,5 +1,3 @@
-// textalive functions
-
 export interface TextAlivePlayerOptions {
   app: {
     token: string;

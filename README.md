@@ -12,7 +12,7 @@ Requires `node`/`npm` and `stack`/`ghc`.
    ```
 3. Preview locally (optional):
    ```bash
-   npm run watch
+   npm run watch (-- --host {IP_ADDRESS})
    ```
 4. Deploy to GitHub Pages:
    ```bash
@@ -22,6 +22,8 @@ Requires `node`/`npm` and `stack`/`ghc`.
    ```
 
 The compiled site outputs to `./docs`. Configure GitHub Pages to serve from the `docs` folder on your main branch.
+
+Set `SITE_PATH=/sub-path` (or pass `--path /sub-path`) when hosting at a sub-path. The CI workflow sets this automatically from the repo name.
 
 ## Common Issues
 

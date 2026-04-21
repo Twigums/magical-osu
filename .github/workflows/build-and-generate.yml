@@ -44,11 +44,15 @@ jobs:
       run: npm run setup # runs stack
 
     - name: Generate site
+      env:
+        # since I have a personal site, and the repo is hosted as a tab
+        # the rest of the site must take that tab as root
+        SITE_PATH: /${{ github.event.repository.name }}
       run: npm run rebuild
 
     - name: Deploy to branch
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
+        publish_dir: ./docs/${{ github.event.repository.name }}
         publish_branch: docs
