@@ -1,0 +1,22 @@
+[
+  { "kind": "click", "time": 5000, "x": 200, "y": 200, "direction": 0.0, "state": "pending" },
+  { "kind": "click", "time": 6000, "x": 600, "y": 200, "direction": 3.141592653589793, "state": "pending" },
+  { "kind": "click", "time": 7000, "x": 400, "y": 300, "direction": -0.7853981633974483, "state": "pending" },
+  { "kind": "click", "time": 8000, "x": 200, "y": 400, "direction": 1.5707963267948966, "state": "pending" },
+  { "kind": "click", "time": 9000, "x": 600, "y": 400, "direction": -1.5707963267948966, "state": "pending" },
+  { "kind": "click", "time": 10000, "x": 400, "y": 150, "direction": 2.356194490192345, "state": "pending" },
+  { "kind": "click", "time": 11000, "x": 150, "y": 300, "direction": 0.0, "state": "pending" },
+  { "kind": "click", "time": 12000, "x": 650, "y": 300, "direction": 3.141592653589793, "state": "pending" },
+  { "kind": "click", "time": 13000, "x": 300, "y": 450, "direction": 0.7853981633974483, "state": "pending" },
+  { "kind": "click", "time": 14000, "x": 500, "y": 150, "direction": -1.5707963267948966, "state": "pending" },
+  { "kind": "stream", "time": 15000, "x": 200, "y": 250, "direction": -0.7853981633974483, "state": "pending" },
+  { "kind": "stream", "time": 16000, "x": 400, "y": 350, "direction": 0.0, "state": "pending" },
+  { "kind": "stream", "time": 17000, "x": 600, "y": 250, "direction": 0.7853981633974483, "state": "pending" },
+  { "kind": "click", "time": 18000, "x": 250, "y": 150, "direction": 3.141592653589793, "state": "pending" },
+  { "kind": "click", "time": 19000, "x": 550, "y": 450, "direction": 2.356194490192345, "state": "pending" },
+  { "kind": "click", "time": 20000, "x": 400, "y": 250, "direction": -1.5707963267948966, "state": "pending" },
+  { "kind": "click", "time": 21000, "x": 150, "y": 400, "direction": 0.7853981633974483, "state": "pending" },
+  { "kind": "click", "time": 22000, "x": 650, "y": 150, "direction": -0.7853981633974483, "state": "pending" },
+  { "kind": "stream", "time": 23000, "x": 300, "y": 300, "direction": 0.0, "state": "pending" },
+  { "kind": "stream", "time": 24000, "x": 500, "y": 350, "direction": 3.141592653589793, "state": "pending" }
+]
