@@ -10,24 +10,6 @@ export function initSongPage(game: GameHandle): void {
   const chart   = body.dataset.songChart ?? "";
   const token   = body.dataset.textaliveToken ?? "";
 
-  const loadingScreen = document.getElementById("loading-screen");
-  const loadingBar    = document.getElementById("loading-bar-fill") as HTMLElement | null;
-
-  const dismissLoading = (): void => {
-    if (!loadingScreen) return;
-    if (loadingBar) loadingBar.style.width = "100%";
-    setTimeout(() => {
-      loadingScreen.classList.add("loaded");
-      loadingScreen.addEventListener("transitionend", () => loadingScreen.remove(), { once: true });
-    }, 400);
-  };
-
-  if (loadingBar) {
-    requestAnimationFrame(() => { loadingBar.style.width = "80%"; });
-  }
-
-  const loadingTimeout = setTimeout(dismissLoading, 15000);
-
   const beatId               = parseInt(body.dataset.textaliveBeatId ?? "");
   const chordId              = parseInt(body.dataset.textaliveChordId ?? "");
   const repetitiveSegmentId  = parseInt(body.dataset.textaliveRepetitiveSegmentId ?? "");
@@ -44,16 +26,32 @@ export function initSongPage(game: GameHandle): void {
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
 
+  const loadingScreen = document.getElementById("loading-screen");
+  const loadingBar    = document.getElementById("loading-bar-fill") as HTMLElement | null;
+
+  const setProgress = (pct: number): void => {
+    if (loadingBar) loadingBar.style.width = `${pct}%`;
+  };
+
+  const dismissLoading = (): void => {
+    if (!loadingScreen) return;
+    setProgress(100);
+    setTimeout(() => {
+      loadingScreen.classList.add("loaded");
+      loadingScreen.addEventListener("transitionend", () => loadingScreen.remove(), { once: true });
+    }, 400);
+  };
+
+  if (loadingBar) requestAnimationFrame(() => setProgress(30));
+
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
   let songLengthMs = 0;
 
   const TextAliveApp = window.TextAliveApp;
-  if (!TextAliveApp || !songUrl || !token) {
-    clearTimeout(loadingTimeout);
+  if (!songUrl || !token) {
     dismissLoading();
-  }
-  if (TextAliveApp && songUrl && token) {
+  } else if (TextAliveApp) {
     btnPlay.disabled = true;
 
     const mediaElement = document.getElementById("textalive-media");
@@ -61,6 +59,12 @@ export function initSongPage(game: GameHandle): void {
       app: { token },
       mediaElement,
     };
+
+    const loadTimeout = setTimeout(() => {
+      playerReady = true;
+      btnPlay.disabled = false;
+      dismissLoading();
+    }, 15000);
 
     player = new TextAliveApp.Player(opts);
     player.addListener({
@@ -76,6 +80,7 @@ export function initSongPage(game: GameHandle): void {
         }
       },
       onVideoReady(video) {
+        setProgress(70);
         storyboard?.setVideo(video);
         songLengthMs = video.duration;
         if (player?.data.song) {
@@ -87,9 +92,9 @@ export function initSongPage(game: GameHandle): void {
         }
       },
       onTimerReady() {
+        clearTimeout(loadTimeout);
         playerReady = true;
         btnPlay.disabled = false;
-        clearTimeout(loadingTimeout);
         dismissLoading();
       },
       onPlay()  { btnPlay.disabled = true;  },
@@ -101,6 +106,8 @@ export function initSongPage(game: GameHandle): void {
         progressFill.style.width = "0%";
       },
     });
+  } else {
+    setTimeout(dismissLoading, 15000);
   }
 
   (async () => {

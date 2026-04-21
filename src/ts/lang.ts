@@ -1,5 +1,4 @@
-// Site-wide EN/JP language toggle
-// Applies to any element with data-en/data-jp or data-title-en/data-title-jp attributes; persists preference to localStorage
+// Applies to elements with data-en/data-jp or data-title-en/data-title-jp; persists to localStorage
 
 export function initLangToggle(): void {
   const savedLang = localStorage.getItem("lang") ?? "en";

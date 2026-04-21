@@ -1,5 +1,4 @@
-// Lyric storyboard to display jp phrases from TextAlive 
-// After a phrase ends, the line fades out and the next phrase fades in
+// Phrase fades out after it ends; next phrase fades in
 
 import type { TextAliveChar, TextAlivePhrase, TextAliveVideo } from "./textalive";
 

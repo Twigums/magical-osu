@@ -58,7 +58,7 @@ stack build --system-ghc
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
 - `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring
 - `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop
-- `src/ts/react/` — React components (`GameSurface.tsx`, `HomeLayoutSwitcher.tsx`, `useLang.ts`)
+- `src/ts/react/` — React components (`GameSurface.tsx` — canvas + hit feedback, `HomeLayoutSwitcher.tsx`, `useLang.ts`)
 - `static/` — Copied verbatim to output (images, `robots.txt`, etc.)
 
 ### Output

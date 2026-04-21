@@ -1,6 +1,3 @@
-// Rnote chart building, canvas rendering, cursor-swipe hit detection, and judgement-window scoring
-// Driven by song.ts which calls tick each animation frame.
-
 import { angleDiff, clamp } from "./utils";
 
 const PERFECT_MS     = 32;
@@ -59,7 +56,6 @@ export function createGame(deps: GameDeps): GameHandle {
 
   const getScale = (): number => canvas.width / LOGICAL_W;
 
-  // input
   const pointer = { x: 0, y: 0, prevX: 0, prevY: 0, held: false };
   const keysHeld = new Set<string>();
   const actionHeld = (): boolean => pointer.held || keysHeld.size > 0;
@@ -83,13 +79,11 @@ export function createGame(deps: GameDeps): GameHandle {
   window.addEventListener("keydown",  e => { if (!e.repeat) keysHeld.add(e.key); });
   window.addEventListener("keyup",    e => { keysHeld.delete(e.key); });
 
-  // state
   let notes: Note[] = [];
   let score = 0;
 
   const setScore = (v: number): void => { score = v; onScore(v); };
 
-  // judgement
   const scoreFor = (deltaMs: number): { result: HitResult; points: number } => {
     const d = Math.abs(deltaMs);
     if (d <= PERFECT_MS) return { result: "perfect", points: PERFECT_POINTS };
@@ -97,7 +91,6 @@ export function createGame(deps: GameDeps): GameHandle {
     return { result: "miss", points: 0 };
   };
 
-  // definition of hit
   const tryHit = (note: Note, songMs: number): void => {
     if (note.state !== "pending") return;
     if (!actionHeld()) return;
@@ -139,7 +132,6 @@ export function createGame(deps: GameDeps): GameHandle {
     }
   };
 
-  // note rendering
   const drawNote = (note: Note, appearProgress: number, scale: number): void => {
     const cx = note.x * scale;
     const cy = note.y * scale;
@@ -221,7 +213,6 @@ export function createGame(deps: GameDeps): GameHandle {
     }
   };
 
-  // use textalive
   return {
     setChart(n: Note[]): void { notes = n; },
     reset(): void {
