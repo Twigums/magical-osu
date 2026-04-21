@@ -4,7 +4,8 @@ import System.FilePath ((</>))
 
 import Hakyll
 
-import Compilers (sassCompiler, tsCompiler)
+import ChartCompiler (chartCompiler)
+import Compilers     (sassCompiler, tsCompiler)
 import Config    (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
 import Context   (postCtx)
 
@@ -45,7 +46,12 @@ rules = do
         route   $ gsubRoute "static/" (const "")
         compile copyFileCompiler
 
-    -- song data (audio, chart/timing json, etc.)
+    -- chart files: compile .mimi -> .json
+    match "src/songs/**/*.mimi" $ do
+        route   $ gsubRoute "src/" (const "") `composeRoutes` setExtension "json"
+        compile chartCompiler
+
+    -- song data (audio, timing json, etc.) — excludes .mimi (matched above)
     match "src/songs/**" $ do
         route   $ gsubRoute "src/" (const "")
         compile copyFileCompiler

@@ -12,7 +12,7 @@ Requires `node`/`npm` and `stack`/`ghc`.
    ```
 3. Preview locally (optional):
    ```bash
-   npm run watch
+   npm run watch (-- --host {IP_ADDRESS})
    ```
 4. Deploy to GitHub Pages:
    ```bash

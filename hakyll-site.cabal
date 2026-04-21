@@ -16,3 +16,4 @@ executable site
   other-modules:    Context
                   , Config
                   , Compilers
+                  , ChartCompiler

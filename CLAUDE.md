@@ -14,32 +14,26 @@ Your changes to the repo will be graded on:
 4. Whether your changes are necessary and efficient.
 
 ## Commands
-These commands are listed to establish context. You should assume that the user will run these commands after your changes. Do not run any following commands unless explicitly directed by the user.
+These commands are listed to establish context. You should assume that the user will run these commands after your changes. Do NOT run any following commands unless explicitly directed by the user.
 
 ### Build & Run
 
 ```bash
-# Install Node dependencies (sass, esbuild — used by Hakyll compilers)
-npm install
-
-# Build Hakyll site binary
-stack build
+# Install Node dependencies and build Hakyll binary
+npm run setup
 
 # Generate site into docs/
-stack exec site build
+npm run rebuild
 
 # Watch for changes and rebuild
-stack exec site watch
-
-# Clean build artifacts
-stack exec site clean
+npm run watch
 ```
 
 ### Haskell
 
 ```bash
-# Rebuild after .hs changes
-stack build && stack exec site rebuild
+# Required after any .hs file change, before rebuild/watch
+stack build --system-ghc
 ```
 
 ## Architecture
@@ -50,24 +44,48 @@ stack build && stack exec site rebuild
 
 | Module | Purpose |
 |--------|---------|
-| `src/Config.hs` | Site-wide constants: `siteRoot`, `blogsDir`, `templateDir`, `tabPaths` |
+| `src/Config.hs` | Site-wide constants: `siteRoot`, `templateDir`, `tabPaths`, `textaliveToken` |
 | `src/Compilers.hs` | `sassCompiler` (npx sass) and `tsCompiler` (npx esbuild) |
+| `src/ChartCompiler.hs` | `chartCompiler` — compiles `.mimi` chart files into `Note[]` JSON |
 | `src/Context.hs` | `postCtx` — adds `root` and `date` fields to Hakyll context |
-| `src/Routes.hs` | `titleRoute` — derives URL slugs from post `title` metadata |
-| `src/Slug.hs` | Converts text to `underscore_slugs` |
 
 ### Content Structure
 
-- `src/tabs/` — Top-level pages. `home.md` → `index.html`, `blog.md` → `blog/index.html`, others → `<name>/index.html`
-- `src/blogs/` — Blog posts. Routed via `titleRoute` → `blogs/<title-slug>.html`
-- `src/templates/` — Hakyll HTML templates (`default.html`, `blog_post.html`, `header.html`, etc.)
+- `src/tabs/` — Top-level pages. `home.md` → `index.html`, `song1.md` → `song1/index.html`, etc.
+- `src/songs/<name>/` — Per-song assets. `.mimi` chart files compiled to `.json`; other files copied verbatim
+- `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
-- `static/` — Copied verbatim to output (images, robots.txt, etc.)
+- `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring
+- `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop
+- `src/ts/react/` — React components (`GameSurface.tsx`, `HomeLayoutSwitcher.tsx`, `useLang.ts`)
+- `static/` — Copied verbatim to output (images, `robots.txt`, etc.)
 
 ### Output
 
 All output goes to `docs/` (configured in `Config.hs` via `hakyllConfig`).
+
+### Chart Format (`.mimi`)
+
+Song charts live at `src/songs/<name>/chart.mimi` and are compiled by `ChartCompiler.hs` to `songs/<name>/chart.json`.
+
+```
+bpm: 120
+offset: 5000
+beats_per_measure: 4
+
+# kind, beat, degrees, x, y
+c, 1,   0, 400, 300
+s, 3,  90, 200, 150
+c, 5, 270, 600, 450
+```
+
+- `kind`: `c` (click, red) or `s` (stream, blue)
+- `beat`: 1-indexed beat number; supports decimals (e.g. `1.5`)
+- `degrees`: direction in standard math convention (0 = right, 90 = up, CCW); converted to canvas radians on compile
+- `x`, `y`: logical game coordinates (800 × 600 space)
+- `offset`: milliseconds from song start to beat 1
+- Blank lines and `#` comment lines are ignored
 
 ### SCSS
 

@@ -6,7 +6,7 @@ song-author: imie
 song-author-jp: imie
 song-mapper: Twigums
 song-url: https://piapro.jp/t/6W2N/20251215164617
-song-chart: /songs/song1/timings.json
+song-chart: /songs/song1/chart.json
 textalive-beat-id: 4827293
 textalive-chord-id: 2963754
 textalive-repetitive-segment-id: 3086261
