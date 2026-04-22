@@ -25,6 +25,14 @@ The compiled site outputs to `./docs`. Configure GitHub Pages to serve from the 
 
 Set `SITE_PATH=/sub-path` (or pass `--path /sub-path`) when hosting at a sub-path. The CI workflow sets this automatically from the repo name.
 
+## Converting osu! Charts
+
+Charts can be authored in the [osu! editor](https://osu.ppy.sh/home/download) using linear sliders, then converted to `.mimi` format:
+
+```bash
+npm run --silent convert:osu -- path/to/file.osu > src/songs/<name>/chart.mimi
+```
+
 ## Common Issues
 
 While building, `The program 'pkg-config' version >= ??? is required but it could not be found.`: This indicates that you need to install `pkg-config`.

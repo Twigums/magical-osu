@@ -2,6 +2,8 @@
 
 A chart is a JSON file containing an array of `Note` objects. Place it under `src/songs/<song-id>/` and reference it via the `song-chart` field in the song's markdown frontmatter.
 
+Charts may be authored in the osu! editor using linear sliders and converted with `npm run convert:osu`. See `README.md` for the command. The osu play area (512×384) is scaled to fit inside the mimi canvas (800×600) — both are 4:3, so the scale factor is uniform (1.5625×) with no offset. The direction of each note is the angle of the osu slider from its start point `(x, y)` to its linear endpoint `(cx, cy)`, expressed in standard math convention (CCW from right, y-axis pointing up). This requires negating the osu y-component before taking `atan2`, since osu uses screen coordinates (y increases downward).
+
 ## Note Format
 
 ```typescript
@@ -22,7 +24,7 @@ The play area is a logical 800 × 600 canvas. (0, 0) is the top-left corner.
 ```
 (0,0) ──────────────── (800,0)
   │                        │
-  │   usable: ~80–720 x   │
+  │   usable: ~80–720 x    │
   │            ~80–520 y   │
   │                        │
 (0,600) ──────────── (800,600)
@@ -90,19 +92,3 @@ Use those `startTime` values directly as `time` in each note.
   { "kind": "stream", "time": 5300,  "x": 300, "y": 500, "direction": 1.571,       "state": "pending" }
 ]
 ```
-
-## Wiring It Up
-
-1. Save your chart as `src/songs/<song-id>/timings.json`
-2. In the song's markdown (`src/tabs/<song-id>.md`), set:
-   ```yaml
-   song-chart: /songs/<song-id>/timings.json
-   ```
-3. Run `stack exec site rebuild` — the file is copied verbatim to `docs/songs/`.
-
-## Tips
-
-- Map to **syllable beats**, not musical beats — the game syncs to lyric timing, not the drum track.
-- Alternate left/right horizontally for streams to make them feel natural to swipe.
-- Leave at least 200 ms between notes in a non-stream section so players can reset their cursor.
-- Test at different play speeds by adjusting the simulated-time offset in `song.ts` (`simStart = performance.now() - <ms>`).

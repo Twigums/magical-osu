@@ -1,4 +1,4 @@
-# Visual Aspect of SITE
+# Visual Aspect of mimi
 
 This file will explain everything on the visual aspect of the website, excluding gameplay related aspects. This specifically means how each page looks in format, art, and layout. Non-game user interaction is also described in this file.
 

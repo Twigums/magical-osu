@@ -1,6 +1,6 @@
-# Gameplay Aspect of SITE
+# Gameplay Aspect of mimi
 
-This file will explain everything on the gameplay aspect of the website, specifically for all songs. This includes the core gameplay, mechanics, and gameplay visuals.
+This file will explain everything on the gameplay aspect of mimi, specifically for all songs. This includes the core gameplay, mechanics, and gameplay visuals.
 
 The gameplay will officially support these dimensions:
 - Monitor: 1920 x 1080 px
