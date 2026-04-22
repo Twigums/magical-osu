@@ -29,7 +29,7 @@ npm run rebuild
 npm run watch
 
 # Rebuild with sub-path (e.g. for GitHub Pages); also accepts --path /sub-path flag
-SITE_PATH=/magical-osu npm run rebuild
+SITE_PATH=/mimi npm run rebuild
 # or: npm run rebuild:pages
 ```
 
