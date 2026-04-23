@@ -27,10 +27,19 @@ export interface Note {
   hitResult?: HitResult;
 }
 
+export interface GameStats {
+  score: number;
+  perfect: number;
+  good: number;
+  miss: number;
+  total: number;
+}
+
 export interface GameHandle {
   setChart(notes: Note[]): void;
   reset(): void;
   tick(songMs: number): void;
+  getStats(): GameStats;
 }
 
 export interface GameDeps {
@@ -81,6 +90,9 @@ export function createGame(deps: GameDeps): GameHandle {
 
   let notes: Note[] = [];
   let score = 0;
+  let perfectCount = 0;
+  let goodCount = 0;
+  let missCount = 0;
 
   const setScore = (v: number): void => { score = v; onScore(v); };
 
@@ -117,6 +129,8 @@ export function createGame(deps: GameDeps): GameHandle {
     const { result, points } = scoreFor(songMs - note.time);
     note.state = "hit";
     note.hitResult = result;
+    if (result === "perfect") perfectCount++;
+    else if (result === "good") goodCount++;
     if (points > 0) setScore(score + points);
     onFeedback(result, note.x, note.y);
   };
@@ -127,6 +141,7 @@ export function createGame(deps: GameDeps): GameHandle {
       if (songMs - n.time > GOOD_MS) {
         n.state = "missed";
         n.hitResult = "miss";
+        missCount++;
         onFeedback("miss", n.x, n.y);
       }
     }
@@ -218,6 +233,18 @@ export function createGame(deps: GameDeps): GameHandle {
     reset(): void {
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
       setScore(0);
+      perfectCount = 0;
+      goodCount = 0;
+      missCount = 0;
+    },
+    getStats(): GameStats {
+      return {
+        score,
+        perfect: perfectCount,
+        good: goodCount,
+        miss: missCount,
+        total: perfectCount + goodCount + missCount,
+      };
     },
     tick(songMs: number): void {
       for (const note of notes) tryHit(note, songMs);

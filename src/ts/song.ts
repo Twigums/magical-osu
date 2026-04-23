@@ -1,10 +1,20 @@
 // Song page: reads body data-* attributes, starts TextAlive player, and drives game elements
 
-import type { GameHandle, Note } from "./game";
+import type { GameHandle, GameStats, Note } from "./game";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
-export function initSongPage(game: GameHandle): void {
+interface SongPageDeps {
+  game: GameHandle;
+  onSongFinish: (stats: GameStats) => void;
+  hideResult: () => void;
+}
+
+export interface SongPageHandle {
+  stop(): void;
+}
+
+export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): SongPageHandle {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
   const chart   = body.dataset.songChart ?? "";
@@ -22,7 +32,7 @@ export function initSongPage(game: GameHandle): void {
   const progressFill = document.getElementById("progress-fill")   as HTMLElement       | null;
   const storyboardEl = document.getElementById("song-storyboard") as HTMLElement       | null;
 
-  if (!btnPlay || !btnStop || !progressFill) return;
+  if (!btnPlay || !btnStop || !progressFill) return { stop() { /* no-op */ } };
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
 
@@ -47,6 +57,13 @@ export function initSongPage(game: GameHandle): void {
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
   let songLengthMs = 0;
+  let finished = false;
+
+  const triggerFinish = (): void => {
+    if (finished) return;
+    finished = true;
+    onSongFinish(game.getStats());
+  };
 
   const TextAliveApp = window.TextAliveApp;
   if (!songUrl || !token) {
@@ -97,10 +114,11 @@ export function initSongPage(game: GameHandle): void {
         btnPlay.disabled = false;
         dismissLoading();
       },
-      onPlay()  { btnPlay.disabled = true;  },
+      onPlay()  { btnPlay.disabled = true; finished = false; },
       onPause() { btnPlay.disabled = false; },
       onStop()  {
         btnPlay.disabled = false;
+        finished = false;
         game.reset();
         storyboard?.reset();
         progressFill.style.width = "0%";
@@ -129,6 +147,7 @@ export function initSongPage(game: GameHandle): void {
 
   btnStop.addEventListener("click", () => {
     if (!playerReady || !player) return;
+    hideResult();
     player.requestStop();
   });
 
@@ -140,10 +159,20 @@ export function initSongPage(game: GameHandle): void {
     if (songLengthMs > 0) {
       const pct = Math.max(0, Math.min(100, (songMs / songLengthMs) * 100));
       progressFill.style.width = `${pct}%`;
+
+      if (songMs >= songLengthMs) triggerFinish();
     }
 
     requestAnimationFrame(loop);
   };
 
   requestAnimationFrame(loop);
+
+  return {
+    stop(): void {
+      if (!playerReady || !player) return;
+      hideResult();
+      player.requestStop();
+    },
+  };
 }
