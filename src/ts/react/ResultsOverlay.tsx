@@ -24,7 +24,7 @@ export function ResultsOverlay({ stats, returnHref, onTryAgain }: Props) {
     : { title: "Results", score: "Score", accuracy: "Accuracy", perfect: "Perfect", good: "Good", miss: "Miss", share: "Share", copied: "Copied!", failed: "Failed", tryAgain: "Try Again", back: "Back" };
 
   const handleShare = (): void => {
-    shareResult({ score: stats.score, accuracy: `${pct}%`, grade, songName, lang })
+    shareResult({ accuracy: `${pct}%`, grade, songName, lang })
       .then(ok => {
         setShareStatus(ok ? "copied" : "failed");
         setTimeout(() => setShareStatus("idle"), 2000);

@@ -1,7 +1,6 @@
 import type { Grade } from "./grade";
 
 interface SharePayload {
-  score: number;
   accuracy: string;
   grade: Grade;
   songName: string;
@@ -9,9 +8,9 @@ interface SharePayload {
 }
 
 export async function shareResult(payload: SharePayload): Promise<boolean> {
-  const { score, grade, songName, lang } = payload;
+  const { accuracy, grade, songName, lang } = payload;
   const url = window.location.href;
-  const accuracyPct = payload.accuracy;
+  const accuracyPct = accuracy;
   const text = lang === "jp"
     ? `「${songName}」で ${accuracyPct} (${grade}) を獲得しました！\n${url}`
     : `I scored ${accuracyPct} (${grade}) on "${songName}" in mimi!\n${url}`;

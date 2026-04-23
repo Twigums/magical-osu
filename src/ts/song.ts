@@ -1,5 +1,3 @@
-// Song page: reads body data-* attributes, starts TextAlive player, and drives game elements
-
 import type { GameHandle, GameStats, Note } from "./game";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
@@ -58,12 +56,27 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   let playerReady = false;
   let songLengthMs = 0;
   let finished = false;
+  let finishTimeout: ReturnType<typeof setTimeout> | null = null;
+  let lastSongMs = 0;
 
   const triggerFinish = (): void => {
     if (finished) return;
     finished = true;
     onSongFinish(game.getStats());
   };
+
+  const resetPlayback = (): void => {
+    if (finishTimeout !== null) { clearTimeout(finishTimeout); finishTimeout = null; }
+    game.reset();
+    storyboard?.reset();
+    progressFill.style.width = "0%";
+    lastSongMs = 0;
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    if (songLengthMs > 0 && lastSongMs >= songLengthMs) triggerFinish();
+  });
 
   const TextAliveApp = window.TextAliveApp;
   if (!songUrl || !token) {
@@ -114,15 +127,17 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
         btnPlay.disabled = false;
         dismissLoading();
       },
-      onPlay()  { btnPlay.disabled = true; finished = false; },
-      onPause() { btnPlay.disabled = false; },
-      onStop()  {
-        btnPlay.disabled = false;
+      onPlay() {
+        btnPlay.disabled = true;
         finished = false;
-        game.reset();
-        storyboard?.reset();
-        progressFill.style.width = "0%";
+        if (finishTimeout !== null) { clearTimeout(finishTimeout); finishTimeout = null; }
+        if (songLengthMs > 0) {
+          const remaining = Math.max(0, songLengthMs - (player?.timer.position ?? 0));
+          finishTimeout = setTimeout(triggerFinish, remaining);
+        }
       },
+      onPause() { btnPlay.disabled = false; },
+      onStop()  { btnPlay.disabled = false; finished = false; },
     });
   } else {
     setTimeout(dismissLoading, 15000);
@@ -148,11 +163,13 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   btnStop.addEventListener("click", () => {
     if (!playerReady || !player) return;
     hideResult();
+    resetPlayback();
     player.requestStop();
   });
 
   const loop = (): void => {
     const songMs = player?.timer.position ?? 0;
+    if (songMs > 0) lastSongMs = songMs;
     game.tick(songMs);
     storyboard?.update(songMs);
 
@@ -172,6 +189,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     stop(): void {
       if (!playerReady || !player) return;
       hideResult();
+      resetPlayback();
       player.requestStop();
     },
   };
