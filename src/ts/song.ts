@@ -56,13 +56,26 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   let playerReady = false;
   let songLengthMs = 0;
   let finished = false;
+  let resultsActive = false;
   let finishTimeout: ReturnType<typeof setTimeout> | null = null;
   let lastSongMs = 0;
+
+  const setResultsActive = (active: boolean): void => {
+    resultsActive = active;
+    btnPlay.disabled = active;
+    btnStop.disabled = active;
+  };
 
   const triggerFinish = (): void => {
     if (finished) return;
     finished = true;
+    setResultsActive(true);
     onSongFinish(game.getStats());
+  };
+
+  const dismissResult = (): void => {
+    setResultsActive(false);
+    hideResult();
   };
 
   const resetPlayback = (): void => {
@@ -137,7 +150,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
         }
       },
       onPause() { btnPlay.disabled = false; },
-      onStop()  { btnPlay.disabled = false; finished = false; },
+      onStop()  { if (!resultsActive) btnPlay.disabled = false; finished = false; },
     });
   } else {
     setTimeout(dismissLoading, 15000);
@@ -162,7 +175,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
 
   btnStop.addEventListener("click", () => {
     if (!playerReady || !player) return;
-    hideResult();
+    dismissResult();
     resetPlayback();
     player.requestStop();
   });
@@ -188,7 +201,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   return {
     stop(): void {
       if (!playerReady || !player) return;
-      hideResult();
+      dismissResult();
       resetPlayback();
       player.requestStop();
     },
