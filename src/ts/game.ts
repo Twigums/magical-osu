@@ -43,16 +43,45 @@ export interface GameHandle {
 }
 
 export interface GameDeps {
-  canvas:     HTMLCanvasElement;
-  gameArea:   HTMLElement;
-  onScore:    (score: number) => void;
-  onFeedback: (result: HitResult, x: number, y: number) => void;
+  canvas:       HTMLCanvasElement;
+  gameArea:     HTMLElement;
+  onScore:      (score: number) => void;
+  onFeedback:   (result: HitResult, x: number, y: number) => void;
+  hitSoundUrl?: string;
 }
 
 export function createGame(deps: GameDeps): GameHandle {
   const { canvas, gameArea, onScore, onFeedback } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
+
+  let audioCtx: AudioContext | null = null;
+  let hitSoundBuffer: AudioBuffer | null = null;
+
+  const playHitSound = (): void => {
+    if (!audioCtx || !hitSoundBuffer) return;
+    const source = audioCtx.createBufferSource();
+    source.buffer = hitSoundBuffer;
+    source.connect(audioCtx.destination);
+    source.start();
+  };
+
+  if (deps.hitSoundUrl) {
+    const url = deps.hitSoundUrl;
+    let loading = false;
+    const loadSound = (): void => {
+      if (loading) return;
+      loading = true;
+      audioCtx = new AudioContext();
+      fetch(url)
+        .then(r => r.arrayBuffer())
+        .then(buf => audioCtx!.decodeAudioData(buf))
+        .then(decoded => { hitSoundBuffer = decoded; })
+        .catch(err => console.error("[mimi] hitsound load failed:", err));
+    };
+    window.addEventListener("pointerdown", loadSound, { once: true });
+    window.addEventListener("keydown",     loadSound, { once: true });
+  }
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();
@@ -93,6 +122,7 @@ export function createGame(deps: GameDeps): GameHandle {
   let perfectCount = 0;
   let goodCount = 0;
   let missCount = 0;
+  let skipExpiry = false;
 
   const setScore = (v: number): void => { score = v; onScore(v); };
 
@@ -133,6 +163,7 @@ export function createGame(deps: GameDeps): GameHandle {
     else if (result === "good") goodCount++;
     if (points > 0) setScore(score + points);
     onFeedback(result, note.x, note.y);
+    playHitSound();
   };
 
   const expireMisses = (songMs: number): void => {
@@ -200,8 +231,9 @@ export function createGame(deps: GameDeps): GameHandle {
     buildPath();
     ctx.save();
     ctx.clip();
+    const fillMaxR = Math.sqrt((len / 2) * (len / 2) + shw * shw);
     ctx.beginPath();
-    ctx.arc(cx, cy, fillProgress * len, 0, Math.PI * 2);
+    ctx.arc(cx, cy, fillProgress * fillMaxR, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${base}, 1.0)`;
     ctx.fill();
     ctx.restore();
@@ -231,6 +263,7 @@ export function createGame(deps: GameDeps): GameHandle {
   return {
     setChart(n: Note[]): void { notes = n; },
     reset(): void {
+      skipExpiry = true;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
       setScore(0);
       perfectCount = 0;
@@ -248,7 +281,11 @@ export function createGame(deps: GameDeps): GameHandle {
     },
     tick(songMs: number): void {
       for (const note of notes) tryHit(note, songMs);
-      expireMisses(songMs);
+      if (skipExpiry) {
+        if (songMs <= APPROACH_MS) skipExpiry = false;
+      } else {
+        expireMisses(songMs);
+      }
       draw(songMs);
       pointer.prevX = pointer.x;
       pointer.prevY = pointer.y;

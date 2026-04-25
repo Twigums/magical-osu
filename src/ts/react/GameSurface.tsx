@@ -30,9 +30,11 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
     const gameArea = gameAreaRef.current;
     if (!canvas || !gameArea) return;
 
+    const hitSoundUrl = document.body.dataset.hitSoundUrl;
     const game = createGame({
       canvas,
       gameArea,
+      hitSoundUrl,
       onScore: setScore,
       onFeedback: (res, x, y) => {
         const id = Date.now() + Math.random();
