@@ -1,4 +1,5 @@
 import type { GameHandle, GameStats, Note } from "./game";
+import { loadVolume, subscribeVolume } from "./settings";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
@@ -110,6 +111,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     }, 15000);
 
     player = new TextAliveApp.Player(opts);
+    subscribeVolume(v => { if (player) player.volume = v; });
     player.addListener({
       onAppReady(app) {
         console.info("[mimi] onAppReady — managed:", app.managed);
@@ -139,6 +141,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
         playerReady = true;
         btnPlay.disabled = false;
         dismissLoading();
+        if (player) player.volume = loadVolume();
       },
       onPlay() {
         btnPlay.disabled = true;

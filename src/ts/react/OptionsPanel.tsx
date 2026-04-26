@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { AR_MIN, AR_MAX, arToMs } from "../settings";
+import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
 import { useApproachRate } from "./useApproachRate";
+import { useVolume } from "./useVolume";
 import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./useLang";
+
+const isSongPage = document.body.classList.contains("song-page");
 
 export function OptionsPanel() {
   const [open, setOpen] = useState(false);
   const [ar, setAr]     = useApproachRate();
+  const [vol, setVol]   = useVolume();
   const lang            = useLang();
 
-  // the settings button lives in home template
   useEffect(() => {
     const btn = document.getElementById("settings-btn");
     const handleOpen = () => setOpen(true);
@@ -19,7 +22,7 @@ export function OptionsPanel() {
 
   if (!open) return null;
 
-  const ms = Math.round(arToMs(ar));
+  const ms   = Math.round(arToMs(ar));
   const isJp = lang === "jp";
 
   return (
@@ -40,8 +43,24 @@ export function OptionsPanel() {
 
         <div className="options-row">
           <label className="options-label">
+            <span>{isJp ? "音量" : "Volume"}</span>
+            <span className="options-setting-value">{vol}%</span>
+          </label>
+          <input
+            type="range"
+            className="options-slider"
+            min={VOLUME_MIN}
+            max={VOLUME_MAX}
+            step={VOLUME_STEP}
+            value={vol}
+            onChange={e => setVol(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="options-row">
+          <label className="options-label">
             <span>{isJp ? "アプローチレート" : "Approach Rate"}</span>
-            <span className="options-ar-value">AR {ar}</span>
+            <span className="options-setting-value">AR {ar}</span>
           </label>
           <input
             type="range"
@@ -50,9 +69,17 @@ export function OptionsPanel() {
             max={AR_MAX}
             step={1}
             value={ar}
+            disabled={isSongPage}
             onChange={e => setAr(Number(e.target.value))}
           />
           <span className="options-ms-label">{ms}ms</span>
+          {isSongPage && (
+            <p className="options-note">
+              {isJp
+                ? "ARはホームページでのみ変更できます。"
+                : "Approach rate can only be changed from the home page."}
+            </p>
+          )}
         </div>
 
         <p className="options-preview-label">

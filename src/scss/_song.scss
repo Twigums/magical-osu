@@ -129,6 +129,9 @@ html body.song-page {
   top: 1.5rem;
   right: 2rem;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .song-controls {

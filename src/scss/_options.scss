@@ -4,7 +4,8 @@
   gap: 0.5rem;
 }
 
-.home-page .settings-btn {
+.home-page .settings-btn,
+.song-page .settings-btn {
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 4px;
@@ -16,16 +17,16 @@
   justify-content: center;
   transition: background 0.2s, color 0.2s;
 
-  svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    display: block;
-  }
-
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
   }
+}
+
+.home-page .settings-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: block;
 }
 
 .song-page .settings-btn svg {
@@ -96,7 +97,7 @@
   opacity: 0.85;
 }
 
-.options-ar-value {
+.options-setting-value {
   font-weight: bold;
   font-variant-numeric: tabular-nums;
   font-size: 0.9rem;
@@ -106,6 +107,18 @@
   width: 100%;
   cursor: pointer;
   accent-color: rgba(255, 255, 255, 0.85);
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.options-note {
+  margin: 0.2rem 0 0;
+  font-size: 0.7rem;
+  opacity: 0.45;
+  letter-spacing: 0.04em;
 }
 
 .options-ms-label {

@@ -39,6 +39,7 @@ export interface TextAlivePlayer {
   video: TextAliveVideo | null;
   data: { song: { length: number; name: string; artist: { name: string } } | null };
   isPlaying: boolean;
+  volume: number;
   addListener(l: Partial<TextAliveListener>): void;
   createFromSongUrl(url: string, options?: { video?: { beatId?: number; chordId?: number; repetitiveSegmentId?: number; lyricId?: number; lyricDiffId?: number } }): Promise<void>;
   requestPlay(): void;
