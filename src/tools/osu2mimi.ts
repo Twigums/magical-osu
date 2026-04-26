@@ -7,7 +7,6 @@ const MIMI_HEIGHT = 600;
 
 // Fit osu play area inside mimi play area, preserving aspect ratio.
 // Both are 4:3 so scale = 1.5625 and offsets are 0, but this handles
-// any future dimension changes without distortion.
 const SCALE    = Math.min(MIMI_WIDTH / OSU_WIDTH, MIMI_HEIGHT / OSU_HEIGHT);
 const OFFSET_X = (MIMI_WIDTH  - OSU_WIDTH  * SCALE) / 2;
 const OFFSET_Y = (MIMI_HEIGHT - OSU_HEIGHT * SCALE) / 2;
@@ -25,6 +24,7 @@ function parseSections(text: string): Map<string, string[]> {
             sections.get(current)!.push(line);
         }
     }
+
     return sections;
 }
 
@@ -75,8 +75,8 @@ function parseHitObject(line: string): Note | null {
 
     return {
         time,
-        x:       xm,
-        y:       ym,
+        x: xm,
+        y: ym,
         degrees: parseFloat(degrees.toFixed(1)),
         noDir,
     };
@@ -87,7 +87,7 @@ function main(): void {
     const fileArg = args.find(a => !a.startsWith("--"));
 
     if (!fileArg) {
-        process.stderr.write("Usage: osu2mimi <file.osu>\n");
+        process.stderr.write("Usage: osu2mimi {file.osu}\n");
         process.exit(1);
     }
 
@@ -99,7 +99,7 @@ function main(): void {
         process.exit(1);
     }
 
-    const sections       = parseSections(content);
+    const sections = parseSections(content);
     const hitObjectLines = sections.get("HitObjects") ?? [];
 
     const notes: Note[] = [];

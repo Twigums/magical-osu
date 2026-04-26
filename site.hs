@@ -8,8 +8,8 @@ import Hakyll
 
 import ChartCompiler (chartCompiler)
 import Compilers     (sassCompiler, tsCompiler)
-import Config    (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
-import Context   (postCtx)
+import Config        (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
+import Context       (postCtx)
 
 
 --------------------------------------------------------------------------------

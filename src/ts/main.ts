@@ -4,8 +4,16 @@ import { initLangToggle } from "./lang";
 import { initSongPage }   from "./song";
 import { HomeLayoutSwitcher } from "./react/HomeLayoutSwitcher";
 import { GameSurface }        from "./react/GameSurface";
+import { OptionsPanel }       from "./react/OptionsPanel";
+
 document.addEventListener("DOMContentLoaded", () => {
   initLangToggle();
+
+  // Mount options panel globally — it is accessible from both home and song pages
+  const settingsRoot = document.createElement("div");
+  settingsRoot.id = "settings-root";
+  document.body.appendChild(settingsRoot);
+  createRoot(settingsRoot).render(createElement(OptionsPanel, null));
 
   const homeRoot = document.getElementById("home-root");
   if (homeRoot) {
