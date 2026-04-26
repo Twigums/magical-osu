@@ -4,11 +4,13 @@ import { useApproachRate } from "./useApproachRate";
 import { useVolume } from "./useVolume";
 import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./useLang";
+import { useTransitionState } from "./useTransitionState";
 
 const isSongPage = document.body.classList.contains("song-page");
 
 export function OptionsPanel() {
   const [open, setOpen] = useState(false);
+  const { state }       = useTransitionState(open, 240);
   const [ar, setAr]     = useApproachRate();
   const [vol, setVol]   = useVolume();
   const lang            = useLang();
@@ -20,14 +22,14 @@ export function OptionsPanel() {
     return () => btn?.removeEventListener("click", handleOpen);
   }, []);
 
-  if (!open) return null;
+  if (state === "exited") return null;
 
   const ms   = Math.round(arToMs(ar));
   const isJp = lang === "jp";
 
   return (
-    <div className="options-backdrop" onClick={() => setOpen(false)}>
-      <div className="options-panel" onClick={e => e.stopPropagation()}>
+    <div className="options-backdrop" data-state={state} onClick={() => setOpen(false)}>
+      <div className="options-panel" data-state={state} onClick={e => e.stopPropagation()}>
 
         <button
           className="options-close"

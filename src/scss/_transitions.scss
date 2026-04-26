@@ -1,0 +1,67 @@
+@use 'variables' as *;
+
+.layout-pane {
+  transition:
+    opacity var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-standard);
+
+  &[data-state="entered"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &[data-state="entering"] {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: none;
+  }
+
+  &[data-state="exiting"] {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.options-backdrop {
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
+
+  &[data-state="entered"] {
+    opacity: 1;
+  }
+
+  &[data-state="entering"] {
+    opacity: 0;
+    transition: none;
+  }
+
+  &[data-state="exiting"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.options-panel {
+  transition: transform var(--motion-duration-base) var(--motion-ease-emphasized);
+
+  &[data-state="entered"] {
+    transform: scale(1) translateY(0);
+  }
+
+  &[data-state="entering"] {
+    transform: scale(0.96) translateY(6px);
+    transition: none;
+  }
+
+  &[data-state="exiting"] {
+    transform: scale(0.96) translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-pane,
+  .options-backdrop,
+  .options-panel {
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+}
