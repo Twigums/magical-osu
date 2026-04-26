@@ -16,7 +16,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_PAT }}
           FORK_OWNER: ${{ github.repository_owner }}
-          UPSTREAM_REPO: Twigums/magical-osu
+          UPSTREAM_REPO: Twigums/mimi
         run: |
           BRANCH=${GITHUB_REF_NAME#pr-meta/}
 

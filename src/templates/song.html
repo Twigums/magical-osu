@@ -1,67 +1,63 @@
 <!doctype html>
-<html lang = "en">
-    <head>
-        <meta charset = "utf-8">
-        <meta http-equiv = "x-ua-compatible" content = "ie=edge">
-        <meta name = "viewport" content = "width=device-width, initial-scale=1">
-        <title>magical-osu - $title$</title>
-        $partial("src/templates/imports.html")$
-    </head>
+<html lang="en">
 
-    <body class = "song-page"
-          data-song-url = "$song-url$"
-          data-song-chart = "$song-chart$"
-          data-textalive-token = "$textalive-token$"
-          data-textalive-beat-id = "$textalive-beat-id$"
-          data-textalive-chord-id = "$textalive-chord-id$"
-          data-textalive-repetitive-segment-id = "$textalive-repetitive-segment-id$"
-          data-textalive-lyric-id = "$textalive-lyric-id$"
-          data-textalive-lyric-diff-id = "$textalive-lyric-diff-id$">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>mimi - $title$</title>
+    $partial("src/templates/imports.html")$
+</head>
 
-        <div id = "loading-screen">
-            <div class = "loading-bar-track">
-                <div class = "loading-bar-fill" id = "loading-bar-fill"></div>
-            </div>
-            <span class = "loading-text" data-en = "Loading..." data-jp = "読み込み中...">Loading...</span>
+<body class="song-page" data-song-url="$song-url$" data-song-chart="$song-chart$"
+    data-textalive-token="$textalive-token$" data-textalive-beat-id="$textalive-beat-id$"
+    data-textalive-chord-id="$textalive-chord-id$"
+    data-textalive-repetitive-segment-id="$textalive-repetitive-segment-id$"
+    data-textalive-lyric-id="$textalive-lyric-id$" data-textalive-lyric-diff-id="$textalive-lyric-diff-id$">
+
+    <div id="loading-screen">
+        <div class="loading-bar-track">
+            <div class="loading-bar-fill" id="loading-bar-fill"></div>
         </div>
+        <span class="loading-text" data-en="Loading..." data-jp="読み込み中...">Loading...</span>
+    </div>
 
-        <div id = "textalive-media"></div>
-        <div class = "bg-overlay"></div>
-        <div class = "song-storyboard" id = "song-storyboard"></div>
+    <div id="textalive-media"></div>
+    <div class="bg-overlay"></div>
+    <div class="song-storyboard" id="song-storyboard"></div>
 
-        <div class = "song-progress-bar">
-            <div class = "song-progress-fill" id = "progress-fill"></div>
-        </div>
+    <div class="song-progress-bar">
+        <div class="song-progress-fill" id="progress-fill"></div>
+    </div>
 
-        <div class = "song-lang">
-            $partial("src/templates/lang_toggle.html")$
-        </div>
+    <div class="song-lang">
+        $partial("src/templates/lang_toggle.html")$
+    </div>
 
-        <div class = "song-controls">
-            <button class = "btn-play-song" id = "btn-play-song"
-                data-title-en = "Play" data-title-jp = "プレイ"
-                title = "Play"><img src = "$path$/images/start-button.svg" alt = "Play"></button>
-            <button class = "btn-stop-song" id = "btn-stop-song"
-                data-title-en = "Stop" data-title-jp = "ストップ"
-                title = "Stop"><img src = "$path$/images/stop-button.svg" alt = "Stop"></button>
-        </div>
+    <div class="song-controls">
+        <button class="btn-play-song" id="btn-play-song" data-title-en="Play" data-title-jp="プレイ" title="Play"><img
+                src="$path$/images/start-button.svg" alt="Play"></button>
+        <button class="btn-stop-song" id="btn-stop-song" data-title-en="Stop" data-title-jp="ストップ" title="Stop"><img
+                src="$path$/images/stop-button.svg" alt="Stop"></button>
+    </div>
 
-        <div class = "song-info">
-            <a href = "$path$/" class = "site-name-link">magical-osu</a>
-            <span class = "song-name" data-en = "$song-name$" data-jp = "$song-name-jp$">$song-name$</span>
-            <span class = "song-author" data-en = "$song-author$" data-jp = "$song-author-jp$">$song-author$</span>
-            <span class = "song-mapper">$song-mapper$</span>
-        </div>
+    <div class="song-info">
+        <a href="$path$/" class="site-name-link">mimi</a>
+        <span class="song-name" data-en="$song-name$" data-jp="$song-name-jp$">$song-name$</span>
+        <span class="song-author" data-en="$song-author$" data-jp="$song-author-jp$">$song-author$</span>
+        <span class="song-mapper">$song-mapper$</span>
+    </div>
 
-        <div id = "game-root"></div>
+    <div id="game-root"></div>
 
-        <div class = "song-page-footer">
-            <a href = "$path$/" class = "btn-back" data-en = "Back" data-jp = "戻る">Back</a>
-        </div>
+    <div class="song-page-footer">
+        <a href="$path$/" class="btn-back" data-en="Back" data-jp="戻る">Back</a>
+    </div>
 
-        <script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src = "https://unpkg.com/textalive-app-api/dist/index.js"></script>
-        <script src = "$path$/js/main.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/textalive-app-api/dist/index.js"></script>
+    <script src="$path$/js/main.js"></script>
 
-    </body>
+</body>
+
 </html>

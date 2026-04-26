@@ -1,5 +1,5 @@
 {
-  "name": "magical-osu",
+  "name": "mimi",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- build",
     "rebuild": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild",
     "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch",
-    "rebuild:pages": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild --path /magical-osu"
+    "rebuild:pages": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild --path /mimi"
   },
   "dependencies": {
     "react": "^18.3.1",

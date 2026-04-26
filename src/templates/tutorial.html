@@ -1,33 +1,35 @@
 <!doctype html>
-<html lang = "en">
-    <head>
-        <meta charset = "utf-8">
-        <meta http-equiv = "x-ua-compatible" content = "ie=edge">
-        <meta name = "viewport" content = "width=device-width, initial-scale=1">
-        <title>magical-osu - $title$</title>
-        $partial("src/templates/imports.html")$
-    </head>
+<html lang="en">
 
-    <body class = "overlay-page">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>mimi - $title$</title>
+    $partial("src/templates/imports.html")$
+</head>
 
-        <div class = "bg-overlay"></div>
+<body class="overlay-page">
 
-        <header class = "home-header">
-            <div class = "home-title">
-                <span class = "site-name">magical-osu</span>
-                <span class = "site-subtitle">Magical Mirai 2026</span>
-            </div>
-        </header>
+    <div class="bg-overlay"></div>
 
-        <main class = "overlay-content">
-            $body$
-        </main>
-
-        <div class = "overlay-footer">
-            <a href = "$path$/" class = "btn-back">Back</a>
+    <header class="home-header">
+        <div class="home-title">
+            <span class="site-name">mimi</span>
+            <span class="site-subtitle">Magical Mirai 2026</span>
         </div>
+    </header>
 
-        <script src = "$path$/js/main.js"></script>
+    <main class="overlay-content">
+        $body$
+    </main>
 
-    </body>
+    <div class="overlay-footer">
+        <a href="$path$/" class="btn-back">Back</a>
+    </div>
+
+    <script src="$path$/js/main.js"></script>
+
+</body>
+
 </html>

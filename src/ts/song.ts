@@ -69,13 +69,13 @@ export function initSongPage(game: GameHandle): void {
     player = new TextAliveApp.Player(opts);
     player.addListener({
       onAppReady(app) {
-        console.info("[magical-osu] onAppReady — managed:", app.managed);
+        console.info("[mimi] onAppReady — managed:", app.managed);
         if (!app.songUrl && player) {
           const videoOpts = hasVideoIds ? {
             video: { beatId, chordId, repetitiveSegmentId, lyricId, lyricDiffId }
           } : undefined;
           player.createFromSongUrl(songUrl, videoOpts).catch(err => {
-            console.error("[magical-osu] createFromSongUrl failed:", err);
+            console.error("[mimi] createFromSongUrl failed:", err);
           });
         }
       },
@@ -118,7 +118,7 @@ export function initSongPage(game: GameHandle): void {
       const notes = await res.json() as Note[];
       game.setChart(notes);
     } catch (err) {
-      console.error("[magical-osu] chart load failed:", err);
+      console.error("[mimi] chart load failed:", err);
     }
   })();
 
