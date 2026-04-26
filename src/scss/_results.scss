@@ -1,7 +1,7 @@
 .results-overlay {
   position: absolute;
   inset: 0;
-  z-index: 200;
+  z-index: var(--z-results);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,11 +41,11 @@
   line-height: 1;
   letter-spacing: -0.02em;
 
-  &--sss { color: #ffd700; text-shadow: 0 0 24px rgba(255, 215, 0, 0.7); }
+  &--sss { color: var(--color-grade-sss); text-shadow: 0 0 24px rgba(255, 215, 0, 0.7); }
   &--ss  { color: var(--color-perfect); text-shadow: 0 0 18px rgba(255, 217, 74, 0.6); }
-  &--s   { color: #c8b4ff; text-shadow: 0 0 14px rgba(200, 180, 255, 0.5); }
+  &--s   { color: var(--color-grade-s); text-shadow: 0 0 14px rgba(200, 180, 255, 0.5); }
   &--a   { color: var(--color-good); text-shadow: 0 0 12px rgba(140, 240, 255, 0.4); }
-  &--b   { color: #7ddc78; }
+  &--b   { color: var(--color-grade-b); }
   &--c   { color: rgba(255, 255, 255, 0.85); }
   &--f   { color: var(--color-miss); }
 }
@@ -118,7 +118,7 @@
   &--share {
     background: rgba(200, 180, 255, 0.15);
     border: 1px solid rgba(200, 180, 255, 0.4);
-    color: #c8b4ff;
+    color: var(--color-grade-s);
     transition: background 0.2s, color 0.2s, border-color 0.2s;
 
     &:hover { background: rgba(200, 180, 255, 0.28); }
@@ -127,7 +127,7 @@
   &--share-copied {
     background: rgba(140, 240, 140, 0.15);
     border-color: rgba(140, 240, 140, 0.4);
-    color: #7ddc78;
+    color: var(--color-grade-b);
   }
 
   &--share-failed {

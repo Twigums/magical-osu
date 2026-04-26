@@ -29,7 +29,7 @@ export function arToMs(ar: number): number {
   return 2000 - (ar - 1) * (1700 / 19);
 }
 
-export function clampAr(n: number): number {
+function clampAr(n: number): number {
   return Math.max(AR_MIN, Math.min(AR_MAX, Math.round(n)));
 }
 
@@ -46,7 +46,7 @@ export const VOLUME_STEP    = 1;
 const VOLUME_STORAGE_KEY  = "songVolume";
 const VOLUME_CHANGE_EVENT = "songVolumeChange";
 
-export function clampVolume(n: number): number {
+function clampVolume(n: number): number {
   return Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, Math.round(n)));
 }
 

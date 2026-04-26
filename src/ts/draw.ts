@@ -23,13 +23,12 @@ export function drawArrow(
   const hw      = r * 0.4;  // arrowhead half-width (flare)
   const shw     = r * 0.17; // shaft half-width
 
-  const a = note.direction;
+  const cosA = Math.cos(note.direction);
+  const sinA = Math.sin(note.direction);
 
   // Rotate local (lx, ly) into canvas space around (cx, cy)
-  const tx = (lx: number, ly: number): number =>
-    cx + Math.cos(a) * lx - Math.sin(a) * ly;
-  const ty = (lx: number, ly: number): number =>
-    cy + Math.sin(a) * lx + Math.cos(a) * ly;
+  const tx = (lx: number, ly: number): number => cx + cosA * lx - sinA * ly;
+  const ty = (lx: number, ly: number): number => cy + sinA * lx + cosA * ly;
 
   const x0 = -len / 2;           // tail
   const x1 =  len / 2 - headLen; // shaft/head junction

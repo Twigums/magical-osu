@@ -5,11 +5,27 @@
   --negative-text-color: #f7f3f2;
   --base-highlight-color: #785ef0;
 
-  // hit judgment and grade display colors
+  // hit judgment colors
   --color-perfect: #ffd94a;
   --color-good: #8cf0ff;
   --color-miss: #ff6b6b;
 
-  // song page / loading background
+  // grade colors (SSS/S/B not covered by judgment colors above)
+  --color-grade-sss: #ffd700;
+  --color-grade-s: #c8b4ff;
+  --color-grade-b: #7ddc78;
+
+  // dark surface (panel backgrounds)
+  --surface-panel: #12092a;
+
+  // page backgrounds
+  --bg-gradient-home: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d1a 60%, #000 100%);
   --bg-gradient-song: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+
+  // z-index stacking layers
+  --z-chrome:  10;
+  --z-hud:    100;
+  --z-results: 200;
+  --z-modal:   500;
+  --z-loading: 1000;
 }

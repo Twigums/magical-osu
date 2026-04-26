@@ -3,7 +3,7 @@
 #loading-screen {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--z-loading);
   background: var(--bg-gradient-song);
   display: flex;
   flex-direction: column;
@@ -114,7 +114,7 @@ html body.song-page {
   right: 0;
   height: 4px;
   background: rgba(255, 255, 255, 0.2);
-  z-index: 100;
+  z-index: var(--z-hud);
 
   .song-progress-fill {
     height: 100%;
@@ -128,7 +128,7 @@ html body.song-page {
   position: fixed;
   top: 1.5rem;
   right: 2rem;
-  z-index: 100;
+  z-index: var(--z-hud);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -140,7 +140,7 @@ html body.song-page {
   right: 2rem;
   display: flex;
   gap: 0.75rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 
   button {
     background: rgba(255, 255, 255, 0.15);
@@ -179,7 +179,7 @@ html body.song-page {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 
   .site-name-link {
     font-size: 1.1rem;
@@ -279,7 +279,7 @@ html body.song-page {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 }
 
 .song-page .btn-back {

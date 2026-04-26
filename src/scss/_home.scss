@@ -18,7 +18,7 @@ html body.home-page {
     content: '';
     position: absolute;
     inset: -10px;
-    background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d1a 60%, #000 100%);
+    background: var(--bg-gradient-home);
     filter: blur(8px);
   }
 
@@ -40,7 +40,7 @@ html body.home-page {
   align-items: flex-start;
   padding: 1.5rem 2rem;
   border-bottom: none;
-  z-index: 10;
+  z-index: var(--z-chrome);
 }
 
 .home-lang {
@@ -171,7 +171,7 @@ html body.home-page {
   gap: 1.5rem;
   padding: 1.2rem;
   border-top: none;
-  z-index: 10;
+  z-index: var(--z-chrome);
 
   img {
     height: 1.5rem;

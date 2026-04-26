@@ -6,6 +6,6 @@ export function useNumericSetting(
   subscribe: (cb: (v: number) => void) => () => void,
 ): [number, (v: number) => void] {
   const [value, setValue] = useState(load);
-  useEffect(() => subscribe(setValue), []);
+  useEffect(() => subscribe(setValue), [subscribe]);
   return [value, save];
 }
