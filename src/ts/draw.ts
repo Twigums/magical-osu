@@ -3,11 +3,8 @@ import type { Note } from "./game";
 // Shared between hit detection in game.ts and rendering here
 export const NOTE_RADIUS = 42;
 
-/**
- * Draws a note arrow onto ctx.
- * appearProgress: 0 = just appearing (outline fades in), 1 = fully filled (at hit time).
- * scale: canvas pixels per logical unit (canvas.width / LOGICAL_W).
- */
+// appearProgress: 0 = faint outline just appearing, 1 = fully filled at hit time
+// scale: canvas pixels per logical unit (canvas.width / LOGICAL_W)
 export function drawArrow(
   ctx: CanvasRenderingContext2D,
   note: Note,

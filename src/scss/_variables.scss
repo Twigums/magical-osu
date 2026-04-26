@@ -1,9 +1,15 @@
-// colors
 :root {
+  // base page colors
   --base-color: #f7f3f2;
-  --negative-color: #272525;
   --base-text-color: #272525;
   --negative-text-color: #f7f3f2;
   --base-highlight-color: #785ef0;
-  --negative-highlight-color: #d4bbff;
+
+  // hit judgment and grade display colors
+  --color-perfect: #ffd94a;
+  --color-good: #8cf0ff;
+  --color-miss: #ff6b6b;
+
+  // song page / loading background
+  --bg-gradient-song: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
 }

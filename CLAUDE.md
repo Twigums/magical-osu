@@ -57,13 +57,30 @@ stack build --system-ghc
 
 - `src/tabs/` — Top-level pages. `home.md` → `index.html`, `song1.md` → `song1/index.html`, etc.
 - `src/songs/<name>/` — Per-song assets. `.mimi` chart files compiled to `.json`; other files copied verbatim
-- `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `imports.html`, `sitemap.xml`
+- `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `settings_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
 - `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring
 - `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop
-- `src/ts/react/` — React components (`GameSurface.tsx` — canvas + hit feedback, `HomeLayoutSwitcher.tsx`, `useLang.ts`)
-- `static/` — Copied verbatim to output (images, `robots.txt`, etc.)
+- `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`)
+- `src/ts/grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
+- `src/ts/lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`
+- `src/ts/settings.ts` — Approach rate (AR) settings: `loadAr`, `saveAr`, `subscribeAr`, `arToMs`
+- `src/ts/share.ts` — Share / clipboard fallback for result sharing
+- `src/ts/sitePath.ts` — Site sub-path helpers (`getSitePath`, `withPath`)
+- `src/ts/storyboard.ts` — TextAlive lyrics storyboard renderer
+- `src/ts/textalive.ts` — TypeScript type declarations for the TextAlive App API
+- `src/ts/utils.ts` — Math utilities (`clamp`, `angleDiff`)
+- `src/ts/react/` — React components:
+  - `GameSurface.tsx` — canvas + score display + hit feedback toasts + `ResultsOverlay`
+  - `HomeLayoutSwitcher.tsx` — home page layout state (original / play / info)
+  - `OptionsPanel.tsx` — settings modal (approach rate slider + preview)
+  - `ResultsOverlay.tsx` — post-song results screen (grade, stats, share, try again)
+  - `ApproachPreview.tsx` — animated arrow canvas preview for AR setting
+  - `useLang.ts` — hook: current language from `localStorage`, re-reads on toggle click
+  - `useApproachRate.ts` — hook: AR state synced to `localStorage` via custom event
+- `src/tools/osu2mimi.ts` — CLI converter from `.osu` slider format to `.mimi` chart format
+- `static/` — Copied verbatim to output (images, audio, `robots.txt`, etc.)
 
 ### Output
 
@@ -93,4 +110,23 @@ c, 5, 270, 600, 450
 
 ### SCSS
 
-Partials use `@use` with `variables` as `*` (variables are globally forwarded). Dark mode is toggled via JS adding `dark-mode` class to `<html>`; theme preference is persisted in `localStorage`.
+Partials use `@use` with `variables` as `*` (variables are globally forwarded). `_variables.scss` defines CSS custom properties on `:root` for base page colors, hit judgment colors (`--color-perfect/good/miss`), and the shared song background gradient (`--bg-gradient-song`).
+
+### Song Frontmatter Fields
+
+Each song tab (`src/tabs/<song>.md`) sets these frontmatter fields used by `song.html`:
+
+| Field | Description |
+|-------|-------------|
+| `title` | Page `<title>` suffix |
+| `song-name` / `song-name-jp` | Song title (EN / JP) |
+| `song-author` / `song-author-jp` | Artist name (EN / JP) |
+| `song-mapper` | Charter name |
+| `song-url` | Piapro/streaming URL passed to TextAlive |
+| `textalive-beat-id` | TextAlive video beat ID |
+| `textalive-chord-id` | TextAlive video chord ID |
+| `textalive-repetitive-segment-id` | TextAlive video repetitive segment ID |
+| `textalive-lyric-id` | TextAlive video lyric ID |
+| `textalive-lyric-diff-id` | TextAlive video lyric diff ID |
+
+The `song-chart` path and `textalive-token` are injected by `site.hs` (not frontmatter).

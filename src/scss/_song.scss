@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+  background: var(--bg-gradient-song);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,7 +55,7 @@ html body.song-page {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+  background: var(--bg-gradient-song);
 }
 
 .song-storyboard {
@@ -262,9 +262,9 @@ html body.song-page {
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
   animation: hit-feedback-fade 0.6s ease-out forwards;
 
-  &.hit-perfect { color: #ffd94a; }
-  &.hit-good    { color: #8cf0ff; }
-  &.hit-miss    { color: #ff6b6b; }
+  &.hit-perfect { color: var(--color-perfect); }
+  &.hit-good    { color: var(--color-good); }
+  &.hit-miss    { color: var(--color-miss); }
 }
 
 @keyframes hit-feedback-fade {
@@ -280,23 +280,8 @@ html body.song-page {
 }
 
 .song-page .btn-back {
-  padding: 0.6rem 1.6rem;
-  font-size: 1rem;
-  font-family: inherit;
-  color: rgba(255, 255, 255, 0.7);
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  letter-spacing: 0.08em;
   text-decoration: none;
   display: inline-block;
-  transition: background 0.2s, color 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    text-decoration: none;
-  }
 }
 
 @media (max-width: 600px) {

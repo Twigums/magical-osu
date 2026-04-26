@@ -42,12 +42,12 @@
   letter-spacing: -0.02em;
 
   &--sss { color: #ffd700; text-shadow: 0 0 24px rgba(255, 215, 0, 0.7); }
-  &--ss  { color: #ffd94a; text-shadow: 0 0 18px rgba(255, 217, 74, 0.6); }
+  &--ss  { color: var(--color-perfect); text-shadow: 0 0 18px rgba(255, 217, 74, 0.6); }
   &--s   { color: #c8b4ff; text-shadow: 0 0 14px rgba(200, 180, 255, 0.5); }
-  &--a   { color: #8cf0ff; text-shadow: 0 0 12px rgba(140, 240, 255, 0.4); }
+  &--a   { color: var(--color-good); text-shadow: 0 0 12px rgba(140, 240, 255, 0.4); }
   &--b   { color: #7ddc78; }
   &--c   { color: rgba(255, 255, 255, 0.85); }
-  &--f   { color: #ff6b6b; }
+  &--f   { color: var(--color-miss); }
 }
 
 .results-stats {
@@ -84,9 +84,9 @@
   margin-top: 0.25rem;
   font-size: 0.8rem;
 
-  &__perfect { color: #ffd94a; }
-  &__good    { color: #8cf0ff; }
-  &__miss    { color: #ff6b6b; }
+  &__perfect { color: var(--color-perfect); }
+  &__good    { color: var(--color-good); }
+  &__miss    { color: var(--color-miss); }
 }
 
 .results-actions {

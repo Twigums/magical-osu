@@ -4,7 +4,7 @@ export type Grade = "SSS" | "SS" | "S" | "A" | "B" | "C" | "F";
 
 export function computeGrade(stats: GameStats): Grade {
   if (stats.total === 0) return "F";
-  const accuracy = (stats.perfect * 5 + stats.good * 2) / (stats.total * 5);
+  const accuracy = computeAccuracy(stats);
   if (accuracy >= 1.00) return "SSS";
   if (accuracy >= 0.99) return "SS";
   if (accuracy >= 0.95) return "S";

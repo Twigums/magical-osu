@@ -10,10 +10,9 @@ interface SharePayload {
 export async function shareResult(payload: SharePayload): Promise<boolean> {
   const { accuracy, grade, songName, lang } = payload;
   const url = window.location.href;
-  const accuracyPct = accuracy;
   const text = lang === "jp"
-    ? `「${songName}」で ${accuracyPct} (${grade}) を獲得しました！\n${url}`
-    : `I scored ${accuracyPct} (${grade}) on "${songName}" in mimi!\n${url}`;
+    ? `「${songName}」で ${accuracy} (${grade}) を獲得しました！\n${url}`
+    : `I scored ${accuracy} (${grade}) on "${songName}" in mimi!\n${url}`;
 
   if (navigator.share) {
     try {
