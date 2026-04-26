@@ -8,7 +8,7 @@
   xmlns:video = "http://www.google.com/schemas/sitemap-video/1.1"
 >
   <url>
-    <loc>https://example.com/magical-osu</loc>
+    <loc>https://example.com/mimi</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
