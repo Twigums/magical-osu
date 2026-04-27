@@ -1,4 +1,5 @@
 import type { GameStats } from "./game";
+import { PERFECT_POINTS, GOOD_POINTS } from "./game";
 
 export type Grade = "SSS" | "SS" | "S" | "A" | "B" | "C" | "F";
 
@@ -16,5 +17,5 @@ export function computeGrade(stats: GameStats): Grade {
 
 export function computeAccuracy(stats: GameStats): number {
   if (stats.total === 0) return 0;
-  return (stats.perfect * 5 + stats.good * 2) / (stats.total * 5);
+  return (stats.perfect * PERFECT_POINTS + stats.good * GOOD_POINTS) / (stats.total * PERFECT_POINTS);
 }

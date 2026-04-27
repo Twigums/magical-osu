@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
 import { useApproachRate } from "./useApproachRate";
 import { useVolume } from "./useVolume";
@@ -9,13 +9,16 @@ import { useTransitionState } from "./useTransitionState";
 
 const isSongPage = document.body.classList.contains("song-page");
 
+const sliderFill = (val: number, min: number, max: number): CSSProperties =>
+  ({ '--fill': `${((val - min) / (max - min)) * 100}%` } as CSSProperties);
+
 export function OptionsPanel() {
   const [open, setOpen] = useState(false);
-  const { state }       = useTransitionState(open, 240);
-  const [ar, setAr]         = useApproachRate();
-  const [vol, setVol]       = useVolume();
-  const [hsVol, setHsVol]   = useHitsoundVolume();
-  const lang                = useLang();
+  const { state } = useTransitionState(open, 240);
+  const [ar, setAr] = useApproachRate();
+  const [vol, setVol] = useVolume();
+  const [hsVol, setHsVol] = useHitsoundVolume();
+  const lang = useLang();
 
   useEffect(() => {
     const btn = document.getElementById("settings-btn");
@@ -57,6 +60,7 @@ export function OptionsPanel() {
             max={VOLUME_MAX}
             step={VOLUME_STEP}
             value={vol}
+            style={sliderFill(vol, VOLUME_MIN, VOLUME_MAX)}
             onChange={e => setVol(Number(e.target.value))}
           />
         </div>
@@ -73,6 +77,7 @@ export function OptionsPanel() {
             max={VOLUME_MAX}
             step={VOLUME_STEP}
             value={hsVol}
+            style={sliderFill(hsVol, VOLUME_MIN, VOLUME_MAX)}
             onChange={e => setHsVol(Number(e.target.value))}
           />
         </div>
@@ -89,6 +94,7 @@ export function OptionsPanel() {
             max={AR_MAX}
             step={1}
             value={ar}
+            style={sliderFill(ar, AR_MIN, AR_MAX)}
             disabled={isSongPage}
             onChange={e => setAr(Number(e.target.value))}
           />

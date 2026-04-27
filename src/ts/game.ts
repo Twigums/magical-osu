@@ -2,10 +2,10 @@ import { angleDiff, clamp } from "./utils";
 import { drawArrow, NOTE_RADIUS } from "./draw";
 import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
 
-const PERFECT_MS     = 32;
-const GOOD_MS        = 100;
-const PERFECT_POINTS = 5;
-const GOOD_POINTS    = 2;
+const PERFECT_MS           = 32;
+const GOOD_MS              = 100;
+export const PERFECT_POINTS = 5;
+export const GOOD_POINTS    = 2;
 
 export const LOGICAL_W = 800;
 export const LOGICAL_H = 600;
@@ -39,7 +39,6 @@ export interface GameHandle {
   reset(): void;
   tick(songMs: number): void;
   getStats(): GameStats;
-  /** Update the approach window duration at runtime (e.g. when the user changes AR). */
   setApproachMs(ms: number): void;
 }
 
@@ -56,14 +55,11 @@ export function createGame(deps: GameDeps): GameHandle {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
 
-  // init AR immediately
   let approachMs = arToMs(loadAr());
 
   let audioCtx: AudioContext | null = null;
   let hitSoundBuffer: AudioBuffer | null = null;
   let hitsoundGain: GainNode | null = null;
-
-  const hitsoundFactor = volToFactor(loadHitsoundVolume());
 
   const playHitSound = (): void => {
     if (!audioCtx || !hitSoundBuffer || !hitsoundGain) return;
@@ -81,7 +77,7 @@ export function createGame(deps: GameDeps): GameHandle {
       loading = true;
       audioCtx = new AudioContext();
       hitsoundGain = audioCtx.createGain();
-      hitsoundGain.gain.value = hitsoundFactor;
+      hitsoundGain.gain.value = volToFactor(loadHitsoundVolume());
       hitsoundGain.connect(audioCtx.destination);
       fetch(url)
         .then(r => r.arrayBuffer())

@@ -114,7 +114,6 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     subscribeVolume(v => { if (player) player.volume = v; });
     player.addListener({
       onAppReady(app) {
-        console.info("[mimi] onAppReady — managed:", app.managed);
         if (!app.songUrl && player) {
           const videoOpts = hasVideoIds ? {
             video: { beatId, chordId, repetitiveSegmentId, lyricId, lyricDiffId }

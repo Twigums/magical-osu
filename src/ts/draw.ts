@@ -18,7 +18,7 @@ export function drawArrow(
   const base     = note.kind === "click" ? "255, 82, 82"  : "82, 162, 255";
   const darkBase = note.kind === "click" ? "191, 62, 62"  : "62, 122, 191";
 
-  const len     = r * 1.0;  // total arrow length
+  const len     = r;         // total arrow length
   const headLen = r * 0.4;  // arrowhead length
   const hw      = r * 0.4;  // arrowhead half-width (flare)
   const shw     = r * 0.17; // shaft half-width
@@ -65,7 +65,6 @@ export function drawArrow(
   ctx.fill();
   ctx.restore();
 
-  // Outline
   buildPath();
   ctx.strokeStyle = `rgba(${darkBase}, ${0.9 * outlineAlpha})`;
   ctx.lineWidth = 2.5 * scale;
