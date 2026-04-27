@@ -67,7 +67,7 @@ stack build --system-ghc
 - `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`)
 - `src/ts/grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
 - `src/ts/lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`
-- `src/ts/settings.ts` — Numeric settings (AR + volume) with shared localStorage/event helpers: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`
+- `src/ts/settings.ts` — Numeric settings (AR + volume) with shared localStorage/event helpers: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`; hitsound volume helpers: `loadHitsoundVolume`, `saveHitsoundVolume`, `subscribeHitsoundVolume`
 - `src/ts/share.ts` — Share / clipboard fallback for result sharing
 - `src/ts/sitePath.ts` — Site sub-path helpers (`getSitePath`, `withPath`)
 - `src/ts/storyboard.ts` — TextAlive lyrics storyboard renderer
@@ -76,13 +76,14 @@ stack build --system-ghc
 - `src/ts/react/` — React components:
   - `GameSurface.tsx` — canvas + score display + hit feedback toasts + `ResultsOverlay`
   - `HomeLayoutSwitcher.tsx` — home page layout state (original / play / info)
-  - `OptionsPanel.tsx` — settings modal (volume slider + AR slider; AR locked on song page)
+  - `OptionsPanel.tsx` — settings modal (music volume slider + hitsound volume slider + AR slider; AR locked on song page)
   - `ResultsOverlay.tsx` — post-song results screen (grade, stats, share, try again)
   - `ApproachPreview.tsx` — animated arrow canvas preview for AR setting
   - `useLang.ts` — hook: current language from `localStorage`, re-reads on toggle click
   - `useApproachRate.ts` — hook: AR state synced to `localStorage` via custom event
   - `useVolume.ts` — hook: volume (0–100) synced to `localStorage` via custom event
-  - `useSetting.ts` — generic `useNumericSetting` hook backing `useApproachRate` and `useVolume`
+  - `useHitsoundVolume.ts` — hook: hitsound volume (0–100) synced to `localStorage` via custom event
+  - `useSetting.ts` — generic `useNumericSetting` hook backing `useApproachRate`, `useVolume`, and `useHitsoundVolume`
 - `src/tools/osu2mimi.ts` — CLI converter from `.osu` slider format to `.mimi` chart format
 - `static/` — Copied verbatim to output (images, audio, `robots.txt`, etc.)
 

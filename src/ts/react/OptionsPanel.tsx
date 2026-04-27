@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
 import { useApproachRate } from "./useApproachRate";
 import { useVolume } from "./useVolume";
+import { useHitsoundVolume } from "./useHitsoundVolume";
 import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./useLang";
 import { useTransitionState } from "./useTransitionState";
@@ -11,9 +12,10 @@ const isSongPage = document.body.classList.contains("song-page");
 export function OptionsPanel() {
   const [open, setOpen] = useState(false);
   const { state }       = useTransitionState(open, 240);
-  const [ar, setAr]     = useApproachRate();
-  const [vol, setVol]   = useVolume();
-  const lang            = useLang();
+  const [ar, setAr]         = useApproachRate();
+  const [vol, setVol]       = useVolume();
+  const [hsVol, setHsVol]   = useHitsoundVolume();
+  const lang                = useLang();
 
   useEffect(() => {
     const btn = document.getElementById("settings-btn");
@@ -45,7 +47,7 @@ export function OptionsPanel() {
 
         <div className="options-row">
           <label className="options-label">
-            <span>{isJp ? "音量" : "Volume"}</span>
+            <span>{isJp ? "音楽音量" : "Music Volume"}</span>
             <span className="options-setting-value">{vol}%</span>
           </label>
           <input
@@ -56,6 +58,22 @@ export function OptionsPanel() {
             step={VOLUME_STEP}
             value={vol}
             onChange={e => setVol(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="options-row">
+          <label className="options-label">
+            <span>{isJp ? "ヒット音量" : "Hitsound Volume"}</span>
+            <span className="options-setting-value">{hsVol}%</span>
+          </label>
+          <input
+            type="range"
+            className="options-slider"
+            min={VOLUME_MIN}
+            max={VOLUME_MAX}
+            step={VOLUME_STEP}
+            value={hsVol}
+            onChange={e => setHsVol(Number(e.target.value))}
           />
         </div>
 

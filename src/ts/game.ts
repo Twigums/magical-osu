@@ -1,6 +1,6 @@
 import { angleDiff, clamp } from "./utils";
 import { drawArrow, NOTE_RADIUS } from "./draw";
-import { arToMs, loadAr } from "./settings";
+import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
 
 const PERFECT_MS     = 32;
 const GOOD_MS        = 100;
@@ -61,12 +61,15 @@ export function createGame(deps: GameDeps): GameHandle {
 
   let audioCtx: AudioContext | null = null;
   let hitSoundBuffer: AudioBuffer | null = null;
+  let hitsoundGain: GainNode | null = null;
+
+  const hitsoundFactor = volToFactor(loadHitsoundVolume());
 
   const playHitSound = (): void => {
-    if (!audioCtx || !hitSoundBuffer) return;
+    if (!audioCtx || !hitSoundBuffer || !hitsoundGain) return;
     const source = audioCtx.createBufferSource();
     source.buffer = hitSoundBuffer;
-    source.connect(audioCtx.destination);
+    source.connect(hitsoundGain);
     source.start();
   };
 
@@ -77,6 +80,9 @@ export function createGame(deps: GameDeps): GameHandle {
       if (loading) return;
       loading = true;
       audioCtx = new AudioContext();
+      hitsoundGain = audioCtx.createGain();
+      hitsoundGain.gain.value = hitsoundFactor;
+      hitsoundGain.connect(audioCtx.destination);
       fetch(url)
         .then(r => r.arrayBuffer())
         .then(buf => audioCtx!.decodeAudioData(buf))
@@ -86,6 +92,10 @@ export function createGame(deps: GameDeps): GameHandle {
     window.addEventListener("pointerdown", loadSound, { once: true });
     window.addEventListener("keydown",     loadSound, { once: true });
   }
+
+  subscribeHitsoundVolume(v => {
+    if (hitsoundGain) hitsoundGain.gain.value = volToFactor(v);
+  });
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();

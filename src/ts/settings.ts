@@ -50,6 +50,15 @@ function clampVolume(n: number): number {
   return Math.max(VOLUME_MIN, Math.min(VOLUME_MAX, Math.round(n)));
 }
 
+export function volToFactor(v: number): number { return clampVolume(v) / VOLUME_MAX; }
+
 export function loadVolume():                              number      { return loadNumericSetting(VOLUME_STORAGE_KEY, clampVolume, VOLUME_DEFAULT); }
 export function saveVolume(v: number):                     void        { saveNumericSetting(VOLUME_STORAGE_KEY, VOLUME_CHANGE_EVENT, clampVolume, v); }
 export function subscribeVolume(cb: (v: number) => void):  () => void  { return subscribeNumericSetting(VOLUME_CHANGE_EVENT, cb); }
+
+const HITSOUND_VOLUME_STORAGE_KEY  = "hitsoundVolume";
+const HITSOUND_VOLUME_CHANGE_EVENT = "hitsoundVolumeChange";
+
+export function loadHitsoundVolume():                              number      { return loadNumericSetting(HITSOUND_VOLUME_STORAGE_KEY, clampVolume, VOLUME_DEFAULT); }
+export function saveHitsoundVolume(v: number):                     void        { saveNumericSetting(HITSOUND_VOLUME_STORAGE_KEY, HITSOUND_VOLUME_CHANGE_EVENT, clampVolume, v); }
+export function subscribeHitsoundVolume(cb: (v: number) => void):  () => void  { return subscribeNumericSetting(HITSOUND_VOLUME_CHANGE_EVENT, cb); }
