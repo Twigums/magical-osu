@@ -1,4 +1,4 @@
-# Visual Aspect of SITE
+# Visual Aspect of mimi
 
 This file will explain everything on the visual aspect of the website, excluding gameplay related aspects. This specifically means how each page looks in format, art, and layout. Non-game user interaction is also described in this file.
 
@@ -33,3 +33,18 @@ The objects in the page fits the screen perfectly. Users across all supported di
 - In the center of the screen is the gameplay. There is a faint, slightly more opaque, white outline for where the game will take place. When the play button is pressed, the game will begin and not stop until the song is completed or the stop button is pressed.
     - Relative to the screen size, for tablet and monitor displays, the game sits at an aspect ratio of 4:3 inside the page. There is a small gap between the borders of the game and the top and bottom of the page. For phone displays, the aspect ratio is still 4:3. However, the gap between the borders is miniscule, and the described play, stop, and back buttons are now pushed more towards the center to give the game area more space.
 - On the bottom of the screen is a single button on the right side. This is the "Back" button. This button is the same "Back" button as the one described in the "home tab" and will redirect to the "home tab".
+
+## Settings / Options Panel
+A settings button sits in the top-right header area of the home tab, next to the language toggle. Clicking it opens a modal overlay where the player can adjust the approach rate. The modal includes a slider and an animated preview that demonstrates the approach animation at the chosen speed. The setting persists across sessions.
+
+## Loading Screen (Song Tab)
+When a song tab loads, a full-screen overlay is shown with a progress bar while assets load. Once all assets are ready, the screen fades out. If loading takes too long, the screen is dismissed automatically.
+
+## Hit Feedback (Song Tab)
+After each note is resolved, a brief label floats up from the note's position and fades out, indicating the judgement result.
+
+## Score Display (Song Tab)
+A live score counter is displayed in the game area and updates on each hit.
+
+## Results Overlay (Song Tab)
+After the song finishes, an overlay appears inside the game area. It shows the player's grade, score, accuracy, and a breakdown by judgement. Three actions are available: share the result, try again, or return to the home tab.

@@ -21,6 +21,12 @@ lookupHeader key ls =
         (v:_) -> Right v
         []    -> Left $ "Missing header field: " ++ key
 
+lookupHeaderDef :: String -> String -> [String] -> String
+lookupHeaderDef key def ls =
+    case [v | l <- ls, Just (k, v) <- [parseHeaderLine l], k == key] of
+        (v:_) -> v
+        []    -> def
+
 readDouble :: String -> String -> Either String Double
 readDouble name s = case reads (trim s) of
     [(v, "")] -> Right v
@@ -34,19 +40,19 @@ data NoteEntry = NoteEntry
     , neDirection :: Double
     }
 
-parseNote :: Double -> Double -> String -> Either String NoteEntry
-parseNote bpm offsetMs line =
+parseNote :: (Double -> Double) -> String -> Either String NoteEntry
+parseNote toMs line =
     case map trim (splitOn ',' line) of
-        [k, b, d, x, y] -> do
-            beat <- readDouble "beat"    b
-            deg  <- readDouble "degrees" d
-            nx   <- readDouble "x"       x
-            ny   <- readDouble "y"       y
+        [k, t, d, x, y] -> do
+            t'  <- readDouble "time"    t
+            deg <- readDouble "degrees" d
+            nx  <- readDouble "x"       x
+            ny  <- readDouble "y"       y
             let kind = case map toLower k of
                     "c" -> "click"
                     "s" -> "stream"
                     _   -> map toLower k
-            let timeMs  = offsetMs + (beat - 1.0) * (60000.0 / bpm)
+            let timeMs  = toMs t'
             let radians = normalizeAngle (-(deg * pi / 180.0))
             Right $ NoteEntry kind timeMs nx ny radians
         _ -> Left $ "Expected 5 comma-separated fields: " ++ line
@@ -78,9 +84,15 @@ compileChart content = do
         hLines    = takeWhile (not . null . trim) ls
         rest      = dropWhile (null . trim) (drop (length hLines) ls)
         noteLines = filter isDataLine rest
-    bpm <- lookupHeader "bpm"    hLines >>= readDouble "bpm"
-    off <- lookupHeader "offset" hLines >>= readDouble "offset"
-    notes <- mapM (parseNote bpm off) noteLines
+        timeUnit  = map toLower $ lookupHeaderDef "time_unit" "beat" hLines
+    toMs <- case timeUnit of
+        "ms"   -> Right id
+        "beat" -> do
+            bpm <- lookupHeader "bpm"    hLines >>= readDouble "bpm"
+            off <- lookupHeader "offset" hLines >>= readDouble "offset"
+            Right $ \beat -> off + (beat - 1.0) * (60000.0 / bpm)
+        other  -> Left $ "Unknown time_unit: " ++ other
+    notes <- mapM (parseNote toMs) noteLines
     Right $ "[\n" ++ intercalate ",\n" (map renderNote notes) ++ "\n]\n"
   where
     isDataLine l = let t = trim l

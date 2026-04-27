@@ -9,11 +9,16 @@
     $partial("src/templates/imports.html")$
 </head>
 
-<body class="song-page" data-song-url="$song-url$" data-song-chart="$song-chart$"
-    data-textalive-token="$textalive-token$" data-textalive-beat-id="$textalive-beat-id$"
+<body class="song-page"
+    data-hit-sound-url="$path$/audio/snare.mp3"
+    data-song-url="$song-url$"
+    data-song-chart="$song-chart$"
+    data-textalive-token="$textalive-token$"
+    data-textalive-beat-id="$textalive-beat-id$"
     data-textalive-chord-id="$textalive-chord-id$"
     data-textalive-repetitive-segment-id="$textalive-repetitive-segment-id$"
-    data-textalive-lyric-id="$textalive-lyric-id$" data-textalive-lyric-diff-id="$textalive-lyric-diff-id$">
+    data-textalive-lyric-id="$textalive-lyric-id$"
+    data-textalive-lyric-diff-id="$textalive-lyric-diff-id$">
 
     <div id="loading-screen">
         <div class="loading-bar-track">
@@ -32,6 +37,7 @@
 
     <div class="song-lang">
         $partial("src/templates/lang_toggle.html")$
+        $partial("src/templates/settings_toggle.html")$
     </div>
 
     <div class="song-controls">

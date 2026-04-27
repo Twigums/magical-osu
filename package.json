@@ -8,7 +8,8 @@
     "build": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- build",
     "rebuild": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild",
     "watch": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- watch",
-    "rebuild:pages": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild --path /mimi"
+    "rebuild:pages": "[ -f .env ] && . ./.env; stack exec --system-ghc site -- rebuild --path /mimi",
+    "convert:osu": "npx esbuild src/tools/osu2mimi.ts --bundle --platform=node --outfile=/tmp/osu2mimi.js --log-level=silent && node /tmp/osu2mimi.js"
   },
   "dependencies": {
     "react": "^18.3.1",

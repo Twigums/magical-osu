@@ -1,6 +1,6 @@
-# Gameplay Aspect of SITE
+# Gameplay Aspect of mimi
 
-This file will explain everything on the gameplay aspect of the website, specifically for all songs. This includes the core gameplay, mechanics, and gameplay visuals.
+This file will explain everything on the gameplay aspect of mimi, specifically for all songs. This includes the core gameplay, mechanics, and gameplay visuals.
 
 The gameplay will officially support these dimensions:
 - Monitor: 1920 x 1080 px
@@ -13,7 +13,7 @@ The game should feel satisfying and rhythmic. The margins for the judgement wind
 A good analogy is comparing this gameplay to Beat Saber, where note hitting is determined by swiping (slashing in Beat Saber).
 
 The TextAlive song information should be from `/wiki/6W2N_chorus_timings.jsonc`.
-The TextAlive API token to use is: AIOQxRTzslB2Pfdb.
+The TextAlive API token to use is: N6S7A1HvahiwDLUg.
 
 ## Notes
 There are two different types of notes in the game:
@@ -32,3 +32,50 @@ The judgement window is the acceptable margin of error for valid hits. Score is 
 
 ## Scoring
 Scoring is simply defined as the sum of points obtained by the player according to the judgement window by the end of the song.
+
+A live score counter is displayed in the game area and updates on each hit.
+
+## Accuracy and Grade
+At the end of a song, an accuracy percentage and letter grade are computed.
+
+**Accuracy formula:**
+```
+accuracy = (perfect × 5 + good × 2) / (total × 5)
+```
+
+**Grade thresholds:**
+| Grade | Accuracy |
+|-------|----------|
+| SSS   | 100%     |
+| SS    | ≥ 99%    |
+| S     | ≥ 95%    |
+| A     | ≥ 85%    |
+| B     | ≥ 70%    |
+| C     | ≥ 50%    |
+| F     | < 50%    |
+
+## Approach Rate (AR)
+The approach rate controls how far in advance notes become visible before their hit time. It is configurable by the player from the options panel.
+
+- **Range:** AR 1–20 (default: AR 12)
+- **Window formula:** `2000 - (ar - 1) × (1700 / 19)` milliseconds
+  - AR 1 → 2000 ms approach window
+  - AR 12 → ~1100 ms approach window
+  - AR 20 → ~300 ms approach window
+
+The setting persists across sessions.
+
+## Angular Tolerance
+The acceptable margin of error for swipe direction is **±30°** (π/6 radians) from the note's specified direction.
+
+## Hitsound
+A short sound plays on every successful hit (perfect or good).
+
+## Completion Screen
+When the song ends, a results overlay appears inside the game area. It displays:
+- Letter grade (color-coded)
+- Total score
+- Accuracy percentage
+- Breakdown of perfect, good, and miss counts
+
+Three actions are available: **Share** (shares the result), **Try Again** (resets playback), and **Back** (returns to the home tab).

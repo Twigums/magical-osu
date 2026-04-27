@@ -1,16 +1,15 @@
 import { angleDiff, clamp } from "./utils";
+import { drawArrow, NOTE_RADIUS } from "./draw";
+import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
 
-const PERFECT_MS     = 32;
-const GOOD_MS        = 100;
-const PERFECT_POINTS = 5;
-const GOOD_POINTS    = 2;
-
-const APPROACH_MS    = 1000;
+const PERFECT_MS           = 32;
+const GOOD_MS              = 100;
+export const PERFECT_POINTS = 5;
+export const GOOD_POINTS    = 2;
 
 export const LOGICAL_W = 800;
 export const LOGICAL_H = 600;
 
-const NOTE_RADIUS    = 42;
 const ANGULAR_MARGIN = Math.PI / 6;
 
 export type NoteKind   = "click" | "stream";
@@ -27,23 +26,72 @@ export interface Note {
   hitResult?: HitResult;
 }
 
+export interface GameStats {
+  score: number;
+  perfect: number;
+  good: number;
+  miss: number;
+  total: number;
+}
+
 export interface GameHandle {
   setChart(notes: Note[]): void;
   reset(): void;
   tick(songMs: number): void;
+  getStats(): GameStats;
+  setApproachMs(ms: number): void;
 }
 
 export interface GameDeps {
-  canvas:     HTMLCanvasElement;
-  gameArea:   HTMLElement;
-  onScore:    (score: number) => void;
-  onFeedback: (result: HitResult, x: number, y: number) => void;
+  canvas:       HTMLCanvasElement;
+  gameArea:     HTMLElement;
+  onScore:      (score: number) => void;
+  onFeedback:   (result: HitResult, x: number, y: number) => void;
+  hitSoundUrl?: string;
 }
 
 export function createGame(deps: GameDeps): GameHandle {
   const { canvas, gameArea, onScore, onFeedback } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
+
+  let approachMs = arToMs(loadAr());
+
+  let audioCtx: AudioContext | null = null;
+  let hitSoundBuffer: AudioBuffer | null = null;
+  let hitsoundGain: GainNode | null = null;
+
+  const playHitSound = (): void => {
+    if (!audioCtx || !hitSoundBuffer || !hitsoundGain) return;
+    const source = audioCtx.createBufferSource();
+    source.buffer = hitSoundBuffer;
+    source.connect(hitsoundGain);
+    source.start();
+  };
+
+  if (deps.hitSoundUrl) {
+    const url = deps.hitSoundUrl;
+    let loading = false;
+    const loadSound = (): void => {
+      if (loading) return;
+      loading = true;
+      audioCtx = new AudioContext();
+      hitsoundGain = audioCtx.createGain();
+      hitsoundGain.gain.value = volToFactor(loadHitsoundVolume());
+      hitsoundGain.connect(audioCtx.destination);
+      fetch(url)
+        .then(r => r.arrayBuffer())
+        .then(buf => audioCtx!.decodeAudioData(buf))
+        .then(decoded => { hitSoundBuffer = decoded; })
+        .catch(err => console.error("[mimi] hitsound load failed:", err));
+    };
+    window.addEventListener("pointerdown", loadSound, { once: true });
+    window.addEventListener("keydown",     loadSound, { once: true });
+  }
+
+  subscribeHitsoundVolume(v => {
+    if (hitsoundGain) hitsoundGain.gain.value = volToFactor(v);
+  });
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();
@@ -81,6 +129,13 @@ export function createGame(deps: GameDeps): GameHandle {
 
   let notes: Note[] = [];
   let score = 0;
+  let perfectCount = 0;
+  let goodCount = 0;
+  let missCount = 0;
+
+  // After reset(), skip expiry until the song confirms it has rewound to the lead-in window
+  // preventing stale mid-song positions from triggering immediate misses.
+  let skipExpiry = false;
 
   const setScore = (v: number): void => { score = v; onScore(v); };
 
@@ -117,8 +172,11 @@ export function createGame(deps: GameDeps): GameHandle {
     const { result, points } = scoreFor(songMs - note.time);
     note.state = "hit";
     note.hitResult = result;
+    if (result === "perfect") perfectCount++;
+    else if (result === "good") goodCount++;
     if (points > 0) setScore(score + points);
     onFeedback(result, note.x, note.y);
+    playHitSound();
   };
 
   const expireMisses = (songMs: number): void => {
@@ -127,78 +185,10 @@ export function createGame(deps: GameDeps): GameHandle {
       if (songMs - n.time > GOOD_MS) {
         n.state = "missed";
         n.hitResult = "miss";
+        missCount++;
         onFeedback("miss", n.x, n.y);
       }
     }
-  };
-
-  const drawNote = (note: Note, appearProgress: number, scale: number): void => {
-    const cx = note.x * scale;
-    const cy = note.y * scale;
-    const r  = NOTE_RADIUS * scale;
-    const base     = note.kind === "click" ? "255, 82, 82"  : "82, 162, 255";
-    const darkBase = note.kind === "click" ? "191, 62, 62"  : "62, 122, 191";
-
-    // arrow length
-    const len     = r * 1.0;
-
-    // head length
-    const headLen = r * 0.4;
-
-    // head half-width (flare)
-    const hw      = r * 0.4;
-
-    // shaft half-width
-    const shw     = r * 0.17;
-
-    const a       = note.direction;
-
-    const tx = (lx: number, ly: number): number =>
-      cx + Math.cos(a) * lx - Math.sin(a) * ly;
-    const ty = (lx: number, ly: number): number =>
-      cy + Math.sin(a) * lx + Math.cos(a) * ly;
-
-    const x0 = -len / 2;
-    const x1 =  len / 2 - headLen;
-    const x2 =  len / 2;
-
-    const buildPath = (): void => {
-      ctx.beginPath();
-      ctx.moveTo(tx(x2,    0), ty(x2,    0));   // 1. tip
-      ctx.lineTo(tx(x1,  -hw), ty(x1,  -hw));   // 2. head shoulder top
-      ctx.lineTo(tx(x1, -shw), ty(x1, -shw));   // 3. shaft top (step in)
-      ctx.lineTo(tx(x0, -shw), ty(x0, -shw));   // 4. tail top corner
-      ctx.lineTo(tx(x0,  shw), ty(x0,  shw));   // 5. tail bottom corner
-      ctx.lineTo(tx(x1,  shw), ty(x1,  shw));   // 6. shaft bottom (step out)
-      ctx.lineTo(tx(x1,   hw), ty(x1,   hw));   // 7. head shoulder bottom
-      ctx.closePath();
-    };
-
-    const OUTLINE_SNAP = 0.12;
-    const FILL_START   = 0.62;
-    const outlineAlpha = Math.min(appearProgress / OUTLINE_SNAP, 1);
-    const fillProgress = Math.max(0, (appearProgress - FILL_START) / (1 - FILL_START));
-
-    ctx.save();
-
-    // Fill from center outward, clipped to arrow shape
-    buildPath();
-    ctx.save();
-    ctx.clip();
-    ctx.beginPath();
-    ctx.arc(cx, cy, fillProgress * len, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${base}, 1.0)`;
-    ctx.fill();
-    ctx.restore();
-
-    // Outline: fast fade-in, then holds at full opacity
-    buildPath();
-    ctx.strokeStyle = `rgba(${darkBase}, ${0.9 * outlineAlpha})`;
-    ctx.lineWidth = 2.5 * scale;
-    ctx.lineJoin = "miter";
-    ctx.stroke();
-
-    ctx.restore();
   };
 
   const draw = (songMs: number): void => {
@@ -207,21 +197,46 @@ export function createGame(deps: GameDeps): GameHandle {
     for (const note of notes) {
       if (note.state !== "pending") continue;
       const dt = note.time - songMs;
-      if (dt > APPROACH_MS || dt < -GOOD_MS) continue;
-      const appearProgress = clamp(1 - dt / APPROACH_MS, 0, 1);
-      drawNote(note, appearProgress, scale);
+      if (dt > approachMs || dt < -GOOD_MS) continue;
+      const appearProgress = clamp(1 - dt / approachMs, 0, 1);
+      drawArrow(ctx, note, appearProgress, scale);
     }
   };
 
   return {
     setChart(n: Note[]): void { notes = n; },
+
     reset(): void {
+      skipExpiry = true;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
       setScore(0);
+      perfectCount = 0;
+      goodCount    = 0;
+      missCount    = 0;
     },
+
+    getStats(): GameStats {
+      return {
+        score,
+        perfect: perfectCount,
+        good:    goodCount,
+        miss:    missCount,
+        total:   perfectCount + goodCount + missCount,
+      };
+    },
+
+    setApproachMs(ms: number): void {
+      approachMs = ms;
+    },
+
     tick(songMs: number): void {
       for (const note of notes) tryHit(note, songMs);
-      expireMisses(songMs);
+      if (skipExpiry) {
+        // Once songMs confirms the song has rewound into the lead-in window, lift the guard
+        if (songMs <= approachMs) skipExpiry = false;
+      } else {
+        expireMisses(songMs);
+      }
       draw(songMs);
       pointer.prevX = pointer.x;
       pointer.prevY = pointer.y;

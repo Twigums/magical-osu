@@ -1,5 +1,3 @@
-// Phrase fades out after it ends; next phrase fades in
-
 import type { TextAliveChar, TextAlivePhrase, TextAliveVideo } from "./textalive";
 
 export interface StoryboardRenderer {
