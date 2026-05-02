@@ -1,5 +1,3 @@
-// Applies to elements with data-en/data-jp or data-title-en/data-title-jp; persists to localStorage
-
 export function initLangToggle(): void {
   const savedLang = localStorage.getItem("lang") ?? "en";
   applyLang(savedLang);

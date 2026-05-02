@@ -1,10 +1,19 @@
-// Song page: reads body data-* attributes, starts TextAlive player, and drives game elements
-
-import type { GameHandle, Note } from "./game";
+import type { GameHandle, GameStats, Note } from "./game";
+import { loadVolume, subscribeVolume } from "./settings";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
-export function initSongPage(game: GameHandle): void {
+interface SongPageDeps {
+  game: GameHandle;
+  onSongFinish: (stats: GameStats) => void;
+  hideResult: () => void;
+}
+
+export interface SongPageHandle {
+  stop(): void;
+}
+
+export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): SongPageHandle {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
   const chart   = body.dataset.songChart ?? "";
@@ -22,7 +31,7 @@ export function initSongPage(game: GameHandle): void {
   const progressFill = document.getElementById("progress-fill")   as HTMLElement       | null;
   const storyboardEl = document.getElementById("song-storyboard") as HTMLElement       | null;
 
-  if (!btnPlay || !btnStop || !progressFill) return;
+  if (!btnPlay || !btnStop || !progressFill) return { stop() { /* no-op */ } };
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
 
@@ -47,6 +56,41 @@ export function initSongPage(game: GameHandle): void {
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
   let songLengthMs = 0;
+  let finished = false;
+  let resultsActive = false;
+  let finishTimeout: ReturnType<typeof setTimeout> | null = null;
+  let lastSongMs = 0;
+
+  const setResultsActive = (active: boolean): void => {
+    resultsActive = active;
+    btnPlay.disabled = active;
+    btnStop.disabled = active;
+  };
+
+  const triggerFinish = (): void => {
+    if (finished) return;
+    finished = true;
+    setResultsActive(true);
+    onSongFinish(game.getStats());
+  };
+
+  const dismissResult = (): void => {
+    setResultsActive(false);
+    hideResult();
+  };
+
+  const resetPlayback = (): void => {
+    if (finishTimeout !== null) { clearTimeout(finishTimeout); finishTimeout = null; }
+    game.reset();
+    storyboard?.reset();
+    progressFill.style.width = "0%";
+    lastSongMs = 0;
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    if (songLengthMs > 0 && lastSongMs >= songLengthMs) triggerFinish();
+  });
 
   const TextAliveApp = window.TextAliveApp;
   if (!songUrl || !token) {
@@ -67,6 +111,7 @@ export function initSongPage(game: GameHandle): void {
     }, 15000);
 
     player = new TextAliveApp.Player(opts);
+    subscribeVolume(v => { if (player) player.volume = v; });
     player.addListener({
       onAppReady(app) {
         console.info("[mimi] onAppReady — managed:", app.managed);
@@ -96,15 +141,19 @@ export function initSongPage(game: GameHandle): void {
         playerReady = true;
         btnPlay.disabled = false;
         dismissLoading();
+        if (player) player.volume = loadVolume();
       },
-      onPlay()  { btnPlay.disabled = true;  },
+      onPlay() {
+        btnPlay.disabled = true;
+        finished = false;
+        if (finishTimeout !== null) { clearTimeout(finishTimeout); finishTimeout = null; }
+        if (songLengthMs > 0) {
+          const remaining = Math.max(0, songLengthMs - (player?.timer.position ?? 0));
+          finishTimeout = setTimeout(triggerFinish, remaining);
+        }
+      },
       onPause() { btnPlay.disabled = false; },
-      onStop()  {
-        btnPlay.disabled = false;
-        game.reset();
-        storyboard?.reset();
-        progressFill.style.width = "0%";
-      },
+      onStop()  { if (!resultsActive) btnPlay.disabled = false; finished = false; },
     });
   } else {
     setTimeout(dismissLoading, 15000);
@@ -129,21 +178,35 @@ export function initSongPage(game: GameHandle): void {
 
   btnStop.addEventListener("click", () => {
     if (!playerReady || !player) return;
+    dismissResult();
+    resetPlayback();
     player.requestStop();
   });
 
   const loop = (): void => {
     const songMs = player?.timer.position ?? 0;
+    if (songMs > 0) lastSongMs = songMs;
     game.tick(songMs);
     storyboard?.update(songMs);
 
     if (songLengthMs > 0) {
       const pct = Math.max(0, Math.min(100, (songMs / songLengthMs) * 100));
       progressFill.style.width = `${pct}%`;
+
+      if (songMs >= songLengthMs) triggerFinish();
     }
 
     requestAnimationFrame(loop);
   };
 
   requestAnimationFrame(loop);
+
+  return {
+    stop(): void {
+      if (!playerReady || !player) return;
+      dismissResult();
+      resetPlayback();
+      player.requestStop();
+    },
+  };
 }

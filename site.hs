@@ -8,8 +8,8 @@ import Hakyll
 
 import ChartCompiler (chartCompiler)
 import Compilers     (sassCompiler, tsCompiler)
-import Config    (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
-import Context   (postCtx)
+import Config        (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
+import Context       (postCtx)
 
 
 --------------------------------------------------------------------------------
@@ -30,8 +30,6 @@ escapeForAttr = concatMap escape
     escape '\'' = "&#39;"
     escape c    = [c]
 
--- Extract --path VALUE from args, returning (path, remaining args).
--- Falls back to empty string if not present; caller supplies env-var fallback.
 extractSitePath :: [String] -> (String, [String])
 extractSitePath = go []
   where

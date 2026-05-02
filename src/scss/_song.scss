@@ -3,8 +3,8 @@
 #loading-screen {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+  z-index: var(--z-loading);
+  background: var(--bg-gradient-song);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,7 +55,7 @@ html body.song-page {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
+  background: var(--bg-gradient-song);
 }
 
 .song-storyboard {
@@ -114,7 +114,7 @@ html body.song-page {
   right: 0;
   height: 4px;
   background: rgba(255, 255, 255, 0.2);
-  z-index: 100;
+  z-index: var(--z-hud);
 
   .song-progress-fill {
     height: 100%;
@@ -128,7 +128,10 @@ html body.song-page {
   position: fixed;
   top: 1.5rem;
   right: 2rem;
-  z-index: 100;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .song-controls {
@@ -137,7 +140,7 @@ html body.song-page {
   right: 2rem;
   display: flex;
   gap: 0.75rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 
   button {
     background: rgba(255, 255, 255, 0.15);
@@ -176,7 +179,7 @@ html body.song-page {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 
   .site-name-link {
     font-size: 1.1rem;
@@ -262,9 +265,9 @@ html body.song-page {
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
   animation: hit-feedback-fade 0.6s ease-out forwards;
 
-  &.hit-perfect { color: #ffd94a; }
-  &.hit-good    { color: #8cf0ff; }
-  &.hit-miss    { color: #ff6b6b; }
+  &.hit-perfect { color: var(--color-perfect); }
+  &.hit-good    { color: var(--color-good); }
+  &.hit-miss    { color: var(--color-miss); }
 }
 
 @keyframes hit-feedback-fade {
@@ -276,27 +279,12 @@ html body.song-page {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  z-index: 100;
+  z-index: var(--z-hud);
 }
 
 .song-page .btn-back {
-  padding: 0.6rem 1.6rem;
-  font-size: 1rem;
-  font-family: inherit;
-  color: rgba(255, 255, 255, 0.7);
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  letter-spacing: 0.08em;
   text-decoration: none;
   display: inline-block;
-  transition: background 0.2s, color 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    text-decoration: none;
-  }
 }
 
 @media (max-width: 600px) {
