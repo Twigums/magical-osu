@@ -7,12 +7,14 @@ import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./useLang";
 import { useTransitionState } from "./useTransitionState";
 
-const isSongPage = document.body.classList.contains("song-page");
+interface Props {
+  isSongPage?: boolean;
+}
 
 const sliderFill = (val: number, min: number, max: number): CSSProperties =>
   ({ '--fill': `${((val - min) / (max - min)) * 100}%` } as CSSProperties);
 
-export function OptionsPanel() {
+export function OptionsPanel({ isSongPage = false }: Props) {
   const [open, setOpen] = useState(false);
   const { state } = useTransitionState(open, 240);
   const [ar, setAr] = useApproachRate();

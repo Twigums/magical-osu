@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLang } from "./useLang";
 import { withPath } from "../sitePath";
 import { useTransitionState } from "./useTransitionState";
+import { OptionsPanel } from "./OptionsPanel";
 
 type Layout = "original" | "play" | "info";
 
@@ -17,6 +18,7 @@ export function HomeLayoutSwitcher({ infoContent }: Props) {
 
   return (
     <div className="layout-container">
+      <OptionsPanel />
       <div className="layout-pane" data-state={state}>
         {currentLayout === "original" && (
           <>

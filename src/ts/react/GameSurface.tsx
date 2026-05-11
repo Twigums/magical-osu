@@ -5,6 +5,7 @@ import { arToMs } from "../settings";
 import { useLang } from "./useLang";
 import { useApproachRate } from "./useApproachRate";
 import { ResultsOverlay } from "./ResultsOverlay";
+import { OptionsPanel } from "./OptionsPanel";
 
 interface FeedbackToast {
   id: number;
@@ -63,31 +64,38 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
   };
 
   return (
-    <div className="game-area" ref={gameAreaRef}>
-      <canvas className="game-canvas" ref={canvasRef} />
-      <div className="score-display">
-        <span className="score-label">{lang === "jp" ? "スコア" : "Score"}</span>
-        <span className="score-value">{score}</span>
-      </div>
-      {feedbacks.map(f => (
-        <div
-          key={f.id}
-          className={`hit-feedback hit-${f.result}`}
-          style={{
-            left: `${(f.x / LOGICAL_W) * 100}%`,
-            top:  `${(f.y / LOGICAL_H) * 100}%`,
-          }}
-        >
-          {f.result.toUpperCase()}
+    <>
+      <OptionsPanel isSongPage={true} />
+
+      <div className="game-area" ref={gameAreaRef}>
+        <canvas className="game-canvas" ref={canvasRef} />
+
+        <div className="score-display">
+          <span className="score-label">{lang === "jp" ? "スコア" : "Score"}</span>
+          <span className="score-value">{score}</span>
         </div>
-      ))}
-      {result && (
-        <ResultsOverlay
-          stats={result}
-          returnHref={returnHref}
-          onTryAgain={handleTryAgain}
-        />
-      )}
-    </div>
+
+        {feedbacks.map(f => (
+          <div
+            key={f.id}
+            className={`hit-feedback hit-${f.result}`}
+            style={{
+              left: `${(f.x / LOGICAL_W) * 100}%`,
+              top:  `${(f.y / LOGICAL_H) * 100}%`,
+            }}
+          >
+            {f.result.toUpperCase()}
+          </div>
+        ))}
+
+        {result && (
+          <ResultsOverlay
+            stats={result}
+            returnHref={returnHref}
+            onTryAgain={handleTryAgain}
+          />
+        )}
+      </div>
+    </>
   );
 }
