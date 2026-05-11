@@ -1,11 +1,9 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
-import { useApproachRate } from "./useApproachRate";
-import { useVolume } from "./useVolume";
-import { useHitsoundVolume } from "./useHitsoundVolume";
+import { useApproachRate, useVolume, useHitsoundVolume } from "./hooks/useSettings";
 import { ApproachPreview } from "./ApproachPreview";
-import { useLang } from "./useLang";
-import { useTransitionState } from "./useTransitionState";
+import { useLang } from "./hooks/useLang";
+import { useTransitionState } from "./hooks/useTransitionState";
 
 interface Props {
   isSongPage?: boolean;

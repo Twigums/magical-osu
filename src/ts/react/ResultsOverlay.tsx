@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLang } from "./useLang";
+import { useLang } from "./hooks/useLang";
 import { computeGrade, computeAccuracy } from "../grade";
 import { shareResult } from "../share";
 import type { GameStats } from "../game";

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useLang } from "./useLang";
+import { useLang } from "./hooks/useLang";
 import { withPath } from "../sitePath";
-import { useTransitionState } from "./useTransitionState";
+import { useTransitionState } from "./hooks/useTransitionState";
 import { OptionsPanel } from "./OptionsPanel";
 
 type Layout = "original" | "play" | "info";

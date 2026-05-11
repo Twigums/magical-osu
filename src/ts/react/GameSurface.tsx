@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { createGame, LOGICAL_W, LOGICAL_H } from "../game";
 import type { GameHandle, HitResult, GameStats } from "../game";
 import { arToMs } from "../settings";
-import { useLang } from "./useLang";
-import { useApproachRate } from "./useApproachRate";
+import { useLang } from "./hooks/useLang";
+import { useApproachRate } from "./hooks/useSettings";
 import { ResultsOverlay } from "./ResultsOverlay";
 import { OptionsPanel } from "./OptionsPanel";
 
