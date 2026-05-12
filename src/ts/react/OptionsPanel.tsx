@@ -1,9 +1,8 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
 import { useApproachRate, useVolume, useHitsoundVolume } from "./hooks/useSettings";
 import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./hooks/useLang";
-import { useTransitionState } from "./hooks/useTransitionState";
 
 interface Props {
   isSongPage?: boolean;
@@ -14,7 +13,21 @@ const sliderFill = (val: number, min: number, max: number): CSSProperties =>
 
 export function OptionsPanel({ isSongPage = false }: Props) {
   const [open, setOpen] = useState(false);
-  const { state } = useTransitionState(open, 240);
+  const [exiting, setExiting] = useState(false);
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const close = useCallback(() => {
+    setExiting(true);
+    exitTimer.current = setTimeout(() => {
+      setOpen(false);
+      setExiting(false);
+    }, 240);
+  }, []);
+
+  useEffect(() => () => {
+    if (exitTimer.current !== null) clearTimeout(exitTimer.current);
+  }, []);
+
   const [ar, setAr] = useApproachRate();
   const [vol, setVol] = useVolume();
   const [hsVol, setHsVol] = useHitsoundVolume();
@@ -27,18 +40,18 @@ export function OptionsPanel({ isSongPage = false }: Props) {
     return () => btn?.removeEventListener("click", handleOpen);
   }, []);
 
-  if (state === "exited") return null;
+  if (!open) return null;
 
   const ms   = Math.round(arToMs(ar));
   const isJp = lang === "jp";
 
   return (
-    <div className="options-backdrop" data-state={state} onClick={() => setOpen(false)}>
-      <div className="options-panel" data-state={state} onClick={e => e.stopPropagation()}>
+    <div className={`options-backdrop${exiting ? " exiting" : ""}`} onClick={close}>
+      <div className={`options-panel${exiting ? " exiting" : ""}`} onClick={e => e.stopPropagation()}>
 
         <button
           className="options-close"
-          onClick={() => setOpen(false)}
+          onClick={close}
           aria-label={isJp ? "閉じる" : "Close"}
         >
           ×

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "./hooks/useLang";
 import { withPath } from "../sitePath";
-import { useTransitionState } from "./hooks/useTransitionState";
 import { OptionsPanel } from "./OptionsPanel";
 
 type Layout = "original" | "play" | "info";
@@ -12,14 +11,35 @@ interface Props {
 
 export function HomeLayoutSwitcher({ infoContent }: Props) {
   const [layout, setLayout] = useState<Layout>("original");
-  const { current: currentLayout, state } = useTransitionState(layout, 240);
+  const [currentLayout, setCurrentLayout] = useState<Layout>(layout);
+  const [exiting, setExiting] = useState(false);
+  const [paneKey, setPaneKey] = useState(0);
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (layout === currentLayout) return;
+    setExiting(true);
+    exitTimer.current = setTimeout(() => {
+      setCurrentLayout(layout);
+      setPaneKey(k => k + 1);
+      setExiting(false);
+    }, 240);
+    return () => {
+      if (exitTimer.current !== null) clearTimeout(exitTimer.current);
+    };
+  }, [layout, currentLayout]);
+
+  useEffect(() => () => {
+    if (exitTimer.current !== null) clearTimeout(exitTimer.current);
+  }, []);
+
   const lang = useLang();
   const t = (en: string, jp: string) => lang === "jp" ? jp : en;
 
   return (
     <div className="layout-container">
       <OptionsPanel />
-      <div className="layout-pane" data-state={state}>
+      <div className={`layout-pane${exiting ? " exiting" : ""}`} key={paneKey}>
         {currentLayout === "original" && (
           <>
             <button className="btn-main" onClick={() => setLayout("play")}>
