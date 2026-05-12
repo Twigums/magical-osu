@@ -174,6 +174,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   btnPlay.addEventListener("click", () => {
     if (!playerReady || !player) return;
     player.requestPlay();
+    game.start();
   });
 
   btnStop.addEventListener("click", () => {

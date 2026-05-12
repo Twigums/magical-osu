@@ -24,8 +24,11 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const gameAreaRef = useRef<HTMLDivElement>(null);
   const gameRef     = useRef<GameHandle | null>(null);
+  const comboRef    = useRef<HTMLSpanElement>(null);
 
   const [score, setScore]         = useState(0);
+  const [combo, setCombo]         = useState(0);
+  const [playing, setPlaying]     = useState(false);
   const [feedbacks, setFeedbacks] = useState<FeedbackToast[]>([]);
   const [result, setResult]       = useState<GameStats | null>(null);
 
@@ -43,6 +46,8 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
       gameArea,
       hitSoundUrl,
       onScore: setScore,
+      onComboChange: setCombo,
+      onPlayingChange: setPlaying,
       onFeedback: (res, x, y) => {
         const id = Date.now() + Math.random();
         setFeedbacks(prev => [...prev, { id, result: res, x, y }]);
@@ -58,6 +63,14 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
     gameRef.current?.setApproachMs(arToMs(ar));
   }, [ar]);
 
+  useEffect(() => {
+    if (comboRef.current) {
+      comboRef.current.classList.remove("combo-pop");
+      void comboRef.current.offsetWidth;
+      comboRef.current.classList.add("combo-pop");
+    }
+  }, [combo]);
+
   const handleTryAgain = (): void => {
     setResult(null);
     onTryAgain();
@@ -67,13 +80,18 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
     <>
       <OptionsPanel isSongPage={true} />
 
-      <div className="game-area" ref={gameAreaRef}>
+      <div className={`game-area${playing ? " playing" : ""}`} ref={gameAreaRef}>
         <canvas className="game-canvas" ref={canvasRef} />
 
         <div className="score-display">
           <span className="score-label">{lang === "jp" ? "スコア" : "Score"}</span>
           <span className="score-value">{score}</span>
         </div>
+
+        <div className="combo-display">
+            <span className="combo-value" ref={comboRef}>{combo}x</span>
+            <span className="combo-label">{lang === "jp" ? "コンボ" : "Combo"}</span>
+          </div>
 
         {feedbacks.map(f => (
           <div

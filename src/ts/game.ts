@@ -32,26 +32,30 @@ export interface GameStats {
   good: number;
   miss: number;
   total: number;
+  combo: number;
 }
 
 export interface GameHandle {
   setChart(notes: Note[]): void;
   reset(): void;
+  start(): void;
   tick(songMs: number): void;
   getStats(): GameStats;
   setApproachMs(ms: number): void;
 }
 
 export interface GameDeps {
-  canvas:       HTMLCanvasElement;
-  gameArea:     HTMLElement;
-  onScore:      (score: number) => void;
-  onFeedback:   (result: HitResult, x: number, y: number) => void;
-  hitSoundUrl?: string;
+  canvas:          HTMLCanvasElement;
+  gameArea:        HTMLElement;
+  onScore:         (score: number) => void;
+  onFeedback:      (result: HitResult, x: number, y: number) => void;
+  onComboChange:   (combo: number) => void;
+  onPlayingChange: (playing: boolean) => void;
+  hitSoundUrl?:    string;
 }
 
 export function createGame(deps: GameDeps): GameHandle {
-  const { canvas, gameArea, onScore, onFeedback } = deps;
+  const { canvas, gameArea, onScore, onFeedback, onComboChange, onPlayingChange } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
 
@@ -132,6 +136,8 @@ export function createGame(deps: GameDeps): GameHandle {
   let perfectCount = 0;
   let goodCount = 0;
   let missCount = 0;
+  let comboCount = 0;
+  let playing = false;
 
   // After reset(), skip expiry until the song confirms it has rewound to the lead-in window
   // preventing stale mid-song positions from triggering immediate misses.
@@ -174,7 +180,11 @@ export function createGame(deps: GameDeps): GameHandle {
     note.hitResult = result;
     if (result === "perfect") perfectCount++;
     else if (result === "good") goodCount++;
-    if (points > 0) setScore(score + points);
+    if (points > 0) {
+      setScore(score + points);
+      comboCount++;
+      onComboChange(comboCount);
+    }
     onFeedback(result, note.x, note.y);
     playHitSound();
   };
@@ -186,6 +196,8 @@ export function createGame(deps: GameDeps): GameHandle {
         n.state = "missed";
         n.hitResult = "miss";
         missCount++;
+        comboCount = 0;
+        onComboChange(0);
         onFeedback("miss", n.x, n.y);
       }
     }
@@ -213,6 +225,15 @@ export function createGame(deps: GameDeps): GameHandle {
       perfectCount = 0;
       goodCount    = 0;
       missCount    = 0;
+      comboCount   = 0;
+      playing      = false;
+      onComboChange(0);
+      onPlayingChange(false);
+    },
+
+    start(): void {
+      playing = true;
+      onPlayingChange(true);
     },
 
     getStats(): GameStats {
@@ -222,6 +243,7 @@ export function createGame(deps: GameDeps): GameHandle {
         good:    goodCount,
         miss:    missCount,
         total:   perfectCount + goodCount + missCount,
+        combo:   comboCount,
       };
     },
 
