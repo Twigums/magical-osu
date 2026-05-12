@@ -73,3 +73,36 @@ export function drawArrow(
 
   ctx.restore();
 }
+
+export function drawFireworks(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  kind: Note["kind"],
+  progress: number,
+  scale: number,
+  seed: number,
+): void {
+  const maxLen = NOTE_RADIUS * 1.8 * scale;
+  const alpha = 1 - progress;
+  const len = maxLen * (1 - Math.pow(1 - progress, 2));
+  const lw = 2.5 * scale * (1 - progress);
+
+  const color = kind === "click" ? "255, 82, 82" : "82, 162, 255";
+  const cx = x * scale;
+  const cy = y * scale;
+
+  ctx.save();
+  ctx.strokeStyle = `rgba(${color}, ${alpha})`;
+  ctx.lineWidth = lw;
+  ctx.lineCap = "round";
+
+  for (let i = 0; i < 4; i++) {
+    const angle = ((seed + i * 1031) % 10007) * Math.PI * 2 / 10007;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * len, cy + Math.sin(angle) * len);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}

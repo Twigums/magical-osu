@@ -1,5 +1,5 @@
 import { angleDiff, clamp } from "./utils";
-import { drawArrow, NOTE_RADIUS } from "./draw";
+import { drawArrow, drawFireworks, NOTE_RADIUS } from "./draw";
 import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
 
 const PERFECT_MS           = 32;
@@ -24,6 +24,14 @@ export interface Note {
   direction: number;
   state: NoteState;
   hitResult?: HitResult;
+}
+
+interface HitAnimation {
+  x: number;
+  y: number;
+  kind: NoteKind;
+  startMs: number;
+  seed: number;
 }
 
 export interface GameStats {
@@ -132,6 +140,7 @@ export function createGame(deps: GameDeps): GameHandle {
   window.addEventListener("keyup",    e => { keysHeld.delete(e.key); });
 
   let notes: Note[] = [];
+  let animations: HitAnimation[] = [];
   let score = 0;
   let perfectCount = 0;
   let goodCount = 0;
@@ -184,6 +193,10 @@ export function createGame(deps: GameDeps): GameHandle {
       setScore(score + points);
       comboCount++;
       onComboChange(comboCount);
+      animations.push({
+        x: note.x, y: note.y, kind: note.kind, startMs: songMs,
+        seed: Math.floor(note.x * 7919 + note.y * 6271),
+      });
     }
     onFeedback(result, note.x, note.y);
     playHitSound();
@@ -213,6 +226,12 @@ export function createGame(deps: GameDeps): GameHandle {
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
       drawArrow(ctx, note, appearProgress, scale);
     }
+    for (const anim of animations) {
+      const dt = songMs - anim.startMs;
+      if (dt < 0 || dt >= 300) continue;
+      drawFireworks(ctx, anim.x, anim.y, anim.kind, dt / 300, scale, anim.seed);
+    }
+    animations = animations.filter(a => songMs - a.startMs < 300);
   };
 
   return {
@@ -221,6 +240,7 @@ export function createGame(deps: GameDeps): GameHandle {
     reset(): void {
       skipExpiry = true;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
+      animations = [];
       setScore(0);
       perfectCount = 0;
       goodCount    = 0;
