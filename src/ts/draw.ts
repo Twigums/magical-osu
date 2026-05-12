@@ -3,6 +3,21 @@ import type { Note } from "./game";
 // Shared between hit detection in game.ts and rendering here
 export const NOTE_RADIUS = 42;
 
+interface NoteColors {
+  base: string;
+  darkBase: string;
+}
+
+export interface NoteStyle {
+  colors: NoteColors;
+  requiresHold: boolean;
+}
+
+export const NOTE_STYLE: Record<Note["kind"], NoteStyle> = {
+  click:  { colors: { base: "255, 82, 82",  darkBase: "191, 62, 62"  }, requiresHold: false },
+  stream: { colors: { base: "82, 162, 255", darkBase: "62, 122, 191" }, requiresHold: true  },
+};
+
 // appearProgress: 0 = faint outline just appearing, 1 = fully filled at hit time
 // scale: canvas pixels per logical unit (canvas.width / LOGICAL_W)
 export function drawArrow(
@@ -15,8 +30,7 @@ export function drawArrow(
   const cy = note.y * scale;
   const r  = NOTE_RADIUS * scale;
 
-  const base     = note.kind === "click" ? "255, 82, 82"  : "82, 162, 255";
-  const darkBase = note.kind === "click" ? "191, 62, 62"  : "62, 122, 191";
+  const { base, darkBase } = NOTE_STYLE[note.kind].colors;
 
   const len     = r;         // total arrow length
   const headLen = r * 0.4;  // arrowhead length
@@ -87,7 +101,7 @@ export function drawFireworks(
   const len = maxLen * (1 - Math.pow(1 - progress, 2));
   const lw = 2.5 * scale * (1 - progress);
 
-  const color = kind === "click" ? "255, 82, 82" : "82, 162, 255";
+  const color = NOTE_STYLE[kind].colors.base;
   const cx = x * scale;
   const cy = y * scale;
 

@@ -1,5 +1,5 @@
 import { angleDiff, clamp } from "./utils";
-import { drawArrow, drawFireworks, NOTE_RADIUS } from "./draw";
+import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
 import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
 
 const PERFECT_MS           = 32;
@@ -163,7 +163,7 @@ export function createGame(deps: GameDeps): GameHandle {
 
   const tryHit = (note: Note, songMs: number): void => {
     if (note.state !== "pending") return;
-    if (!actionHeld()) return;
+    if (NOTE_STYLE[note.kind].requiresHold && !actionHeld()) return;
     if (Math.abs(songMs - note.time) > GOOD_MS) return;
 
     const dx = Math.cos(note.direction);
