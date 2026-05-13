@@ -92,9 +92,9 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
         </div>
 
         <div className="combo-display">
-            <span className="combo-value" ref={comboRef}>{combo}x</span>
-            <span className="combo-label">{lang === "jp" ? "コンボ" : "Combo"}</span>
-          </div>
+          <span className="combo-value" ref={comboRef}>{combo}x</span>
+          <span className="combo-label">{lang === "jp" ? "コンボ" : "Combo"}</span>
+        </div>
 
         {feedbacks.map(f => (
           <div

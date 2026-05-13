@@ -94,7 +94,6 @@ export function createGame(deps: GameDeps): GameHandle {
     const loadSound = (): void => {
       if (loading) return;
       loading = true;
-      audioLoadCleanup = null;
       audioCtx = new AudioContext();
       hitsoundGain = audioCtx.createGain();
       hitsoundGain.gain.value = volToFactor(loadHitsoundVolume());
@@ -165,6 +164,7 @@ export function createGame(deps: GameDeps): GameHandle {
   let notes: Note[] = [];
   let pendingStart = 0;
   let animations: HitAnimation[] = [];
+  let animStart = 0;
   let score = 0;
   let perfectCount = 0;
   let goodCount = 0;
@@ -254,16 +254,13 @@ export function createGame(deps: GameDeps): GameHandle {
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
       drawArrow(ctx, note, appearProgress, scale, hiddenMod);
     }
-    for (let i = 0; i < animations.length; i++) {
+    for (let i = animStart; i < animations.length; i++) {
       const anim = animations[i];
       const dt = songMs - anim.startMs;
       if (dt < 0 || dt >= 300) continue;
       drawFireworks(ctx, anim.x, anim.y, anim.kind, dt / 300, scale, anim.seed);
     }
-    // Animations are pushed in chronological order; trim expired from front
-    let trimTo = 0;
-    while (trimTo < animations.length && songMs - animations[trimTo].startMs >= 300) trimTo++;
-    if (trimTo > 0) animations.splice(0, trimTo);
+    while (animStart < animations.length && songMs - animations[animStart].startMs >= 300) animStart++;
   };
 
   return {
@@ -274,6 +271,7 @@ export function createGame(deps: GameDeps): GameHandle {
       pendingStart = 0;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
       animations = [];
+      animStart = 0;
       setScore(0);
       perfectCount = 0;
       goodCount    = 0;

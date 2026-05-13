@@ -30,10 +30,6 @@ export function ResultsOverlay({ stats, returnHref, onTryAgain }: Props) {
       .then(ok => {
         setShareStatus(ok ? "copied" : "failed");
         setTimeout(() => setShareStatus("idle"), 2000);
-      })
-      .catch(() => {
-        setShareStatus("failed");
-        setTimeout(() => setShareStatus("idle"), 2000);
       });
   };
 

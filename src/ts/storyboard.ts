@@ -11,6 +11,7 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
   let currentPhrase: TextAlivePhrase | null = null;
   let lineEl: HTMLElement | null = null;
   let charEls: { ch: TextAliveChar; el: HTMLElement }[] = [];
+  let clearTimer: ReturnType<typeof setTimeout> | null = null;
 
   const renderPhrase = (phrase: TextAlivePhrase): void => {
     root.innerHTML = "";
@@ -31,9 +32,13 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
   };
 
   const clearLine = (): void => {
+    if (clearTimer !== null) { clearTimeout(clearTimer); clearTimer = null; }
     if (lineEl) lineEl.classList.remove("visible");
     const toRemove = lineEl;
-    setTimeout(() => { if (toRemove && toRemove.parentNode === root) root.removeChild(toRemove); }, 300);
+    clearTimer = setTimeout(() => {
+      clearTimer = null;
+      if (toRemove && toRemove.parentNode === root) root.removeChild(toRemove);
+    }, 300);
     lineEl = null;
     charEls = [];
     currentPhrase = null;

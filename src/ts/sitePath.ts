@@ -1,5 +1,10 @@
+let cachedPath: string | undefined;
+
 function getSitePath(): string {
-  return document.querySelector('meta[name="site-path"]')?.getAttribute('content') ?? '';
+  if (cachedPath === undefined) {
+    cachedPath = document.querySelector('meta[name="site-path"]')?.getAttribute('content') ?? '';
+  }
+  return cachedPath;
 }
 
 export function withPath(path: string): string {

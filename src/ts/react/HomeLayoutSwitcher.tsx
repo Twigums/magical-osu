@@ -109,6 +109,19 @@ export function HomeLayoutSwitcher({ infoContent, tutorialContent, songsManifest
     if (songTimer.current !== null) clearTimeout(songTimer.current);
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (selectedSong !== null) {
+        setSelectedSong(null);
+      } else if (layout !== "original") {
+        setLayout("original");
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [layout, selectedSong]);
+
   const lang = useLang();
   const t = (en: string, jp: string) => lang === "jp" ? jp : en;
 
