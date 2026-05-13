@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLang } from "./hooks/useLang";
-import { withPath } from "../sitePath";
 import { OptionsPanel } from "./OptionsPanel";
 
-type Layout = "original" | "play" | "info";
+type Layout = "original" | "play" | "info" | "tutorial";
 
 interface Props {
   infoContent: string;
+  tutorialContent: string;
   songsManifest: string;
 }
 
@@ -63,7 +63,7 @@ function parseManifest(json: string): SongEntry[] {
   }
 }
 
-export function HomeLayoutSwitcher({ infoContent, songsManifest }: Props) {
+export function HomeLayoutSwitcher({ infoContent, tutorialContent, songsManifest }: Props) {
   const songs = useMemo(() => parseManifest(songsManifest), [songsManifest]);
 
   const [layout, setLayout] = useState<Layout>("original");
@@ -127,9 +127,9 @@ export function HomeLayoutSwitcher({ infoContent, songsManifest }: Props) {
             <button className="btn-main" onClick={handlePlayClick}>
               {t("Play", "プレイ")}
             </button>
-            <a href={withPath('/tutorial/')} className="btn-main">
+            <button className="btn-main" onClick={() => setLayout("tutorial")}>
               {t("Tutorial", "チュートリアル")}
-            </a>
+            </button>
             <button className="btn-main" onClick={() => setLayout("info")}>
               {t("Info", "情報")}
             </button>
@@ -195,6 +195,17 @@ export function HomeLayoutSwitcher({ infoContent, songsManifest }: Props) {
             <div
               className="info-content"
               dangerouslySetInnerHTML={{ __html: infoContent }}
+            />
+            <button className="btn-back" onClick={() => setLayout("original")}>
+              {t("Back", "戻る")}
+            </button>
+          </>
+        )}
+        {currentLayout === "tutorial" && (
+          <>
+            <div
+              className="info-content"
+              dangerouslySetInnerHTML={{ __html: tutorialContent }}
             />
             <button className="btn-back" onClick={() => setLayout("original")}>
               {t("Back", "戻る")}

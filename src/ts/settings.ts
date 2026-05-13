@@ -25,13 +25,37 @@ function createNumericSetting(key: string, event: string, clamp: (n: number) => 
   };
 }
 
+function loadBoolSetting(key: string, def: boolean): boolean {
+  const raw = localStorage.getItem(key);
+  if (raw === null) return def;
+  return raw === "true";
+}
+
+function saveBoolSetting(key: string, event: string, value: boolean): void {
+  localStorage.setItem(key, String(value));
+  window.dispatchEvent(new CustomEvent<boolean>(event, { detail: value }));
+}
+
+function subscribeBoolSetting(event: string, cb: (v: boolean) => void): () => void {
+  const handler = (e: Event) => cb((e as CustomEvent<boolean>).detail);
+  window.addEventListener(event, handler);
+  return () => window.removeEventListener(event, handler);
+}
+
+export const loadHiddenMod      = (): boolean => loadBoolSetting("modHidden", false);
+export const saveHiddenMod      = (v: boolean): void => saveBoolSetting("modHidden", "modHiddenChange", v);
+export const subscribeHiddenMod = (cb: (v: boolean) => void): (() => void) => subscribeBoolSetting("modHiddenChange", cb);
+
 export const AR_MIN     = 1;
 export const AR_MAX     = 20;
-const AR_DEFAULT = 12;
+const AR_DEFAULT = 10;
 
-// 2000 ms at AR 1 → ~300 ms at AR 20
+// [1, 10] → 2000ms–1000ms; (10, 20] → 1000ms–300ms
 export function arToMs(ar: number): number {
-  return 2000 - (ar - 1) * (1700 / 19);
+  if (ar <= 10) {
+    return 2000 - (ar - 1) * (1000 / 9);
+  }
+  return 1000 - (ar - 10) * (700 / 10);
 }
 
 function clampAr(n: number): number {

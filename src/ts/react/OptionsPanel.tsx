@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP } from "../settings";
-import { useApproachRate, useVolume, useHitsoundVolume } from "./hooks/useSettings";
+import { useApproachRate, useVolume, useHitsoundVolume, useHiddenMod } from "./hooks/useSettings";
 import { ApproachPreview } from "./ApproachPreview";
 import { useLang } from "./hooks/useLang";
 
@@ -31,6 +31,7 @@ export function OptionsPanel({ isSongPage = false }: Props) {
   const [ar, setAr] = useApproachRate();
   const [vol, setVol] = useVolume();
   const [hsVol, setHsVol] = useHitsoundVolume();
+  const [hidden, setHidden] = useHiddenMod();
   const lang = useLang();
 
   useEffect(() => {
@@ -121,11 +122,27 @@ export function OptionsPanel({ isSongPage = false }: Props) {
           )}
         </div>
 
+        <h3 className="options-section-title">
+          {isJp ? "MOD" : "Mods"}
+        </h3>
+
+        <div className="options-row options-row--mod">
+          <label className="options-mod-label">
+            <input
+              type="checkbox"
+              className="options-mod-checkbox"
+              checked={hidden}
+              onChange={e => setHidden(e.target.checked)}
+            />
+            <span>{isJp ? "ヒドゥン" : "Hidden"}</span>
+          </label>
+        </div>
+
         <p className="options-preview-label">
           {isJp ? "プレビュー" : "Preview"}
         </p>
         <div className="options-preview-wrap">
-          <ApproachPreview ar={ar} />
+          <ApproachPreview ar={ar} hidden={hidden} />
         </div>
 
       </div>

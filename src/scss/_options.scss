@@ -177,6 +177,41 @@
   text-align: right;
 }
 
+.options-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.45;
+}
+
+.options-row--mod {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.options-mod-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0.85;
+  user-select: none;
+
+  &:hover { opacity: 1; }
+}
+
+.options-mod-checkbox {
+  width: 0.9rem;
+  height: 0.9rem;
+  cursor: pointer;
+  accent-color: rgba(255, 255, 255, 0.85);
+}
+
 .options-preview-label {
   margin: 0 0 0.4rem;
   font-size: 0.75rem;

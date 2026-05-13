@@ -1,6 +1,6 @@
 import { angleDiff, clamp } from "./utils";
 import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
-import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
+import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "./settings";
 
 const PERFECT_MS           = 32;
 const GOOD_MS              = 100;
@@ -69,6 +69,7 @@ export function createGame(deps: GameDeps): GameHandle {
   if (!ctx) throw new Error("2D canvas context unavailable");
 
   let approachMs = arToMs(loadAr());
+  let hiddenMod  = loadHiddenMod();
 
   let audioCtx: AudioContext | null = null;
   let hitSoundBuffer: AudioBuffer | null = null;
@@ -112,6 +113,8 @@ export function createGame(deps: GameDeps): GameHandle {
   const unsubHitsound = subscribeHitsoundVolume(v => {
     if (hitsoundGain) hitsoundGain.gain.value = volToFactor(v);
   });
+
+  const unsubHiddenMod = subscribeHiddenMod(v => { hiddenMod = v; });
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();
@@ -246,7 +249,7 @@ export function createGame(deps: GameDeps): GameHandle {
       if (dt > approachMs) break;
       if (dt < -GOOD_MS) continue;
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
-      drawArrow(ctx, note, appearProgress, scale);
+      drawArrow(ctx, note, appearProgress, scale, hiddenMod);
     }
     for (let i = 0; i < animations.length; i++) {
       const anim = animations[i];
@@ -328,6 +331,7 @@ export function createGame(deps: GameDeps): GameHandle {
       window.removeEventListener("keyup",      onKeyUp);
       window.removeEventListener("resize",     resize);
       unsubHitsound();
+      unsubHiddenMod();
       audioLoadCleanup?.();
     },
   };

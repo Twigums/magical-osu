@@ -20,16 +20,19 @@ const PREVIEW_NOTE: Note = {
 
 interface Props {
   ar: number;
+  hidden?: boolean;
 }
 
-export function ApproachPreview({ ar }: Props) {
+export function ApproachPreview({ ar, hidden = false }: Props) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
-  // Ref keeps the rAF loop reading the latest AR without restarting the loop
+  // Refs keep the rAF loop reading latest values without restarting the loop
   const arRef        = useRef(ar);
+  const hiddenRef    = useRef(hidden);
   const startTimeRef = useRef<number | null>(null);
 
   // written during render, read only inside rAF
-  arRef.current = ar;
+  arRef.current     = ar;
+  hiddenRef.current = hidden;
 
   useEffect(() => {
     startTimeRef.current = null;
@@ -56,7 +59,7 @@ export function ApproachPreview({ ar }: Props) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // scale=1: the preview canvas uses logical coords directly
-      drawArrow(ctx, PREVIEW_NOTE, appearProgress, 1);
+      drawArrow(ctx, PREVIEW_NOTE, appearProgress, 1, hiddenRef.current);
 
       rafId = requestAnimationFrame(loop);
     };

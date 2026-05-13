@@ -3,6 +3,7 @@ import {
   loadAr, saveAr, subscribeAr,
   loadVolume, saveVolume, subscribeVolume,
   loadHitsoundVolume, saveHitsoundVolume, subscribeHitsoundVolume,
+  loadHiddenMod, saveHiddenMod, subscribeHiddenMod,
 } from "../../settings";
 
 function useNumericSetting(
@@ -25,4 +26,10 @@ export function useVolume(): [number, (v: number) => void] {
 
 export function useHitsoundVolume(): [number, (v: number) => void] {
   return useNumericSetting(loadHitsoundVolume, saveHitsoundVolume, subscribeHitsoundVolume);
+}
+
+export function useHiddenMod(): [boolean, (v: boolean) => void] {
+  const [value, setValue] = useState(loadHiddenMod);
+  useEffect(() => subscribeHiddenMod(setValue), []);
+  return [value, saveHiddenMod];
 }

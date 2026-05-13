@@ -62,13 +62,21 @@ accuracy = (perfect × 5 + good × 2) / (total × 5)
 ## Approach Rate (AR)
 The approach rate controls how far in advance notes become visible before their hit time. It is configurable by the player from the options panel.
 
-- **Range:** AR 1–20 (default: AR 12)
-- **Window formula:** `2000 - (ar - 1) × (1700 / 19)` milliseconds
-  - AR 1 → 2000 ms approach window
-  - AR 12 → ~1100 ms approach window
-  - AR 20 → ~300 ms approach window
+- **Range:** AR 1–20 (default: AR 10)
+- **Window formula (piecewise linear):**
+  - AR 1–10: `2000 - (ar - 1) × (1000 / 9)` ms → 2000 ms at AR 1, 1000 ms at AR 10
+  - AR 10–20: `1000 - (ar - 10) × (700 / 10)` ms → 1000 ms at AR 10, 300 ms at AR 20
 
 The setting persists across sessions.
+
+## Mods
+Mods are optional gameplay modifiers toggled from the options panel under the **Mods** section.
+
+| Mod    | Effect |
+|--------|--------|
+| Hidden | Notes show only their outline; the fill animation is suppressed. |
+
+Mod states persist across sessions via `localStorage`.
 
 ## Angular Tolerance
 The acceptable margin of error for swipe direction is **±30°** (π/6 radians) from the note's specified direction.

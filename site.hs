@@ -185,18 +185,19 @@ rules sitePath = do
         match "src/tabs/home.md" $ do
             route   $ constRoute "index.html"
             compile $ do
-                infoContent   <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
-                manifest      <- unsafeCompiler $ buildManifest sitePath
-                let homeCtx = constField "info-content" (escapeForAttr infoContent)
-                           <> constField "songs-manifest" (escapeForAttr manifest)
+                infoContent      <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
+                tutorialContent  <- loadSnapshotBody (fromFilePath "src/tabs/tutorial.md") "content"
+                manifest         <- unsafeCompiler $ buildManifest sitePath
+                let homeCtx = constField "info-content"      (escapeForAttr infoContent)
+                           <> constField "tutorial-content"  (escapeForAttr tutorialContent)
+                           <> constField "songs-manifest"    (escapeForAttr manifest)
                            <> baseCtx
                 pandocCompiler
                     >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
 
     match "src/tabs/tutorial.md" $ do
-        route   $ constRoute "tutorial/index.html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "tutorial.html") baseCtx
+            >>= saveSnapshot "content"
 
     match "src/tabs/info.md" $ do
         compile $ pandocCompiler

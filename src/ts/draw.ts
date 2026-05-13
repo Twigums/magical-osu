@@ -25,6 +25,7 @@ export function drawArrow(
   note: Note,
   appearProgress: number,
   scale: number,
+  hidden = false,
 ): void {
   const cx = note.x * scale;
   const cy = note.y * scale;
@@ -65,15 +66,17 @@ export function drawArrow(
   path.lineTo(tx(x1,   hw), ty(x1,   hw));
   path.closePath();
 
-  // Radial fill clipped to arrow shape
-  ctx.save();
-  ctx.clip(path);
-  const fillMaxR = Math.sqrt((len / 2) ** 2 + shw ** 2);
-  ctx.beginPath();
-  ctx.arc(cx, cy, fillProgress * fillMaxR, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(${base}, 1.0)`;
-  ctx.fill();
-  ctx.restore();
+  // Radial fill clipped to arrow shape (skipped in hidden mod)
+  if (!hidden) {
+    ctx.save();
+    ctx.clip(path);
+    const fillMaxR = Math.sqrt((len / 2) ** 2 + shw ** 2);
+    ctx.beginPath();
+    ctx.arc(cx, cy, fillProgress * fillMaxR, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${base}, 1.0)`;
+    ctx.fill();
+    ctx.restore();
+  }
 
   // Stroke outline (clip no longer active)
   ctx.save();
