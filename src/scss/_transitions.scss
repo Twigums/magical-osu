@@ -52,8 +52,26 @@
   to   { transform: scale(1) translateY(0); }
 }
 
+.song-pane {
+  animation: layoutPaneIn var(--motion-duration-base) var(--motion-ease-standard);
+  transition:
+    opacity var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-standard);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+
+  &.exiting {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .layout-pane,
+  .song-pane,
   .options-backdrop,
   .options-panel {
     animation-duration: 0.01ms !important;

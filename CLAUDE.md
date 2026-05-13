@@ -57,7 +57,7 @@ stack build --system-ghc
 
 ### Content Structure
 
-- `src/tabs/` — Top-level pages. `home.md` → `index.html`, `song1.md` → `song1/index.html`, etc.
+- `src/tabs/` — Top-level pages. `home.md` → `index.html`, `kotaete.md` → `kotaete/index.html`, etc.
 - `src/songs/<name>/` — Per-song assets. `.mimi` chart files compiled to `.json`; other files copied verbatim
 - `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `settings_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials

@@ -20,7 +20,7 @@ tabPaths :: [FilePath]
 tabPaths =
     [ "src/tabs/home.md"
     , "src/tabs/tutorial.md"
-    , "src/tabs/song1.md"
+    , "src/tabs/songs/kotaete.md"
     ]
 
 hakyllConfig :: Configuration

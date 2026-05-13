@@ -1,5 +1,5 @@
 ---
-title: song1
+title: kotaete
 song-name: Kotaete
 song-name-jp: こたえて
 song-author: imie

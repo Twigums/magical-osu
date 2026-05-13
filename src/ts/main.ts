@@ -10,9 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const homeRoot = document.getElementById("home-root");
   if (homeRoot) {
-    const infoContent = homeRoot.dataset.infoContent ?? "";
+    const infoContent   = homeRoot.dataset.infoContent ?? "";
+    const songsManifest = homeRoot.dataset.songsManifest ?? "{\"songs\":[]}";
     createRoot(homeRoot).render(
-      createElement(HomeLayoutSwitcher, { infoContent })
+      createElement(HomeLayoutSwitcher, { infoContent, songsManifest })
     );
   }
 

@@ -29,7 +29,7 @@ export function ApproachPreview({ ar }: Props) {
   // Setting this to null inside an effect causes the next frame to reset the cycle start
   const startTimeRef = useRef<number | null>(null);
 
-  // Always current — written during render, read only inside rAF (safe pattern)
+  // written during render, read only inside rAF
   arRef.current = ar;
 
   // Reset the animation cycle whenever AR changes so the new speed is immediately visible
@@ -49,13 +49,15 @@ export function ApproachPreview({ ar }: Props) {
       if (startTimeRef.current === null) startTimeRef.current = timestamp;
 
       const ms           = arToMs(arRef.current);
+
       // Cycle = fill duration + 400ms pause so the completed arrow is briefly visible
       const cycleDuration = ms + 400;
       const elapsed       = (timestamp - startTimeRef.current) % cycleDuration;
       const appearProgress = clamp(elapsed / ms, 0, 1);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // scale=1: the preview canvas uses logical coords directly; CSS handles display size
+
+      // scale=1: the preview canvas uses logical coords directly
       drawArrow(ctx, PREVIEW_NOTE, appearProgress, 1);
 
       rafId = requestAnimationFrame(loop);
@@ -63,7 +65,7 @@ export function ApproachPreview({ ar }: Props) {
 
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, []); // mount/unmount only — AR is read via arRef
+  }, []); // AR is read via arRef
 
   return (
     <canvas

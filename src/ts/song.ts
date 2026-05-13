@@ -16,7 +16,9 @@ export interface SongPageHandle {
 export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): SongPageHandle {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
-  const chart   = body.dataset.songChart ?? "";
+  const chartDir = body.dataset.songChartDir ?? "";
+  const difficulty = new URL(window.location.href).searchParams.get("d") ?? "expert";
+  const chartUrl = chartDir ? `${chartDir}chart-${difficulty}.json` : "";
   const token   = body.dataset.textaliveToken ?? "";
 
   const beatId               = parseInt(body.dataset.textaliveBeatId ?? "");
@@ -160,9 +162,12 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   }
 
   (async () => {
-    if (!chart) return;
+    if (!chartUrl) return;
     try {
-      const res = await fetch(chart);
+      let res = await fetch(chartUrl);
+      if (!res.ok && difficulty !== "expert") {
+        res = await fetch(`${chartDir}chart-expert.json`);
+      }
       if (!res.ok) return;
       const notes = await res.json() as Note[];
       game.setChart(notes);
