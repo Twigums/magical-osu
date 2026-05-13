@@ -1,4 +1,4 @@
-export function getSitePath(): string {
+function getSitePath(): string {
   return document.querySelector('meta[name="site-path"]')?.getAttribute('content') ?? '';
 }
 

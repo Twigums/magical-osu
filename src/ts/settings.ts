@@ -27,7 +27,7 @@ function createNumericSetting(key: string, event: string, clamp: (n: number) => 
 
 export const AR_MIN     = 1;
 export const AR_MAX     = 20;
-export const AR_DEFAULT = 12;
+const AR_DEFAULT = 12;
 
 // 2000 ms at AR 1 → ~300 ms at AR 20
 export function arToMs(ar: number): number {
@@ -45,7 +45,7 @@ export const subscribeAr   = arSetting.subscribe;
 
 export const VOLUME_MIN     = 0;
 export const VOLUME_MAX     = 100;
-export const VOLUME_DEFAULT = 100;
+const VOLUME_DEFAULT = 100;
 export const VOLUME_STEP    = 1;
 
 function clampVolume(n: number): number {

@@ -7,6 +7,8 @@ import { useApproachRate } from "./hooks/useSettings";
 import { ResultsOverlay } from "./ResultsOverlay";
 import { OptionsPanel } from "./OptionsPanel";
 
+let _toastId = 0;
+
 interface FeedbackToast {
   id: number;
   result: HitResult;
@@ -49,7 +51,7 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
       onComboChange: setCombo,
       onPlayingChange: setPlaying,
       onFeedback: (res, x, y) => {
-        const id = Date.now() + Math.random();
+        const id = ++_toastId;
         setFeedbacks(prev => [...prev, { id, result: res, x, y }]);
         setTimeout(() => setFeedbacks(prev => prev.filter(f => f.id !== id)), 700);
       },
@@ -57,6 +59,7 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
 
     gameRef.current = game;
     onReady(game, setResult, () => setResult(null));
+    return () => game.destroy();
   }, []);
 
   useEffect(() => {

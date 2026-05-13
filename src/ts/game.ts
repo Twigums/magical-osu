@@ -12,9 +12,9 @@ export const LOGICAL_H = 600;
 
 const ANGULAR_MARGIN = Math.PI / 6;
 
-export type NoteKind   = "click" | "stream";
+type NoteKind          = "click" | "stream";
 export type HitResult  = "perfect" | "good" | "miss";
-export type NoteState  = "pending" | "hit" | "missed";
+type NoteState         = "pending" | "hit" | "missed";
 
 export interface Note {
   kind: NoteKind;
@@ -50,9 +50,10 @@ export interface GameHandle {
   tick(songMs: number): void;
   getStats(): GameStats;
   setApproachMs(ms: number): void;
+  destroy(): void;
 }
 
-export interface GameDeps {
+interface GameDeps {
   canvas:          HTMLCanvasElement;
   gameArea:        HTMLElement;
   onScore:         (score: number) => void;
@@ -81,12 +82,15 @@ export function createGame(deps: GameDeps): GameHandle {
     source.start();
   };
 
+  let audioLoadCleanup: (() => void) | null = null;
+
   if (deps.hitSoundUrl) {
     const url = deps.hitSoundUrl;
     let loading = false;
     const loadSound = (): void => {
       if (loading) return;
       loading = true;
+      audioLoadCleanup = null;
       audioCtx = new AudioContext();
       hitsoundGain = audioCtx.createGain();
       hitsoundGain.gain.value = volToFactor(loadHitsoundVolume());
@@ -99,9 +103,13 @@ export function createGame(deps: GameDeps): GameHandle {
     };
     window.addEventListener("pointerdown", loadSound, { once: true });
     window.addEventListener("keydown",     loadSound, { once: true });
+    audioLoadCleanup = (): void => {
+      window.removeEventListener("pointerdown", loadSound);
+      window.removeEventListener("keydown",     loadSound);
+    };
   }
 
-  subscribeHitsoundVolume(v => {
+  const unsubHitsound = subscribeHitsoundVolume(v => {
     if (hitsoundGain) hitsoundGain.gain.value = volToFactor(v);
   });
 
@@ -112,7 +120,6 @@ export function createGame(deps: GameDeps): GameHandle {
     canvas.height = rect.height * dpr;
   };
   resize();
-  window.addEventListener("resize", resize);
 
   const getScale = (): number => canvas.width / LOGICAL_W;
 
@@ -126,20 +133,31 @@ export function createGame(deps: GameDeps): GameHandle {
     pointer.y = (clientY - rect.top)  * (LOGICAL_H / rect.height);
   };
 
-  canvas.addEventListener("mousemove",  e => setPointer(e.clientX, e.clientY));
-  canvas.addEventListener("mousedown",  e => { setPointer(e.clientX, e.clientY); pointer.held = true; });
-  window.addEventListener("mouseup",    () => { pointer.held = false; });
-  canvas.addEventListener("touchmove",  e => {
+  const onMouseMove  = (e: MouseEvent): void => setPointer(e.clientX, e.clientY);
+  const onMouseDown  = (e: MouseEvent): void => { setPointer(e.clientX, e.clientY); pointer.held = true; };
+  const onMouseUp    = (): void => { pointer.held = false; };
+  const onTouchMove  = (e: TouchEvent): void => {
     const t = e.touches[0]; if (t) setPointer(t.clientX, t.clientY); e.preventDefault();
-  }, { passive: false });
-  canvas.addEventListener("touchstart", e => {
+  };
+  const onTouchStart = (e: TouchEvent): void => {
     const t = e.touches[0]; if (t) { setPointer(t.clientX, t.clientY); pointer.held = true; } e.preventDefault();
-  }, { passive: false });
-  window.addEventListener("touchend", () => { pointer.held = false; });
-  window.addEventListener("keydown",  e => { if (!e.repeat) keysHeld.add(e.key); });
-  window.addEventListener("keyup",    e => { keysHeld.delete(e.key); });
+  };
+  const onTouchEnd   = (): void => { pointer.held = false; };
+  const onKeyDown    = (e: KeyboardEvent): void => { if (!e.repeat) keysHeld.add(e.key); };
+  const onKeyUp      = (e: KeyboardEvent): void => { keysHeld.delete(e.key); };
+
+  canvas.addEventListener("mousemove",  onMouseMove);
+  canvas.addEventListener("mousedown",  onMouseDown);
+  window.addEventListener("mouseup",    onMouseUp);
+  canvas.addEventListener("touchmove",  onTouchMove,  { passive: false });
+  canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+  window.addEventListener("touchend",   onTouchEnd);
+  window.addEventListener("keydown",    onKeyDown);
+  window.addEventListener("keyup",      onKeyUp);
+  window.addEventListener("resize",     resize);
 
   let notes: Note[] = [];
+  let pendingStart = 0;
   let animations: HitAnimation[] = [];
   let score = 0;
   let perfectCount = 0;
@@ -203,42 +221,51 @@ export function createGame(deps: GameDeps): GameHandle {
   };
 
   const expireMisses = (songMs: number): void => {
-    for (const n of notes) {
+    // Notes are time-sorted: break as soon as a pending note is within the hit window
+    for (let i = pendingStart; i < notes.length; i++) {
+      const n = notes[i];
       if (n.state !== "pending") continue;
-      if (songMs - n.time > GOOD_MS) {
-        n.state = "missed";
-        n.hitResult = "miss";
-        missCount++;
-        comboCount = 0;
-        onComboChange(0);
-        onFeedback("miss", n.x, n.y);
-      }
+      if (songMs - n.time <= GOOD_MS) break;
+      n.state = "missed";
+      n.hitResult = "miss";
+      missCount++;
+      comboCount = 0;
+      onComboChange(0);
+      onFeedback("miss", n.x, n.y);
     }
   };
 
   const draw = (songMs: number): void => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const scale = getScale();
-    for (const note of notes) {
+    // Notes are time-sorted: break once a pending note is past the approach window
+    for (let i = pendingStart; i < notes.length; i++) {
+      const note = notes[i];
       if (note.state !== "pending") continue;
       const dt = note.time - songMs;
-      if (dt > approachMs || dt < -GOOD_MS) continue;
+      if (dt > approachMs) break;
+      if (dt < -GOOD_MS) continue;
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
       drawArrow(ctx, note, appearProgress, scale);
     }
-    for (const anim of animations) {
+    for (let i = 0; i < animations.length; i++) {
+      const anim = animations[i];
       const dt = songMs - anim.startMs;
       if (dt < 0 || dt >= 300) continue;
       drawFireworks(ctx, anim.x, anim.y, anim.kind, dt / 300, scale, anim.seed);
     }
-    animations = animations.filter(a => songMs - a.startMs < 300);
+    // Animations are pushed in chronological order; trim expired from front
+    let trimTo = 0;
+    while (trimTo < animations.length && songMs - animations[trimTo].startMs >= 300) trimTo++;
+    if (trimTo > 0) animations.splice(0, trimTo);
   };
 
   return {
-    setChart(n: Note[]): void { notes = n; },
+    setChart(n: Note[]): void { notes = n; pendingStart = 0; },
 
     reset(): void {
       skipExpiry = true;
+      pendingStart = 0;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
       animations = [];
       setScore(0);
@@ -272,16 +299,36 @@ export function createGame(deps: GameDeps): GameHandle {
     },
 
     tick(songMs: number): void {
-      for (const note of notes) tryHit(note, songMs);
+      // Only check notes within the hit window; notes are time-sorted so break early
+      for (let i = pendingStart; i < notes.length; i++) {
+        const n = notes[i];
+        if (n.time > songMs + GOOD_MS) break;
+        if (n.state === "pending") tryHit(n, songMs);
+      }
       if (skipExpiry) {
-        // Once songMs confirms the song has rewound into the lead-in window, lift the guard
         if (songMs <= approachMs) skipExpiry = false;
       } else {
         expireMisses(songMs);
       }
+      // Advance past resolved notes (hit or missed) at the front
+      while (pendingStart < notes.length && notes[pendingStart].state !== "pending") pendingStart++;
       draw(songMs);
       pointer.prevX = pointer.x;
       pointer.prevY = pointer.y;
+    },
+
+    destroy(): void {
+      canvas.removeEventListener("mousemove",  onMouseMove);
+      canvas.removeEventListener("mousedown",  onMouseDown);
+      window.removeEventListener("mouseup",    onMouseUp);
+      canvas.removeEventListener("touchmove",  onTouchMove);
+      canvas.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend",   onTouchEnd);
+      window.removeEventListener("keydown",    onKeyDown);
+      window.removeEventListener("keyup",      onKeyUp);
+      window.removeEventListener("resize",     resize);
+      unsubHitsound();
+      audioLoadCleanup?.();
     },
   };
 }

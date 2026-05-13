@@ -26,13 +26,11 @@ export function ApproachPreview({ ar }: Props) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   // Ref keeps the rAF loop reading the latest AR without restarting the loop
   const arRef        = useRef(ar);
-  // Setting this to null inside an effect causes the next frame to reset the cycle start
   const startTimeRef = useRef<number | null>(null);
 
   // written during render, read only inside rAF
   arRef.current = ar;
 
-  // Reset the animation cycle whenever AR changes so the new speed is immediately visible
   useEffect(() => {
     startTimeRef.current = null;
   }, [ar]);

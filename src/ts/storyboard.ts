@@ -1,6 +1,6 @@
 import type { TextAliveChar, TextAlivePhrase, TextAliveVideo } from "./textalive";
 
-export interface StoryboardRenderer {
+interface StoryboardRenderer {
   setVideo(video: TextAliveVideo): void;
   update(songMs: number): void;
   reset(): void;
@@ -50,9 +50,10 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
         if (phrase) renderPhrase(phrase);
       }
       for (const { ch, el } of charEls) {
-        if (songMs < ch.startTime)     el.className = "storyboard-char";
-        else if (songMs <= ch.endTime) el.className = "storyboard-char active";
-        else                           el.className = "storyboard-char sung";
+        const cls = songMs < ch.startTime ? "storyboard-char"
+          : songMs <= ch.endTime          ? "storyboard-char active"
+          : "storyboard-char sung";
+        if (el.className !== cls) el.className = cls;
       }
     },
     reset(): void { clearLine(); },

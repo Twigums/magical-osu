@@ -8,7 +8,7 @@ interface NoteColors {
   darkBase: string;
 }
 
-export interface NoteStyle {
+interface NoteStyle {
   colors: NoteColors;
   requiresHold: boolean;
 }
@@ -48,30 +48,26 @@ export function drawArrow(
   const x1 =  len / 2 - headLen; // shaft/head junction
   const x2 =  len / 2;           // tip
 
-  const buildPath = (): void => {
-    ctx.beginPath();
-    ctx.moveTo(tx(x2,    0), ty(x2,    0));   // tip
-    ctx.lineTo(tx(x1,  -hw), ty(x1,  -hw));   // head top shoulder
-    ctx.lineTo(tx(x1, -shw), ty(x1, -shw));   // shaft top (step in)
-    ctx.lineTo(tx(x0, -shw), ty(x0, -shw));   // tail top
-    ctx.lineTo(tx(x0,  shw), ty(x0,  shw));   // tail bottom
-    ctx.lineTo(tx(x1,  shw), ty(x1,  shw));   // shaft bottom (step out)
-    ctx.lineTo(tx(x1,   hw), ty(x1,   hw));   // head bottom shoulder
-    ctx.closePath();
-  };
-
   // Outline snaps to full opacity quickly; fill grows from center after FILL_START
   const OUTLINE_SNAP = 0.12;
   const FILL_START   = 0.62;
   const outlineAlpha = Math.min(appearProgress / OUTLINE_SNAP, 1);
   const fillProgress = Math.max(0, (appearProgress - FILL_START) / (1 - FILL_START));
 
-  ctx.save();
+  // Build path once; reuse for both clip and stroke
+  const path = new Path2D();
+  path.moveTo(tx(x2,    0), ty(x2,    0));
+  path.lineTo(tx(x1,  -hw), ty(x1,  -hw));
+  path.lineTo(tx(x1, -shw), ty(x1, -shw));
+  path.lineTo(tx(x0, -shw), ty(x0, -shw));
+  path.lineTo(tx(x0,  shw), ty(x0,  shw));
+  path.lineTo(tx(x1,  shw), ty(x1,  shw));
+  path.lineTo(tx(x1,   hw), ty(x1,   hw));
+  path.closePath();
 
   // Radial fill clipped to arrow shape
-  buildPath();
   ctx.save();
-  ctx.clip();
+  ctx.clip(path);
   const fillMaxR = Math.sqrt((len / 2) ** 2 + shw ** 2);
   ctx.beginPath();
   ctx.arc(cx, cy, fillProgress * fillMaxR, 0, Math.PI * 2);
@@ -79,12 +75,12 @@ export function drawArrow(
   ctx.fill();
   ctx.restore();
 
-  buildPath();
+  // Stroke outline (clip no longer active)
+  ctx.save();
   ctx.strokeStyle = `rgba(${darkBase}, ${0.9 * outlineAlpha})`;
   ctx.lineWidth = 2.5 * scale;
   ctx.lineJoin  = "miter";
-  ctx.stroke();
-
+  ctx.stroke(path);
   ctx.restore();
 }
 

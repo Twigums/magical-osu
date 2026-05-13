@@ -9,7 +9,7 @@ interface SongPageDeps {
   hideResult: () => void;
 }
 
-export interface SongPageHandle {
+interface SongPageHandle {
   stop(): void;
 }
 
@@ -53,7 +53,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     }, 400);
   };
 
-  if (loadingBar) requestAnimationFrame(() => setProgress(30));
+  if (loadingBar) setProgress(30);
 
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
@@ -116,7 +116,6 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     subscribeVolume(v => { if (player) player.volume = v; });
     player.addListener({
       onAppReady(app) {
-        console.info("[mimi] onAppReady — managed:", app.managed);
         if (!app.songUrl && player) {
           const videoOpts = hasVideoIds ? {
             video: { beatId, chordId, repetitiveSegmentId, lyricId, lyricDiffId }
@@ -193,7 +192,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     const songMs = player?.timer.position ?? 0;
     if (songMs > 0) lastSongMs = songMs;
     game.tick(songMs);
-    storyboard?.update(songMs);
+    if (songMs > 0) storyboard?.update(songMs);
 
     if (songLengthMs > 0) {
       const pct = Math.max(0, Math.min(100, (songMs / songLengthMs) * 100));
