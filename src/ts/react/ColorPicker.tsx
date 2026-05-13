@@ -71,19 +71,6 @@ export function ColorPicker({ r, g, b, onChange }: Props) {
     ctx.fillStyle = bGrad;
     ctx.fillRect(0, 0, SV_W, SV_H);
 
-    // Picker dot
-    const px = s * SV_W;
-    const py = (1 - v) * SV_H;
-    ctx.beginPath();
-    ctx.arc(px, py, 6, 0, Math.PI * 2);
-    ctx.strokeStyle = "rgba(0,0,0,0.6)";
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(px, py, 5, 0, Math.PI * 2);
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
   }, [h, s, v]);
 
   // Draw hue bar
@@ -127,14 +114,20 @@ export function ColorPicker({ r, g, b, onChange }: Props) {
 
   return (
     <div className="color-picker">
-      <canvas
-        ref={svRef}
-        className="color-picker-sv"
-        width={SV_W}
-        height={SV_H}
-        onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); handleSvPointer(e); }}
-        onPointerMove={handleSvPointer}
-      />
+      <div className="color-picker-sv-wrap">
+        <canvas
+          ref={svRef}
+          className="color-picker-sv"
+          width={SV_W}
+          height={SV_H}
+          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); handleSvPointer(e); }}
+          onPointerMove={handleSvPointer}
+        />
+        <div
+          className="color-picker-dot"
+          style={{ left: `${s * 100}%`, top: `${(1 - v) * 100}%` }}
+        />
+      </div>
       <canvas
         ref={hueRef}
         className="color-picker-hue"
