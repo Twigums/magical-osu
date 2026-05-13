@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 html body.home-page {
   margin: 0;
   padding: 0;
@@ -84,7 +86,7 @@ html body.home-page {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 400px;
+  max-width: $layout-max-width;
 }
 
 .layout-pane {
@@ -165,27 +167,52 @@ html body.home-page {
 }
 
 .diff-level {
-  float: left;
+  flex: 0 0 $diff-level-width;
+  width: $diff-level-width;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #1a0a2e;
   font-weight: bold;
-  opacity: 0.85;
-  margin-right: 0.8rem;
-  padding-right: 0.9rem;
   position: relative;
+  z-index: 1;
 
   &::after {
     content: '';
     position: absolute;
-    right: 0;
-    top: -0.15rem;
-    bottom: -0.15rem;
-    width: 1px;
-    background: rgba(255, 255, 255, 0.35);
-    transform: skewX(-18deg);
+    top: -1px;
+    right: -1.15rem;
+    bottom: -1px;
+    width: 2.3rem;
+    background: inherit;
+    transform: skewX($diff-separator-angle);
+    z-index: -1;
   }
 }
 
+.diff-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
 .diff-btn {
-  padding: 1.1rem 2rem;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  min-height: $diff-btn-height;
+
+  @each $id, $color in $diff-colors {
+    &--#{$id} .diff-level {
+      background: $color;
+      color: #fff;
+    }
+  }
 }
 
 .placeholder-text {

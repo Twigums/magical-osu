@@ -176,10 +176,10 @@ export function HomeLayoutSwitcher({ infoContent, songsManifest }: Props) {
                     <a
                       key={diff.id}
                       href={`${renderedSong.href}?d=${diff.id}`}
-                      className="btn-main diff-btn"
+                      className={`btn-main diff-btn diff-btn--${diff.id}`}
                     >
                       <span className="diff-level">{diff.level}</span>
-                      {t(diff.labelEn, diff.labelJp)}
+                      <span className="diff-label">{t(diff.labelEn, diff.labelJp)}</span>
                     </a>
                   ))}
                 </div>

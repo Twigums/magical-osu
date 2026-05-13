@@ -1,3 +1,22 @@
+// ── Sass variables ───────────────────────────────────────────────────────────
+
+// Home layout
+$layout-max-width: 400px;
+
+// Difficulty button
+$diff-btn-height:       3.6rem;
+$diff-level-width:      4rem;
+$diff-separator-angle: -14deg;
+
+$diff-colors: (
+  easy:   #4caf50,
+  medium: #f5c518,
+  hard:   #e53935,
+  expert: #9c27b0,
+);
+
+// ── CSS custom properties ─────────────────────────────────────────────────────
+
 :root {
   // base page colors
   --base-color: #f7f3f2;
