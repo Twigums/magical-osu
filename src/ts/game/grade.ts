@@ -1,5 +1,5 @@
-import type { GameStats } from "./game";
-import { PERFECT_POINTS, GOOD_POINTS } from "./game";
+import type { GameStats } from "./engine";
+import { PERFECT_POINTS, GOOD_POINTS } from "./engine";
 
 export type Grade = "SSS" | "SS" | "S" | "A" | "B" | "C" | "F";
 

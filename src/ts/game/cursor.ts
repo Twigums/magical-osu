@@ -6,7 +6,7 @@ import {
   loadCursorB, subscribeCursorB,
   loadTrailFadeSpeed, subscribeTrailFadeSpeed,
   trailFadeToLifetimeMs,
-} from "./settings";
+} from "../core/settings";
 
 interface TrailParticle {
   x: number;
@@ -15,7 +15,7 @@ interface TrailParticle {
   alive: boolean;
 }
 
-const MAX_PARTICLES      = 64;
+const MAX_PARTICLES      = 150;
 const SPAWN_INTERVAL_MS  = 8;
 
 export interface CursorRenderer {
@@ -50,11 +50,14 @@ export function createCursorRenderer(canvas: HTMLCanvasElement): CursorRenderer 
     return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
   };
 
+  const activeSlots = (): number =>
+    Math.max(1, Math.ceil(trailFadeToLifetimeMs(fadeSpeed) / SPAWN_INTERVAL_MS));
+
   const spawnParticle = (x: number, y: number, now: number): void => {
     if (now - lastSpawnAt < SPAWN_INTERVAL_MS) return;
     lastSpawnAt = now;
     particles[nextSlot] = { x, y, bornAt: now, alive: true };
-    nextSlot = (nextSlot + 1) % MAX_PARTICLES;
+    nextSlot = (nextSlot + 1) % activeSlots();
   };
 
   const onPointerMove  = (e: PointerEvent): void => {
@@ -88,7 +91,7 @@ export function createCursorRenderer(canvas: HTMLCanvasElement): CursorRenderer 
       const orbR     = cursorSize * dpr;
 
       ctx.save();
-      for (let i = 0; i < MAX_PARTICLES; i++) {
+      for (let i = 0; i < activeSlots(); i++) {
         const p = particles[i];
         if (!p.alive) continue;
         const age = now - p.bornAt;

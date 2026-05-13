@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { drawArrow } from "../draw";
-import { arToMs } from "../settings";
-import { clamp } from "../utils";
-import type { Note } from "../game";
+import { drawArrow } from "../game/draw";
+import { arToMs } from "../core/settings";
+import { clamp } from "../core/utils";
+import type { Note } from "../game/engine";
 
 // 4:3 canvas that matches the game's logical aspect ratio; CSS scales it down
 const PREVIEW_W = 400;

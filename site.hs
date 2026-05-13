@@ -172,8 +172,8 @@ rules sitePath = do
             compile sassCompiler
 
     -- track ts/tsx module changes so main.ts re-bundles
-    tsPartialDep  <- makePatternDependency "src/ts/*.ts"
-    tsxPartialDep <- makePatternDependency "src/ts/react/*.tsx"
+    tsPartialDep  <- makePatternDependency "src/ts/**/*.ts"
+    tsxPartialDep <- makePatternDependency "src/ts/**/*.tsx"
     rulesExtraDependencies [tsPartialDep, tsxPartialDep] $
         match "src/ts/main.ts" $ do
             route   $ constRoute "js/main.js"

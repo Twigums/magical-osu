@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { createGame, LOGICAL_W, LOGICAL_H } from "../game";
-import type { GameHandle, HitResult, GameStats } from "../game";
-import { arToMs } from "../settings";
+import { createGame, LOGICAL_W, LOGICAL_H } from "../game/engine";
+import type { GameHandle, HitResult, GameStats } from "../game/engine";
+import { arToMs } from "../core/settings";
 import { useLang } from "./hooks/useLang";
 import { useApproachRate } from "./hooks/useSettings";
 import { ResultsOverlay } from "./ResultsOverlay";

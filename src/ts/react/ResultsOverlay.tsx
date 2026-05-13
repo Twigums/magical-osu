@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLang } from "./hooks/useLang";
-import { computeGrade, computeAccuracy } from "../grade";
-import { shareResult } from "../share";
-import type { GameStats } from "../game";
+import { computeGrade, computeAccuracy } from "../game/grade";
+import { shareResult } from "../song/share";
+import type { GameStats } from "../game/engine";
 
 const LABELS_EN = { title: "Results", score: "Score", accuracy: "Accuracy", perfect: "Perfect", good: "Good", miss: "Miss", share: "Share", copied: "Copied!", failed: "Failed", tryAgain: "Try Again", back: "Back" };
 const LABELS_JP = { title: "リザルト", score: "スコア", accuracy: "精度", perfect: "パーフェクト", good: "グッド", miss: "ミス", share: "シェア", copied: "コピー済み！", failed: "失敗", tryAgain: "やり直す", back: "戻る" };
@@ -16,8 +16,12 @@ interface Props {
 export function ResultsOverlay({ stats, returnHref, onTryAgain }: Props) {
   const lang = useLang();
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">("idle");
-  const [songName] = useState(() => document.querySelector<HTMLElement>(".song-name")?.textContent ?? "");
-  const [artist]   = useState(() => document.querySelector<HTMLElement>(".song-author")?.textContent ?? "");
+
+  const songNameEl = document.querySelector<HTMLElement>(".song-name");
+  const artistEl   = document.querySelector<HTMLElement>(".song-author");
+  const nameKey    = lang === "jp" ? "jp" : "en";
+  const songName   = songNameEl?.dataset[nameKey] ?? songNameEl?.textContent ?? "";
+  const artist     = artistEl?.dataset[nameKey]   ?? artistEl?.textContent   ?? "";
 
   const grade = computeGrade(stats);
   const accuracy = computeAccuracy(stats);

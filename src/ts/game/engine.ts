@@ -1,6 +1,6 @@
-import { angleDiff, clamp } from "./utils";
+import { angleDiff, clamp } from "../core/utils";
 import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
-import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "./settings";
+import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "../core/settings";
 import { createCursorRenderer, type CursorRenderer } from "./cursor";
 
 const PERFECT_MS           = 32;

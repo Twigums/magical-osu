@@ -62,18 +62,21 @@ stack build --system-ghc
 - `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `settings_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
-- `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring; instantiates `CursorRenderer` and calls `cursor.render(now)` after each frame draw
-- `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop, fullscreen toggle
-- `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`, `drawFireworks`); cursor helpers: `drawCursorOrb` (inner solid + fuzzy shadow halo), `drawCursorParticle` (flat alpha circle)
-- `src/ts/cursor.ts` — Custom cursor renderer (`createCursorRenderer`): tracks pointer over the canvas, maintains a 64-slot ring-buffer particle trail, exposes `render(now)` / `destroy()`; subscribes to cursor settings
-- `src/ts/grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
-- `src/ts/lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`
-- `src/ts/settings.ts` — Shared localStorage/event helpers for all settings. Numeric: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`, hitsound volume, cursor size (`loadCursorSize/saveCursorSize/subscribeCursorSize`, range 4–20), cursor color channels (`loadCursorR/G/B`, `saveCursorR/G/B`, `subscribeCursorR/G/B`, each 0–255, defaults 0/255/255 = cyan), trail fade speed (`loadTrailFadeSpeed/saveTrailFadeSpeed/subscribeTrailFadeSpeed`, range 1–10). Boolean mod: `loadHiddenMod`, `saveHiddenMod`, `subscribeHiddenMod`
-- `src/ts/share.ts` — Share / clipboard fallback for result sharing
-- `src/ts/sitePath.ts` — Site sub-path helpers (`getSitePath`, `withPath`)
-- `src/ts/storyboard.ts` — TextAlive lyrics storyboard renderer
-- `src/ts/textalive.ts` — TypeScript type declarations for the TextAlive App API
-- `src/ts/utils.ts` — Math utilities (`clamp`, `angleDiff`)
+- `src/ts/core/` — Shared primitives (no inter-island dependencies):
+  - `utils.ts` — Math utilities (`clamp`, `angleDiff`)
+  - `settings.ts` — Shared localStorage/event helpers for all settings. Numeric: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`, hitsound volume, cursor size (`loadCursorSize/saveCursorSize/subscribeCursorSize`, range 4–20), cursor color channels (`loadCursorR/G/B`, `saveCursorR/G/B`, `subscribeCursorR/G/B`, each 0–255, defaults 0/255/255 = cyan), trail fade speed (`loadTrailFadeSpeed/saveTrailFadeSpeed/subscribeTrailFadeSpeed`, range 1–10). Boolean mod: `loadHiddenMod`, `saveHiddenMod`, `subscribeHiddenMod`
+  - `sitePath.ts` — Site sub-path helpers (`getSitePath`, `withPath`)
+  - `lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`
+- `src/ts/game/` — Rhythm game engine island:
+  - `engine.ts` — Note rendering, hit detection, scoring; instantiates `CursorRenderer` and calls `cursor.render(now)` after each frame draw
+  - `draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`, `drawFireworks`); cursor helpers: `drawCursorOrb` (inner solid + fuzzy shadow halo), `drawCursorParticle` (flat alpha circle)
+  - `cursor.ts` — Custom cursor renderer (`createCursorRenderer`): tracks pointer over the canvas, maintains a 64-slot ring-buffer particle trail, exposes `render(now)` / `destroy()`; subscribes to cursor settings
+  - `grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
+- `src/ts/song/` — Song page / TextAlive island:
+  - `controller.ts` — Song page controller: TextAlive integration, chart loading, game loop, fullscreen toggle
+  - `storyboard.ts` — TextAlive lyrics storyboard renderer
+  - `textalive.ts` — TypeScript type declarations for the TextAlive App API
+  - `share.ts` — Share / clipboard fallback for result sharing
 - `src/ts/react/` — React components:
   - `GameSurface.tsx` — canvas + score display + hit feedback toasts + `ResultsOverlay`
   - `HomeLayoutSwitcher.tsx` — home page layout state (original / play / info)

@@ -1,4 +1,4 @@
-import type { Grade } from "./grade";
+import type { Grade } from "../game/grade";
 
 interface SharePayload {
   accuracy: string;

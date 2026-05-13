@@ -1,6 +1,6 @@
-import type { Note } from "./game";
+import type { Note } from "./engine";
 
-// Shared between hit detection in game.ts and rendering here
+// Shared between hit detection in engine.ts and rendering here
 export const NOTE_RADIUS = 42;
 
 interface NoteColors {

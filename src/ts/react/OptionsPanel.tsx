@@ -3,7 +3,7 @@ import {
   AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP,
   CURSOR_SIZE_MIN, CURSOR_SIZE_MAX,
   TRAIL_FADE_MIN, TRAIL_FADE_MAX,
-} from "../settings";
+} from "../core/settings";
 import { useApproachRate, useVolume, useHitsoundVolume, useHiddenMod, useCursorSize, useCursorR, useCursorG, useCursorB, useTrailFadeSpeed } from "./hooks/useSettings";
 import { ApproachPreview } from "./ApproachPreview";
 import { CursorPreview } from "./CursorPreview";
@@ -232,7 +232,7 @@ export function OptionsPanel({ isSongPage = false }: Props) {
 
               <div className="options-row">
                 <label className="options-label">
-                  <span>{isJp ? "オーブカラー" : "Orb Color"}</span>
+                  <span>{isJp ? "カーソルカラー" : "Cursor Color"}</span>
                 </label>
                 <ColorPicker r={cursorR} g={cursorG} b={cursorB} onChange={handleColorChange} />
               </div>

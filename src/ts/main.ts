@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { initLangToggle } from "./lang";
-import { initSongPage }   from "./song";
+import { initLangToggle } from "./core/lang";
+import { initSongPage }   from "./song/controller";
 import { HomeLayoutSwitcher } from "./react/HomeLayoutSwitcher";
 import { GameSurface }        from "./react/GameSurface";
 

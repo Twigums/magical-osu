@@ -9,7 +9,7 @@ import {
   loadCursorG, saveCursorG, subscribeCursorG,
   loadCursorB, saveCursorB, subscribeCursorB,
   loadTrailFadeSpeed, saveTrailFadeSpeed, subscribeTrailFadeSpeed,
-} from "../../settings";
+} from "../../core/settings";
 
 function useNumericSetting(
   load: () => number,

@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { drawCursorOrb, drawCursorParticle } from "../draw";
-import { trailFadeToLifetimeMs } from "../settings";
+import { drawCursorOrb, drawCursorParticle } from "../game/draw";
+import { trailFadeToLifetimeMs } from "../core/settings";
 
 const PREVIEW_W = 400;
 const PREVIEW_H = 300;
 
-const MAX_PARTICLES  = 64;
+const MAX_PARTICLES  = 150;
 const SPAWN_INTERVAL = 8;
 
 interface Particle {
@@ -59,20 +59,22 @@ export function CursorPreview({ r, g, b, cursorSize, trailFadeSpeed }: Props) {
       const x  = cx + PREVIEW_W * 0.33 * Math.sin(t);
       const y  = cy + PREVIEW_H * 0.28 * Math.sin(2 * t + Math.PI / 2);
 
+      const lifetime    = trailFadeToLifetimeMs(fadeRef.current);
+      const activeSlots = Math.max(1, Math.ceil(lifetime / SPAWN_INTERVAL));
+
       if (now - lastSpawnAt >= SPAWN_INTERVAL) {
         particles[nextSlot] = { x, y, bornAt: now, alive: true };
-        nextSlot = (nextSlot + 1) % MAX_PARTICLES;
+        nextSlot = (nextSlot + 1) % activeSlots;
         lastSpawnAt = now;
       }
 
       ctx.clearRect(0, 0, PREVIEW_W, PREVIEW_H);
 
-      const rgb      = `${rRef.current}, ${gRef.current}, ${bRef.current}`;
-      const lifetime = trailFadeToLifetimeMs(fadeRef.current);
-      const orbR     = sizeRef.current;
+      const rgb  = `${rRef.current}, ${gRef.current}, ${bRef.current}`;
+      const orbR = sizeRef.current;
 
       ctx.save();
-      for (let i = 0; i < MAX_PARTICLES; i++) {
+      for (let i = 0; i < activeSlots; i++) {
         const p = particles[i];
         if (!p.alive) continue;
         const age = now - p.bornAt;

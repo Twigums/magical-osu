@@ -1,5 +1,5 @@
-import type { GameHandle, GameStats, Note } from "./game";
-import { loadVolume, subscribeVolume } from "./settings";
+import type { GameHandle, GameStats, Note } from "../game/engine";
+import { loadVolume, subscribeVolume } from "../core/settings";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
@@ -133,8 +133,9 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
           const songNameEl   = document.querySelector(".song-name")   as HTMLElement | null;
           const songAuthorEl = document.querySelector(".song-author") as HTMLElement | null;
           const { name, artist } = player.data.song;
-          if (songNameEl)   { songNameEl.textContent   = name;        songNameEl.dataset.en   = name;        }
-          if (songAuthorEl) { songAuthorEl.textContent = artist.name; songAuthorEl.dataset.en = artist.name; }
+          const isJp = (localStorage.getItem("lang") ?? "en") === "jp";
+          if (songNameEl)   { songNameEl.dataset.jp   = name;        if (isJp) songNameEl.textContent   = name;        }
+          if (songAuthorEl) { songAuthorEl.dataset.jp = artist.name; if (isJp) songAuthorEl.textContent = artist.name; }
         }
       },
       onTimerReady() {
