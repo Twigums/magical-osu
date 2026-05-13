@@ -42,11 +42,13 @@ $diff-colors: (
   --bg-gradient-song: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
 
   // z-index stacking layers
-  --z-chrome:  10;
-  --z-hud:    100;
-  --z-results: 200;
-  --z-modal:   500;
-  --z-loading: 1000;
+  --z-chrome:          10;
+  --z-hud:            100;
+  --z-small-screen:   150;
+  --z-small-screen-ui: 160;
+  --z-results:         200;
+  --z-modal:           500;
+  --z-loading:        1000;
 
   // motion
   --motion-duration-fast: 160ms;

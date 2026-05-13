@@ -329,11 +329,116 @@ html body.song-page {
   bottom: 1.5rem;
   right: 1.5rem;
   z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .song-page .btn-back {
   text-decoration: none;
   display: inline-block;
+}
+
+.btn-fullscreen {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  svg {
+    width: 1.3rem;
+    height: 1.3rem;
+    display: block;
+  }
+
+  .icon-exit-fullscreen {
+    display: none;
+  }
+
+  &.is-fullscreen {
+    .icon-fullscreen     { display: none; }
+    .icon-exit-fullscreen { display: block; }
+  }
+
+  svg .corner {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .icon-fullscreen {
+    .corner-tl { transform: translate(-2px, -2px); }
+    .corner-tr { transform: translate(2px, -2px); }
+    .corner-br { transform: translate(2px, 2px); }
+    .corner-bl { transform: translate(-2px, 2px); }
+  }
+
+  &:hover .icon-exit-fullscreen {
+    .corner-tl { transform: translate(2px, 2px); }
+    .corner-tr { transform: translate(-2px, 2px); }
+    .corner-br { transform: translate(-2px, -2px); }
+    .corner-bl { transform: translate(2px, -2px); }
+  }
+}
+
+.small-screen-warning {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-small-screen);
+  backdrop-filter: blur(24px);
+  background: rgba(0, 0, 0, 0.55);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.15rem;
+    text-align: center;
+    max-width: 480px;
+    line-height: 1.7;
+    padding: 0 2rem;
+  }
+}
+
+.song-lang {
+  transition: z-index 0s;
+
+  .settings-btn {
+    transition: opacity var(--motion-duration-base) var(--motion-ease-standard),
+                filter  var(--motion-duration-base) var(--motion-ease-standard);
+  }
+}
+
+@media (max-width: 1799px), (max-height: 989px) {
+  .small-screen-warning {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .song-lang {
+    z-index: var(--z-small-screen-ui);
+
+    .settings-btn {
+      pointer-events: none;
+      opacity: 0.3;
+      filter: blur(2px);
+    }
+  }
+
+  .song-page-footer {
+    z-index: var(--z-small-screen-ui);
+  }
 }
 
 @media (max-width: 600px) {

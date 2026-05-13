@@ -32,7 +32,12 @@ The objects in the page fits the screen perfectly. Users across all supported di
 - Below the progress bar, on the left, is a description of the song: the song name, the author's name, and the mapper's name.
 - In the center of the screen is the gameplay. There is a faint, slightly more opaque, white outline for where the game will take place. When the play button is pressed, the game will begin and not stop until the song is completed or the stop button is pressed.
     - Relative to the screen size, for tablet and monitor displays, the game sits at an aspect ratio of 4:3 inside the page. There is a small gap between the borders of the game and the top and bottom of the page. For phone displays, the aspect ratio is still 4:3. However, the gap between the borders is miniscule, and the described play, stop, and back buttons are now pushed more towards the center to give the game area more space.
-- On the bottom of the screen is a single button on the right side. This is the "Back" button. This button is the same "Back" button as the one described in the "home tab" and will redirect to the "home tab".
+- On the bottom-right of the screen are two items:
+    - A fullscreen toggle button (icon-only). In normal state it shows an expand icon (four outward-facing corner brackets); in fullscreen state it shows a compress icon (four inward-facing corner brackets). Hovering over the expand icon animates the corners outward; hovering over the compress icon animates them inward. Clicking toggles the browser fullscreen state.
+    - The "Back" button. This button is the same "Back" button as the one described in the "home tab" and will redirect to the "home tab".
+
+## Small Screen Warning (Song Tab)
+When the viewport is smaller than 1800 px wide or 990 px tall on a song tab, a full-screen blurred overlay is shown with centered text asking the player to play in fullscreen or increase the window size. The language toggle and the fullscreen and back buttons (bottom-right footer) remain above the overlay and fully usable. The settings button is visually dimmed and non-interactive while the overlay is active.
 
 ## Settings / Options Panel
 A settings button sits in the top-right header area of the home tab, next to the language toggle. Clicking it opens a modal overlay where the player can adjust the approach rate. The modal includes a slider and an animated preview that demonstrates the approach animation at the chosen speed. The setting persists across sessions.

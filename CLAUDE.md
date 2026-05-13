@@ -63,7 +63,7 @@ stack build --system-ghc
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
 - `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring
-- `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop
+- `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop, fullscreen toggle
 - `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`)
 - `src/ts/grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
 - `src/ts/lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`

@@ -54,9 +54,28 @@
         <span class="song-mapper">$song-mapper$</span>
     </div>
 
+    <div class="small-screen-warning">
+        <p data-en="Please play in fullscreen or increase your window size."
+           data-jp="フルスクリーンで再生するか、ウィンドウサイズを大きくしてください。">Please play in fullscreen or increase your window size.</p>
+    </div>
+
     <div id="game-root"></div>
 
     <div class="song-page-footer">
+        <button class="btn-fullscreen" id="btn-fullscreen" title="Fullscreen">
+            <svg class="icon-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <g class="corner corner-tl"><path d="M3 9 L3 3 L9 3"/></g>
+                <g class="corner corner-tr"><path d="M15 3 L21 3 L21 9"/></g>
+                <g class="corner corner-br"><path d="M21 15 L21 21 L15 21"/></g>
+                <g class="corner corner-bl"><path d="M9 21 L3 21 L3 15"/></g>
+            </svg>
+            <svg class="icon-exit-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <g class="corner corner-tl"><path d="M3 9 L9 9 L9 3"/></g>
+                <g class="corner corner-tr"><path d="M15 3 L15 9 L21 9"/></g>
+                <g class="corner corner-br"><path d="M21 15 L15 15 L15 21"/></g>
+                <g class="corner corner-bl"><path d="M9 21 L9 15 L3 15"/></g>
+            </svg>
+        </button>
         <a href="$path$/" class="btn-back" data-en="Back" data-jp="戻る">Back</a>
     </div>
 

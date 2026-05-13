@@ -175,6 +175,21 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     }
   })();
 
+  const btnFullscreen = document.getElementById("btn-fullscreen") as HTMLButtonElement | null;
+  if (btnFullscreen) {
+    const syncFullscreenIcon = (): void => {
+      btnFullscreen.classList.toggle("is-fullscreen", !!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", syncFullscreenIcon);
+    btnFullscreen.addEventListener("click", () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    });
+  }
+
   btnPlay.addEventListener("click", () => {
     if (!playerReady || !player) return;
     player.requestPlay();
