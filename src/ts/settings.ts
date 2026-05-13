@@ -42,10 +42,6 @@ function subscribeBoolSetting(event: string, cb: (v: boolean) => void): () => vo
   return () => window.removeEventListener(event, handler);
 }
 
-export const loadHiddenMod      = (): boolean => loadBoolSetting("modHidden", false);
-export const saveHiddenMod      = (v: boolean): void => saveBoolSetting("modHidden", "modHiddenChange", v);
-export const subscribeHiddenMod = (cb: (v: boolean) => void): (() => void) => subscribeBoolSetting("modHiddenChange", cb);
-
 export const AR_MIN     = 1;
 export const AR_MAX     = 20;
 const AR_DEFAULT = 10;
@@ -87,3 +83,58 @@ const hitsoundSetting = createNumericSetting("hitsoundVolume", "hitsoundVolumeCh
 export const loadHitsoundVolume      = hitsoundSetting.load;
 export const saveHitsoundVolume      = hitsoundSetting.save;
 export const subscribeHitsoundVolume = hitsoundSetting.subscribe;
+
+export const loadHiddenMod      = (): boolean => loadBoolSetting("modHidden", false);
+export const saveHiddenMod      = (v: boolean): void => saveBoolSetting("modHidden", "modHiddenChange", v);
+export const subscribeHiddenMod = (cb: (v: boolean) => void): (() => void) => subscribeBoolSetting("modHiddenChange", cb);
+
+export const CURSOR_SIZE_MIN = 4;
+export const CURSOR_SIZE_MAX = 20;
+const CURSOR_SIZE_DEFAULT    = 8;
+export const TRAIL_FADE_MIN  = 1;
+export const TRAIL_FADE_MAX  = 10;
+const TRAIL_FADE_DEFAULT     = 5;
+
+function clampCursorSize(n: number): number {
+  return Math.max(CURSOR_SIZE_MIN, Math.min(CURSOR_SIZE_MAX, Math.round(n)));
+}
+
+function clampTrailFade(n: number): number {
+  return Math.max(TRAIL_FADE_MIN, Math.min(TRAIL_FADE_MAX, Math.round(n)));
+}
+
+function clampRgb(n: number): number {
+  return Math.max(0, Math.min(255, Math.round(n)));
+}
+
+const cursorSizeSetting = createNumericSetting("cursorSize", "cursorSizeChange", clampCursorSize, CURSOR_SIZE_DEFAULT);
+export const loadCursorSize      = cursorSizeSetting.load;
+export const saveCursorSize      = cursorSizeSetting.save;
+export const subscribeCursorSize = cursorSizeSetting.subscribe;
+
+const trailFadeSetting = createNumericSetting("trailFadeSpeed", "trailFadeSpeedChange", clampTrailFade, TRAIL_FADE_DEFAULT);
+export const loadTrailFadeSpeed      = trailFadeSetting.load;
+export const saveTrailFadeSpeed      = trailFadeSetting.save;
+export const subscribeTrailFadeSpeed = trailFadeSetting.subscribe;
+
+// 1 = longest trail (1200ms), 10 = no trail (0ms)
+const TRAIL_MAX_LIFETIME_MS = 1200;
+export function trailFadeToLifetimeMs(fadeSpeed: number): number {
+  return Math.max(0, (TRAIL_FADE_MAX - fadeSpeed) * (TRAIL_MAX_LIFETIME_MS / (TRAIL_FADE_MAX - TRAIL_FADE_MIN)));
+}
+
+// Default: cyan (0, 255, 255)
+const cursorRSetting = createNumericSetting("cursorR", "cursorRChange", clampRgb, 0);
+export const loadCursorR      = cursorRSetting.load;
+export const saveCursorR      = cursorRSetting.save;
+export const subscribeCursorR = cursorRSetting.subscribe;
+
+const cursorGSetting = createNumericSetting("cursorG", "cursorGChange", clampRgb, 255);
+export const loadCursorG      = cursorGSetting.load;
+export const saveCursorG      = cursorGSetting.save;
+export const subscribeCursorG = cursorGSetting.subscribe;
+
+const cursorBSetting = createNumericSetting("cursorB", "cursorBChange", clampRgb, 255);
+export const loadCursorB      = cursorBSetting.load;
+export const saveCursorB      = cursorBSetting.save;
+export const subscribeCursorB = cursorBSetting.subscribe;

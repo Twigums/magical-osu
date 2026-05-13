@@ -62,12 +62,13 @@ stack build --system-ghc
 - `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `settings_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
-- `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring
+- `src/ts/game.ts` — Rhythm game engine: note rendering, hit detection, scoring; instantiates `CursorRenderer` and calls `cursor.render(now)` after each frame draw
 - `src/ts/song.ts` — Song page controller: TextAlive integration, chart loading, game loop, fullscreen toggle
-- `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`)
+- `src/ts/draw.ts` — Canvas drawing utilities (`drawArrow`, `NOTE_RADIUS`, `drawFireworks`); cursor helpers: `drawCursorOrb` (inner solid + fuzzy shadow halo), `drawCursorParticle` (flat alpha circle)
+- `src/ts/cursor.ts` — Custom cursor renderer (`createCursorRenderer`): tracks pointer over the canvas, maintains a 64-slot ring-buffer particle trail, exposes `render(now)` / `destroy()`; subscribes to cursor settings
 - `src/ts/grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
 - `src/ts/lang.ts` — Language toggle initialization; persists `en`/`jp` in `localStorage`
-- `src/ts/settings.ts` — Numeric settings (AR + volume) with shared localStorage/event helpers: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`; hitsound volume helpers: `loadHitsoundVolume`, `saveHitsoundVolume`, `subscribeHitsoundVolume`; boolean mod helpers: `loadHiddenMod`, `saveHiddenMod`, `subscribeHiddenMod`
+- `src/ts/settings.ts` — Shared localStorage/event helpers for all settings. Numeric: `loadAr/Vol`, `saveAr/Vol`, `subscribeAr/Vol`, `arToMs`, `volToFactor`, hitsound volume, cursor size (`loadCursorSize/saveCursorSize/subscribeCursorSize`, range 4–20), cursor color channels (`loadCursorR/G/B`, `saveCursorR/G/B`, `subscribeCursorR/G/B`, each 0–255, defaults 0/255/255 = cyan), trail fade speed (`loadTrailFadeSpeed/saveTrailFadeSpeed/subscribeTrailFadeSpeed`, range 1–10). Boolean mod: `loadHiddenMod`, `saveHiddenMod`, `subscribeHiddenMod`
 - `src/ts/share.ts` — Share / clipboard fallback for result sharing
 - `src/ts/sitePath.ts` — Site sub-path helpers (`getSitePath`, `withPath`)
 - `src/ts/storyboard.ts` — TextAlive lyrics storyboard renderer
@@ -76,11 +77,13 @@ stack build --system-ghc
 - `src/ts/react/` — React components:
   - `GameSurface.tsx` — canvas + score display + hit feedback toasts + `ResultsOverlay`
   - `HomeLayoutSwitcher.tsx` — home page layout state (original / play / info)
-  - `OptionsPanel.tsx` — settings modal (music volume slider + hitsound volume slider + AR slider; AR locked on song page; Mods section with Hidden checkbox)
+  - `OptionsPanel.tsx` — settings modal with volume/hitsound sliders always visible, plus three `<details>` accordions: Mods (Hidden mod checkbox), Notes (AR slider + animated approach preview; AR locked on song page), Cursor (size slider, HSV color picker, trail fade speed slider, animated cursor preview); accordion open/closed states persist in localStorage
+  - `ColorPicker.tsx` — inline HSV color picker: SV square canvas + hue bar canvas, both draggable with pointer capture; converts HSV↔RGB; preserves hue across low-saturation colors via `localH` state
   - `ResultsOverlay.tsx` — post-song results screen (grade, stats, share, try again)
   - `ApproachPreview.tsx` — animated arrow canvas preview for AR setting; accepts `hidden` prop to mirror Hidden mod state
+  - `CursorPreview.tsx` — animated canvas preview of the custom cursor; renders a Lissajous path with orb + trail using current cursor settings; uses refs so rAF loop survives prop changes
   - `hooks/useLang.ts` — hook: current language from `localStorage`, re-reads on toggle click
-  - `hooks/useSettings.ts` — consolidated setting hooks: `useApproachRate`, `useVolume`, `useHitsoundVolume` (numeric, shared `useNumericSetting` helper); `useHiddenMod` (boolean)
+  - `hooks/useSettings.ts` — consolidated setting hooks: `useApproachRate`, `useVolume`, `useHitsoundVolume` (numeric, shared `useNumericSetting` helper); `useHiddenMod` (boolean); `useCursorSize`, `useCursorR`, `useCursorG`, `useCursorB`, `useTrailFadeSpeed` (numeric)
 - `src/tools/osu2mimi.ts` — CLI converter from `.osu` slider format to `.mimi` chart format
 - `static/` — Copied verbatim to output (images, audio, `robots.txt`, etc.)
 
@@ -114,7 +117,7 @@ s, 3080,  68.2, 381.3, 425.0
 ### SCSS
 
 Partials use `@use` with `variables` as `*` (variables are globally forwarded). `_variables.scss` defines two layers:
-- **Sass variables** — layout and component sizing (`$layout-max-width`, `$diff-btn-height`, `$diff-level-width`, `$diff-separator-angle`, `$diff-colors`); partials that need these must `@use 'variables' as *` directly
+- **Sass variables** — layout and component sizing (`$layout-max-width`, `$diff-btn-height`, `$diff-level-width`, `$diff-separator-angle`, `$diff-colors`); color picker canvas dimensions (`$color-picker-sv-w/h`, `$color-picker-hue-h`) used for `aspect-ratio` in `_options.scss`; partials that need these must `@use 'variables' as *` directly
 - **CSS custom properties** on `:root` — base page colors, hit judgment colors (`--color-perfect/good/miss`), grade colors, surface/background gradients, z-index layers, and motion constants
 
 ### Song Frontmatter Fields

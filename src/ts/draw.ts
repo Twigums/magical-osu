@@ -87,6 +87,37 @@ export function drawArrow(
   ctx.restore();
 }
 
+export function drawCursorOrb(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  rgb: string,
+): void {
+  ctx.save();
+  ctx.shadowBlur = radius * 2.5;
+  ctx.shadowColor = `rgba(${rgb}, 0.9)`;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${rgb}, 1.0)`;
+  ctx.fill();
+  ctx.restore();
+}
+
+export function drawCursorParticle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  alpha: number,
+  rgb: string,
+): void {
+  ctx.beginPath();
+  ctx.arc(x, y, Math.max(0.5, radius), 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${rgb}, ${alpha})`;
+  ctx.fill();
+}
+
 export function drawFireworks(
   ctx: CanvasRenderingContext2D,
   x: number, y: number,

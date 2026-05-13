@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 .home-lang {
   display: flex;
   align-items: center;
@@ -52,6 +54,8 @@
   padding: 2rem 2rem 1.5rem;
   min-width: min(320px, 90vw);
   max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
   color: #fff;
 }
 
@@ -177,6 +181,58 @@
   text-align: right;
 }
 
+.options-accordion {
+  margin-bottom: 0.25rem;
+}
+
+.options-accordion-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 0 0.3rem;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.45;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.75; }
+}
+
+.options-accordion-chevron {
+  display: inline-block;
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.options-accordion--open .options-accordion-chevron {
+  transform: rotate(180deg);
+}
+
+.options-accordion-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+  overflow: hidden;
+}
+
+.options-accordion--open .options-accordion-body {
+  grid-template-rows: 1fr;
+}
+
+.options-accordion-body-inner {
+  overflow: hidden;
+  padding-top: 0.25rem;
+}
+
 .options-section-title {
   margin: 0 0 0.75rem;
   font-size: 0.75rem;
@@ -227,6 +283,43 @@
 }
 
 .approach-preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.color-picker-sv {
+  display: block;
+  width: 100%;
+  aspect-ratio: $color-picker-sv-w / $color-picker-sv-h;
+  border-radius: 3px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.color-picker-hue {
+  display: block;
+  width: 100%;
+  aspect-ratio: $color-picker-sv-w / $color-picker-hue-h;
+  border-radius: 3px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.color-picker-swatch {
+  height: 0.9rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cursor-preview {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 3;

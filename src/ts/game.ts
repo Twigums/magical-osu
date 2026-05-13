@@ -1,6 +1,7 @@
 import { angleDiff, clamp } from "./utils";
 import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
 import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "./settings";
+import { createCursorRenderer, type CursorRenderer } from "./cursor";
 
 const PERFECT_MS           = 32;
 const GOOD_MS              = 100;
@@ -67,6 +68,8 @@ export function createGame(deps: GameDeps): GameHandle {
   const { canvas, gameArea, onScore, onFeedback, onComboChange, onPlayingChange } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
+
+  const cursor: CursorRenderer = createCursorRenderer(canvas);
 
   let approachMs = arToMs(loadAr());
   let hiddenMod  = loadHiddenMod();
@@ -316,6 +319,7 @@ export function createGame(deps: GameDeps): GameHandle {
       // Advance past resolved notes (hit or missed) at the front
       while (pendingStart < notes.length && notes[pendingStart].state !== "pending") pendingStart++;
       draw(songMs);
+      cursor.render(performance.now());
       pointer.prevX = pointer.x;
       pointer.prevY = pointer.y;
     },
@@ -330,6 +334,7 @@ export function createGame(deps: GameDeps): GameHandle {
       window.removeEventListener("keydown",    onKeyDown);
       window.removeEventListener("keyup",      onKeyUp);
       window.removeEventListener("resize",     resize);
+      cursor.destroy();
       unsubHitsound();
       unsubHiddenMod();
       audioLoadCleanup?.();

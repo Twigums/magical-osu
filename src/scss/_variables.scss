@@ -3,6 +3,11 @@
 // Home layout
 $layout-max-width: 400px;
 
+// Color picker canvas dimensions (must match SV_W/SV_H/HUE_H in ColorPicker.tsx)
+$color-picker-sv-w:  256;
+$color-picker-sv-h:  160;
+$color-picker-hue-h:  14;
+
 // Difficulty button
 $diff-btn-height:       3.6rem;
 $diff-level-width:      4rem;

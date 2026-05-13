@@ -40,7 +40,7 @@ The objects in the page fits the screen perfectly. Users across all supported di
 When the viewport is smaller than 1800 px wide or 990 px tall on a song tab, a full-screen blurred overlay is shown with centered text asking the player to play in fullscreen or increase the window size. The language toggle and the fullscreen and back buttons (bottom-right footer) remain above the overlay and fully usable. The settings button is visually dimmed and non-interactive while the overlay is active.
 
 ## Settings / Options Panel
-A settings button sits in the top-right header area of the home tab, next to the language toggle. Clicking it opens a modal overlay where the player can adjust the approach rate. The modal includes a slider and an animated preview that demonstrates the approach animation at the chosen speed. The setting persists across sessions.
+A settings button sits in the top-right header area of both the home and song tabs, next to the language toggle. Clicking it opens a modal overlay with collapsible accordion sections: Mods (Hidden mod toggle), Notes (approach rate slider with animated preview), and Cursor (size, color picker, and trail fade speed with animated preview). All settings persist across sessions. Accordion open/closed states also persist across page navigation.
 
 ## Loading Screen (Song Tab)
 When a song tab loads, a full-screen overlay is shown with a progress bar while assets load. Once all assets are ready, the screen fades out. If loading takes too long, the screen is dismissed automatically.
@@ -56,3 +56,6 @@ A combo counter is displayed in the bottom-left of the game area. It shows the c
 
 ## Results Overlay (Song Tab)
 After the song finishes, an overlay appears inside the game area. It shows the player's grade, score, accuracy, and a breakdown by judgement. Three actions are available: share the result, try again, or return to the home tab.
+
+## Custom Cursor (Song Tab)
+The default OS cursor is hidden over the game canvas and replaced by a custom shiny orb with a particle trail. The orb always renders above all other game elements. The cursor's size, color, and trail fade speed can be adjusted in the Cursor section of the Options panel.

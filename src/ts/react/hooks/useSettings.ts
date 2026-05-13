@@ -4,6 +4,11 @@ import {
   loadVolume, saveVolume, subscribeVolume,
   loadHitsoundVolume, saveHitsoundVolume, subscribeHitsoundVolume,
   loadHiddenMod, saveHiddenMod, subscribeHiddenMod,
+  loadCursorSize, saveCursorSize, subscribeCursorSize,
+  loadCursorR, saveCursorR, subscribeCursorR,
+  loadCursorG, saveCursorG, subscribeCursorG,
+  loadCursorB, saveCursorB, subscribeCursorB,
+  loadTrailFadeSpeed, saveTrailFadeSpeed, subscribeTrailFadeSpeed,
 } from "../../settings";
 
 function useNumericSetting(
@@ -32,4 +37,24 @@ export function useHiddenMod(): [boolean, (v: boolean) => void] {
   const [value, setValue] = useState(loadHiddenMod);
   useEffect(() => subscribeHiddenMod(setValue), []);
   return [value, saveHiddenMod];
+}
+
+export function useCursorSize(): [number, (v: number) => void] {
+  return useNumericSetting(loadCursorSize, saveCursorSize, subscribeCursorSize);
+}
+
+export function useCursorR(): [number, (v: number) => void] {
+  return useNumericSetting(loadCursorR, saveCursorR, subscribeCursorR);
+}
+
+export function useCursorG(): [number, (v: number) => void] {
+  return useNumericSetting(loadCursorG, saveCursorG, subscribeCursorG);
+}
+
+export function useCursorB(): [number, (v: number) => void] {
+  return useNumericSetting(loadCursorB, saveCursorB, subscribeCursorB);
+}
+
+export function useTrailFadeSpeed(): [number, (v: number) => void] {
+  return useNumericSetting(loadTrailFadeSpeed, saveTrailFadeSpeed, subscribeTrailFadeSpeed);
 }
