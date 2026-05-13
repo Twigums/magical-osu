@@ -12,7 +12,7 @@ The home tab is established to provide the end user a welcoming experience and a
 - The background is a blurred gif that shows the gameplay. It should be darkened and established in the background. All objects on this page must sit over this background.
 - The header includes the title, which is the name of the website on the top left. Additionally, "Magical Mirai 2026" is stated right below it in smaller font. On the top right, there is a button/switch to change the language from English to Japanese. English should be set by default.
 - The body includes the "original layout", which includes three buttons: "Play", "Tutorial", and "Info". "Tutorial" will take the user to the "Tutorial" tab. Both "Play" and "Info" will replace items on this page.
-    - "Play" will replace the "original layout" with buttons to each song. Each song button will take the user to the song tab for that specific song. Additionally, there will be a visually different "Back" button that returns the layout back to the "original layout".
+    - "Play" will replace the "original layout" with buttons to each song. Selecting a song then shows the difficulty selection for that song. Each difficulty is shown as a split button divided by a diagonal separator: the left badge displays the numeric difficulty level in the difficulty's color (easy = green, medium = yellow, hard = red, expert = purple), and the right section displays the difficulty name in the standard button style. The left badge is a fixed width regardless of the level number. Each difficulty button navigates to the song tab with the chosen difficulty. Additionally, there will be a visually different "Back" button that returns the layout back to the "original layout".
     - "Info" will replace the "original layout" with information about the site and the authors. Additionally, there will be a "Back" button that returns the layout back to the "original layout".
     - The "Back" buttons for both the "Play" layout and "Info" layout must be the same in style and placement. 
 - The footer includes a clickable image to this repository and a clickable image to Hakyll.
@@ -44,7 +44,10 @@ When a song tab loads, a full-screen overlay is shown with a progress bar while 
 After each note is resolved, a brief label floats up from the note's position and fades out, indicating the judgement result.
 
 ## Score Display (Song Tab)
-A live score counter is displayed in the game area and updates on each hit.
+A live score counter is displayed in the top-right of the game area and updates on each hit.
+
+## Combo Display (Song Tab)
+A combo counter is displayed in the bottom-left of the game area. It shows the current consecutive hit count with a "COMBO" label beneath it. A brief pop animation plays when the combo increments. Both the score and combo displays are hidden until the song begins playing.
 
 ## Results Overlay (Song Tab)
 After the song finishes, an overlay appears inside the game area. It shows the player's grade, score, accuracy, and a breakdown by judgement. Three actions are available: share the result, try again, or return to the home tab.

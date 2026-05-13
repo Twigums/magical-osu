@@ -22,6 +22,8 @@ There are two different types of notes in the game:
 
 Directions will have an acceptable margin of error window, so the player can hit the note successfully from a range of angles. A successful hit is defined as moving from behind the note to past the arrow in the specified direction while a key is held (or dragged for touchscreen devices). When the cursor reaches the center of the note is when the judgement is called and a score is obtained for that hit if it is a successful hit.
 
+The hold requirement differs between note types. Stream notes require the mouse button (or touch) to be held when the cursor crosses the note; click notes do not require holding.
+
 Both types will appear and disappear in the same way. They will gradually appear as the song progresses. Each note will appear as a faint outline at first, and the inside of the note will appear more and more opaque before becoming the note's color when its the perfect time to hit the note (defined by the judgement window).
 
 ## Judgement Window
@@ -34,6 +36,9 @@ The judgement window is the acceptable margin of error for valid hits. Score is 
 Scoring is simply defined as the sum of points obtained by the player according to the judgement window by the end of the song.
 
 A live score counter is displayed in the game area and updates on each hit.
+
+## Combo
+A combo counter tracks consecutive successful hits (perfect or good). It increments on each successful hit and resets to zero on a miss. The current combo is displayed in the bottom-left of the game area.
 
 ## Accuracy and Grade
 At the end of a song, an accuracy percentage and letter grade are computed.

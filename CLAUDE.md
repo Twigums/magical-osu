@@ -79,11 +79,8 @@ stack build --system-ghc
   - `OptionsPanel.tsx` — settings modal (music volume slider + hitsound volume slider + AR slider; AR locked on song page)
   - `ResultsOverlay.tsx` — post-song results screen (grade, stats, share, try again)
   - `ApproachPreview.tsx` — animated arrow canvas preview for AR setting
-  - `useLang.ts` — hook: current language from `localStorage`, re-reads on toggle click
-  - `useApproachRate.ts` — hook: AR state synced to `localStorage` via custom event
-  - `useVolume.ts` — hook: volume (0–100) synced to `localStorage` via custom event
-  - `useHitsoundVolume.ts` — hook: hitsound volume (0–100) synced to `localStorage` via custom event
-  - `useSetting.ts` — generic `useNumericSetting` hook backing `useApproachRate`, `useVolume`, and `useHitsoundVolume`
+  - `hooks/useLang.ts` — hook: current language from `localStorage`, re-reads on toggle click
+  - `hooks/useSettings.ts` — consolidated numeric setting hooks: `useApproachRate`, `useVolume`, `useHitsoundVolume`, each backed by a shared `useNumericSetting` helper
 - `src/tools/osu2mimi.ts` — CLI converter from `.osu` slider format to `.mimi` chart format
 - `static/` — Copied verbatim to output (images, audio, `robots.txt`, etc.)
 
@@ -93,29 +90,32 @@ All output goes to `docs/` (configured in `Config.hs` via `hakyllConfig`).
 
 ### Chart Format (`.mimi`)
 
-Song charts live at `src/songs/<name>/chart.mimi` and are compiled by `ChartCompiler.hs` to `songs/<name>/chart.json`.
+Each difficulty is a separate file: `src/songs/<name>/chart-<difficulty>.mimi` (e.g. `chart-easy.mimi`, `chart-expert.mimi`). `site.hs` scans for these files to build the song manifest; `ChartCompiler.hs` compiles each to `songs/<name>/chart-<difficulty>.json`.
 
 ```
-bpm: 120
-offset: 5000
+time_unit: ms
+difficulty: 12
 beats_per_measure: 4
 
-# kind, beat, degrees, x, y
-c, 1,   0, 400, 300
-s, 3,  90, 200, 150
-c, 5, 270, 600, 450
+# kind, time_ms, degrees, x, y
+c, 2388, -30.6, 396.9,  92.2
+s, 3080,  68.2, 381.3, 425.0
 ```
 
-- `kind`: `c` (click, red) or `s` (stream, blue)
-- `beat`: 1-indexed beat number; supports decimals (e.g. `1.5`)
+- `time_unit`: always `ms`
+- `difficulty`: integer level shown on the difficulty selection button
+- `beats_per_measure`: optional, informational only
+- `kind`: `c` (click, red — no hold required) or `s` (stream, blue — requires holding)
+- `time_ms`: milliseconds from song start when the note should be hit
 - `degrees`: direction in standard math convention (0 = right, 90 = up, CCW); converted to canvas radians on compile
 - `x`, `y`: logical game coordinates (800 × 600 space)
-- `offset`: milliseconds from song start to beat 1
 - Blank lines and `#` comment lines are ignored
 
 ### SCSS
 
-Partials use `@use` with `variables` as `*` (variables are globally forwarded). `_variables.scss` defines CSS custom properties on `:root` for base page colors, hit judgment colors (`--color-perfect/good/miss`), and the shared song background gradient (`--bg-gradient-song`).
+Partials use `@use` with `variables` as `*` (variables are globally forwarded). `_variables.scss` defines two layers:
+- **Sass variables** — layout and component sizing (`$layout-max-width`, `$diff-btn-height`, `$diff-level-width`, `$diff-separator-angle`, `$diff-colors`); partials that need these must `@use 'variables' as *` directly
+- **CSS custom properties** on `:root` — base page colors, hit judgment colors (`--color-perfect/good/miss`), grade colors, surface/background gradients, z-index layers, and motion constants
 
 ### Song Frontmatter Fields
 
