@@ -138,3 +138,16 @@ const cursorBSetting = createNumericSetting("cursorB", "cursorBChange", clampRgb
 export const loadCursorB      = cursorBSetting.load;
 export const saveCursorB      = cursorBSetting.save;
 export const subscribeCursorB = cursorBSetting.subscribe;
+
+export const OFFSET_MIN  = -5000;
+export const OFFSET_MAX  =  5000;
+export const OFFSET_STEP =    10;
+
+function clampOffset(n: number): number {
+  return Math.max(OFFSET_MIN, Math.min(OFFSET_MAX, Math.round(n / OFFSET_STEP) * OFFSET_STEP));
+}
+
+const musicOffsetSetting = createNumericSetting("musicOffset", "musicOffsetChange", clampOffset, 0);
+export const loadMusicOffset      = musicOffsetSetting.load;
+export const saveMusicOffset      = musicOffsetSetting.save;
+export const subscribeMusicOffset = musicOffsetSetting.subscribe;

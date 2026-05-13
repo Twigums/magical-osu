@@ -9,6 +9,7 @@ import {
   loadCursorG, saveCursorG, subscribeCursorG,
   loadCursorB, saveCursorB, subscribeCursorB,
   loadTrailFadeSpeed, saveTrailFadeSpeed, subscribeTrailFadeSpeed,
+  loadMusicOffset, saveMusicOffset, subscribeMusicOffset,
 } from "../../core/settings";
 
 function useNumericSetting(
@@ -57,4 +58,8 @@ export function useCursorB(): [number, (v: number) => void] {
 
 export function useTrailFadeSpeed(): [number, (v: number) => void] {
   return useNumericSetting(loadTrailFadeSpeed, saveTrailFadeSpeed, subscribeTrailFadeSpeed);
+}
+
+export function useMusicOffset(): [number, (v: number) => void] {
+  return useNumericSetting(loadMusicOffset, saveMusicOffset, subscribeMusicOffset);
 }

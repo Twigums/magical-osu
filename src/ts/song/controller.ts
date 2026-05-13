@@ -1,5 +1,5 @@
 import type { GameHandle, GameStats, Note } from "../game/engine";
-import { loadVolume, subscribeVolume } from "../core/settings";
+import { loadVolume, subscribeVolume, loadMusicOffset, subscribeMusicOffset } from "../core/settings";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
@@ -54,6 +54,9 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   };
 
   if (loadingBar) setProgress(30);
+
+  let musicOffsetMs = loadMusicOffset();
+  const unsubMusicOffset = subscribeMusicOffset(v => { musicOffsetMs = v; });
 
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
@@ -207,7 +210,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   const loop = (): void => {
     const songMs = player?.timer.position ?? 0;
     if (songMs > 0) lastSongMs = songMs;
-    game.tick(songMs);
+    game.tick(songMs + musicOffsetMs);
     if (songMs > 0) storyboard?.update(songMs);
 
     if (songLengthMs > 0) {
@@ -224,6 +227,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
 
   return {
     stop(): void {
+      unsubMusicOffset();
       if (!playerReady || !player) return;
       dismissResult();
       resetPlayback();

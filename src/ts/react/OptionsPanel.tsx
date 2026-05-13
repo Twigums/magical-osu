@@ -3,8 +3,9 @@ import {
   AR_MIN, AR_MAX, arToMs, VOLUME_MIN, VOLUME_MAX, VOLUME_STEP,
   CURSOR_SIZE_MIN, CURSOR_SIZE_MAX,
   TRAIL_FADE_MIN, TRAIL_FADE_MAX,
+  OFFSET_MIN, OFFSET_MAX, OFFSET_STEP,
 } from "../core/settings";
-import { useApproachRate, useVolume, useHitsoundVolume, useHiddenMod, useCursorSize, useCursorR, useCursorG, useCursorB, useTrailFadeSpeed } from "./hooks/useSettings";
+import { useApproachRate, useVolume, useHitsoundVolume, useHiddenMod, useCursorSize, useCursorR, useCursorG, useCursorB, useTrailFadeSpeed, useMusicOffset } from "./hooks/useSettings";
 import { ApproachPreview } from "./ApproachPreview";
 import { CursorPreview } from "./CursorPreview";
 import { ColorPicker } from "./ColorPicker";
@@ -43,6 +44,7 @@ export function OptionsPanel({ isSongPage = false }: Props) {
   const [cursorG, setCursorG]               = useCursorG();
   const [cursorB, setCursorB]               = useCursorB();
   const [trailFadeSpeed, setTrailFadeSpeed] = useTrailFadeSpeed();
+  const [musicOffset, setMusicOffset] = useMusicOffset();
   const lang = useLang();
 
   useEffect(() => {
@@ -58,14 +60,18 @@ export function OptionsPanel({ isSongPage = false }: Props) {
     setCursorB(b);
   }, [setCursorR, setCursorG, setCursorB]);
 
-  const [modsOpen, setModsOpen]       = useState(() => localStorage.getItem("modsAccordionOpen") === "true");
-  const [notesOpen, setNotesOpen]     = useState(() => localStorage.getItem("notesAccordionOpen") !== "false");
-  const [cursorOpen, setCursorOpen]   = useState(() => localStorage.getItem("cursorAccordionOpen") !== "false");
+  const [volumeOpen, setVolumeOpen]   = useState(() => localStorage.getItem("volumeAccordionOpen") !== "false");
+  const [timingOpen, setTimingOpen]   = useState(() => localStorage.getItem("timingAccordionOpen") !== "false");
+  const [modsOpen, setModsOpen]       = useState(() => localStorage.getItem("modsAccordionOpen") !== "false");
+  const [notesOpen, setNotesOpen]     = useState(() => localStorage.getItem("notesAccordionOpen") === "true");
+  const [cursorOpen, setCursorOpen]   = useState(() => localStorage.getItem("cursorAccordionOpen") === "true");
 
   if (!open) return null;
 
-  const ms   = Math.round(arToMs(ar));
-  const isJp = lang === "jp";
+  const ms    = Math.round(arToMs(ar));
+  const isJp  = lang === "jp";
+  const fmtOffset = (ms: number): string =>
+    (ms >= 0 ? "+" : "") + (ms / 1000).toFixed(2) + "s";
 
   return (
     <div className={`options-backdrop${exiting ? " exiting" : ""}`} onClick={close}>
@@ -83,38 +89,98 @@ export function OptionsPanel({ isSongPage = false }: Props) {
           {isJp ? "オプション" : "Options"}
         </h2>
 
-        <div className="options-row">
-          <label className="options-label">
-            <span>{isJp ? "音楽音量" : "Music Volume"}</span>
-            <span className="options-setting-value">{vol}%</span>
-          </label>
-          <input
-            type="range"
-            className="options-slider"
-            min={VOLUME_MIN}
-            max={VOLUME_MAX}
-            step={VOLUME_STEP}
-            value={vol}
-            style={sliderFill(vol, VOLUME_MIN, VOLUME_MAX)}
-            onChange={e => setVol(Number(e.target.value))}
-          />
+        <div className={`options-accordion${volumeOpen ? " options-accordion--open" : ""}`}>
+          <button
+            className="options-accordion-summary"
+            onClick={() => {
+              const v = !volumeOpen;
+              setVolumeOpen(v);
+              localStorage.setItem("volumeAccordionOpen", String(v));
+            }}
+          >
+            <span>{isJp ? "音量" : "Volume"}</span>
+            <span className="options-accordion-chevron">▾</span>
+          </button>
+          <div className="options-accordion-body">
+            <div className="options-accordion-body-inner">
+
+              <div className="options-row">
+                <label className="options-label">
+                  <span>{isJp ? "音楽音量" : "Music Volume"}</span>
+                  <span className="options-setting-value">{vol}%</span>
+                </label>
+                <input
+                  type="range"
+                  className="options-slider"
+                  min={VOLUME_MIN}
+                  max={VOLUME_MAX}
+                  step={VOLUME_STEP}
+                  value={vol}
+                  style={sliderFill(vol, VOLUME_MIN, VOLUME_MAX)}
+                  onChange={e => setVol(Number(e.target.value))}
+                />
+              </div>
+
+              <div className="options-row">
+                <label className="options-label">
+                  <span>{isJp ? "ヒット音量" : "Hitsound Volume"}</span>
+                  <span className="options-setting-value">{hsVol}%</span>
+                </label>
+                <input
+                  type="range"
+                  className="options-slider"
+                  min={VOLUME_MIN}
+                  max={VOLUME_MAX}
+                  step={VOLUME_STEP}
+                  value={hsVol}
+                  style={sliderFill(hsVol, VOLUME_MIN, VOLUME_MAX)}
+                  onChange={e => setHsVol(Number(e.target.value))}
+                />
+              </div>
+
+            </div>
+          </div>
         </div>
 
-        <div className="options-row">
-          <label className="options-label">
-            <span>{isJp ? "ヒット音量" : "Hitsound Volume"}</span>
-            <span className="options-setting-value">{hsVol}%</span>
-          </label>
-          <input
-            type="range"
-            className="options-slider"
-            min={VOLUME_MIN}
-            max={VOLUME_MAX}
-            step={VOLUME_STEP}
-            value={hsVol}
-            style={sliderFill(hsVol, VOLUME_MIN, VOLUME_MAX)}
-            onChange={e => setHsVol(Number(e.target.value))}
-          />
+        <div className={`options-accordion${timingOpen ? " options-accordion--open" : ""}`}>
+          <button
+            className="options-accordion-summary"
+            onClick={() => {
+              const v = !timingOpen;
+              setTimingOpen(v);
+              localStorage.setItem("timingAccordionOpen", String(v));
+            }}
+          >
+            <span>{isJp ? "タイミング" : "Timing"}</span>
+            <span className="options-accordion-chevron">▾</span>
+          </button>
+          <div className="options-accordion-body">
+            <div className="options-accordion-body-inner">
+
+              <div className="options-row">
+                <label className="options-label">
+                  <span>{isJp ? "音楽オフセット" : "Music Offset"}</span>
+                  <span className="options-setting-value">{fmtOffset(musicOffset)}</span>
+                </label>
+                <input
+                  type="range"
+                  className="options-slider"
+                  min={OFFSET_MIN}
+                  max={OFFSET_MAX}
+                  step={OFFSET_STEP}
+                  value={musicOffset}
+                  style={sliderFill(musicOffset, OFFSET_MIN, OFFSET_MAX)}
+                  onChange={e => { const v = Number(e.target.value); setMusicOffset(Math.abs(v) <= OFFSET_STEP ? 0 : v); }}
+                />
+                <p className="options-note">
+                  {isJp
+                    ? "曲が遅れる場合は増やし、曲が早い場合は減らす。"
+                    : "Increase if song is late, decrease if song is early."}
+                </p>
+              </div>
+
+            </div>
+          </div>
         </div>
 
         <div className={`options-accordion${modsOpen ? " options-accordion--open" : ""}`}>
