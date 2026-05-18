@@ -21,14 +21,14 @@
   </url>
 
   <url>
-    <loc>https://example.comsrc/tabs/song1.md/song1/index.html</loc>
+    <loc>https://example.comsrc/tabs/songs/kotaete.md/kotaete/index.html</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://example.comsrc/tabs/tutorial.md/tutorial/index.html</loc>
+    <loc>https://example.comsrc/tabs/tutorial.md</loc>
     <lastmod></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
