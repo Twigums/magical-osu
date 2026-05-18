@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-import Data.List            (dropWhileEnd)
-import Data.Maybe           (fromMaybe)
+import Data.List            (dropWhileEnd, intercalate, isPrefixOf)
+import Data.Maybe           (catMaybes, fromMaybe)
+import System.Directory     (doesDirectoryExist, doesFileExist, listDirectory)
 import System.Environment   (getArgs, lookupEnv, withArgs)
-import System.FilePath      ((</>))
+import System.FilePath      ((</>), (<.>), takeBaseName)
+import Control.Monad        (filterM, forM)
 
 import Hakyll
 
@@ -30,6 +32,13 @@ escapeForAttr = concatMap escape
     escape '\'' = "&#39;"
     escape c    = [c]
 
+escapeForJson :: String -> String
+escapeForJson = concatMap escape
+  where
+    escape '"'  = "\\\""
+    escape '\\' = "\\\\"
+    escape c    = [c]
+
 extractSitePath :: [String] -> (String, [String])
 extractSitePath = go []
   where
@@ -43,6 +52,79 @@ normalizeSitePath path =
     let stripped = dropWhile (== '/') path
         trimmed  = dropWhileEnd (== '/') stripped
     in "/" ++ trimmed
+
+--------------------------------------------------------------------------------
+
+safeTrim :: String -> String
+safeTrim = dropWhileEnd (== ' ') . dropWhile (== ' ')
+
+parseFrontmatter :: String -> [(String, String)]
+parseFrontmatter content =
+    let ls = lines content
+        afterDelim = drop 1 $ dropWhile (/= "---") ls
+        fmLines = takeWhile (/= "---") afterDelim
+    in map parseLine fmLines
+  where
+    parseLine line = case break (== ':') line of
+        (key, ':':val) -> (safeTrim key, safeTrim val)
+        _              -> ("", "")
+
+lookupFM :: String -> [(String, String)] -> String
+lookupFM key fm = fromMaybe "" $ lookup key fm
+
+difficultyIds :: [String]
+difficultyIds = ["easy", "medium", "hard", "expert"]
+
+parseMimiDifficulty :: String -> Int
+parseMimiDifficulty content =
+    case [v | l <- takeWhile (not . null) (lines content),
+              Just (k, v) <- [parseHeader l], k == "difficulty"] of
+        (v:_) -> case reads v of
+                    [(n, "")] -> n
+                    _         -> 0
+        []    -> 0
+  where
+    parseHeader line = case break (== ':') line of
+        (key, ':':val) -> Just (safeTrim key, safeTrim val)
+        _              -> Nothing
+
+buildManifest :: String -> IO String
+buildManifest sitePath = do
+    let songsDir = "src/songs"
+    exists <- doesDirectoryExist songsDir
+    if not exists then return "{\"songs\":[]}" else do
+        dirs <- listDirectory songsDir
+        songDirs <- filterM (doesDirectoryExist . (songsDir </>)) dirs
+
+        entries <- fmap catMaybes $ forM songDirs $ \songId -> do
+            let tabPath = "src/tabs/songs" </> songId <.> "md"
+            tabExists <- doesFileExist tabPath
+            if not tabExists then return Nothing else do
+                content <- readFile tabPath
+                let fm = parseFrontmatter content
+                    titleEn  = lookupFM "song-name" fm
+                    titleJp  = lookupFM "song-name-jp" fm
+                    authorEn = lookupFM "song-author" fm
+                    authorJp = lookupFM "song-author-jp" fm
+
+                avail <- filterM (\d -> doesFileExist $ songsDir </> songId </> "chart-" ++ d ++ ".mimi") difficultyIds
+                if null avail then return Nothing else do
+                    diffs <- forM avail $ \d -> do
+                        level <- fmap parseMimiDifficulty $ readFile (songsDir </> songId </> "chart-" ++ d ++ ".mimi")
+                        return $ "{\"id\":\"" ++ d ++ "\",\"level\":" ++ show level ++ "}"
+                    let diffsJson = "[" ++ intercalate "," diffs ++ "]"
+                    let href = sitePath ++ "/" ++ songId ++ "/"
+                    return $ Just $ "{"
+                        ++ "\"id\":\"" ++ songId ++ "\","
+                        ++ "\"titleEn\":\"" ++ escapeForJson titleEn ++ "\","
+                        ++ "\"titleJp\":\"" ++ escapeForJson titleJp ++ "\","
+                        ++ "\"authorEn\":\"" ++ escapeForJson authorEn ++ "\","
+                        ++ "\"authorJp\":\"" ++ escapeForJson authorJp ++ "\","
+                        ++ "\"href\":\"" ++ href ++ "\","
+                        ++ "\"difficulties\":" ++ diffsJson
+                        ++ "}"
+
+        return $ "{\"songs\":[" ++ intercalate "," entries ++ "]}"
 
 --------------------------------------------------------------------------------
 
@@ -90,39 +172,50 @@ rules sitePath = do
             compile sassCompiler
 
     -- track ts/tsx module changes so main.ts re-bundles
-    tsPartialDep  <- makePatternDependency "src/ts/*.ts"
-    tsxPartialDep <- makePatternDependency "src/ts/react/*.tsx"
+    tsPartialDep  <- makePatternDependency "src/ts/**/*.ts"
+    tsxPartialDep <- makePatternDependency "src/ts/**/*.tsx"
     rulesExtraDependencies [tsPartialDep, tsxPartialDep] $
         match "src/ts/main.ts" $ do
             route   $ constRoute "js/main.js"
             compile tsCompiler
 
-    match "src/tabs/home.md" $ do
-        route   $ constRoute "index.html"
-        compile $ do
-            infoContent <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
-            let homeCtx = constField "info-content" (escapeForAttr infoContent) <> baseCtx
-            pandocCompiler
-                >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
+    songsTabDep <- makePatternDependency "src/tabs/songs/*.md"
+    songsChartDep <- makePatternDependency "src/songs/**/*.mimi"
+    rulesExtraDependencies [songsTabDep, songsChartDep] $
+        match "src/tabs/home.md" $ do
+            route   $ constRoute "index.html"
+            compile $ do
+                infoContent      <- loadSnapshotBody (fromFilePath "src/tabs/info.md") "content"
+                tutorialContent  <- loadSnapshotBody (fromFilePath "src/tabs/tutorial.md") "content"
+                manifest         <- unsafeCompiler $ buildManifest sitePath
+                let homeCtx = constField "info-content"      (escapeForAttr infoContent)
+                           <> constField "tutorial-content"  (escapeForAttr tutorialContent)
+                           <> constField "songs-manifest"    (escapeForAttr manifest)
+                           <> baseCtx
+                pandocCompiler
+                    >>= loadAndApplyTemplate (makeIdentifier templateDir "home.html") homeCtx
 
     match "src/tabs/tutorial.md" $ do
-        route   $ constRoute "tutorial/index.html"
         compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "tutorial.html") baseCtx
+            >>= saveSnapshot "content"
 
     match "src/tabs/info.md" $ do
         compile $ pandocCompiler
             >>= saveSnapshot "content"
 
-    let songCtx =
-          constField "textalive-token" textaliveToken <>
-          constField "song-chart" (sitePath ++ "/songs/song1/chart.json") <>
-          baseCtx
-
-    match "src/tabs/song1.md" $ do
-        route   $ constRoute "song1/index.html"
-        compile $ pandocCompiler
-            >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") songCtx
+    match "src/tabs/songs/*.md" $ do
+        route   $ customRoute $ \ident ->
+            let name = takeBaseName (toFilePath ident)
+            in name </> "index.html"
+        compile $ do
+            ident  <- getUnderlying
+            let songId = takeBaseName (toFilePath ident)
+                songCtx =
+                  constField "textalive-token" textaliveToken <>
+                  constField "song-chart-dir" (sitePath ++ "/songs/" ++ songId ++ "/") <>
+                  baseCtx
+            pandocCompiler
+                >>= loadAndApplyTemplate (makeIdentifier templateDir "song.html") songCtx
 
     create ["sitemap.xml"] $ do
         route idRoute

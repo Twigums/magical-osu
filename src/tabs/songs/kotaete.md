@@ -1,6 +1,6 @@
 ---
-title: song1
-song-name: Kotaete
+title: Answer Me
+song-name: Answer Me
 song-name-jp: こたえて
 song-author: imie
 song-author-jp: imie

@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 html body.home-page {
   margin: 0;
   padding: 0;
@@ -84,7 +86,7 @@ html body.home-page {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 320px;
+  max-width: $layout-max-width;
 }
 
 .layout-pane {
@@ -148,6 +150,69 @@ html body.home-page {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+}
+
+.song-title {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 0.2rem;
+}
+
+.difficulty-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.diff-level {
+  flex: 0 0 $diff-level-width;
+  width: $diff-level-width;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #1a0a2e;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: -1.15rem;
+    bottom: -1px;
+    width: 2.3rem;
+    background: inherit;
+    transform: skewX($diff-separator-angle);
+    z-index: -1;
+  }
+}
+
+.diff-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
+.diff-btn {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  min-height: $diff-btn-height;
+
+  @each $id, $color in $diff-colors {
+    &--#{$id} .diff-level {
+      background: $color;
+      color: #fff;
+    }
+  }
 }
 
 .placeholder-text {

@@ -1,6 +1,6 @@
 import type { TextAliveChar, TextAlivePhrase, TextAliveVideo } from "./textalive";
 
-export interface StoryboardRenderer {
+interface StoryboardRenderer {
   setVideo(video: TextAliveVideo): void;
   update(songMs: number): void;
   reset(): void;
@@ -11,6 +11,7 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
   let currentPhrase: TextAlivePhrase | null = null;
   let lineEl: HTMLElement | null = null;
   let charEls: { ch: TextAliveChar; el: HTMLElement }[] = [];
+  let clearTimer: ReturnType<typeof setTimeout> | null = null;
 
   const renderPhrase = (phrase: TextAlivePhrase): void => {
     root.innerHTML = "";
@@ -31,9 +32,13 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
   };
 
   const clearLine = (): void => {
+    if (clearTimer !== null) { clearTimeout(clearTimer); clearTimer = null; }
     if (lineEl) lineEl.classList.remove("visible");
     const toRemove = lineEl;
-    setTimeout(() => { if (toRemove && toRemove.parentNode === root) root.removeChild(toRemove); }, 300);
+    clearTimer = setTimeout(() => {
+      clearTimer = null;
+      if (toRemove && toRemove.parentNode === root) root.removeChild(toRemove);
+    }, 300);
     lineEl = null;
     charEls = [];
     currentPhrase = null;
@@ -50,9 +55,10 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
         if (phrase) renderPhrase(phrase);
       }
       for (const { ch, el } of charEls) {
-        if (songMs < ch.startTime)     el.className = "storyboard-char";
-        else if (songMs <= ch.endTime) el.className = "storyboard-char active";
-        else                           el.className = "storyboard-char sung";
+        const cls = songMs < ch.startTime ? "storyboard-char"
+          : songMs <= ch.endTime          ? "storyboard-char active"
+          : "storyboard-char sung";
+        if (el.className !== cls) el.className = cls;
       }
     },
     reset(): void { clearLine(); },

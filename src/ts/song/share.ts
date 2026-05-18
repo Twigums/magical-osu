@@ -1,18 +1,20 @@
-import type { Grade } from "./grade";
+import type { Grade } from "../game/grade";
 
 interface SharePayload {
   accuracy: string;
   grade: Grade;
   songName: string;
+  artist: string;
   lang: string;
 }
 
 export async function shareResult(payload: SharePayload): Promise<boolean> {
-  const { accuracy, grade, songName, lang } = payload;
+  const { accuracy, grade, songName, artist, lang } = payload;
   const url = window.location.href;
+  const songId = artist ? `${songName} — ${artist}` : songName;
   const text = lang === "jp"
-    ? `「${songName}」で ${accuracy} (${grade}) を獲得しました！\n${url}`
-    : `I scored ${accuracy} (${grade}) on "${songName}" in mimi!\n${url}`;
+    ? `「${songId}」で ${accuracy} (${grade}) を獲得しました！\n${url}`
+    : `I scored ${accuracy} (${grade}) on "${songId}" in mimi!\n${url}`;
 
   if (navigator.share) {
     try {

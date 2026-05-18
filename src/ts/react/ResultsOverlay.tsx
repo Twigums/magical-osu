@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useLang } from "./useLang";
-import { computeGrade, computeAccuracy } from "../grade";
-import { shareResult } from "../share";
-import type { GameStats } from "../game";
+import { useLang } from "./hooks/useLang";
+import { computeGrade, computeAccuracy } from "../game/grade";
+import { shareResult } from "../song/share";
+import type { GameStats } from "../game/engine";
+
+const LABELS_EN = { title: "Results", score: "Score", accuracy: "Accuracy", perfect: "Perfect", good: "Good", miss: "Miss", share: "Share", copied: "Copied!", failed: "Failed", tryAgain: "Try Again", back: "Back" };
+const LABELS_JP = { title: "リザルト", score: "スコア", accuracy: "精度", perfect: "パーフェクト", good: "グッド", miss: "ミス", share: "シェア", copied: "コピー済み！", failed: "失敗", tryAgain: "やり直す", back: "戻る" };
 
 interface Props {
   stats: GameStats;
@@ -14,23 +17,22 @@ export function ResultsOverlay({ stats, returnHref, onTryAgain }: Props) {
   const lang = useLang();
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">("idle");
 
+  const songNameEl = document.querySelector<HTMLElement>(".song-name");
+  const artistEl   = document.querySelector<HTMLElement>(".song-author");
+  const nameKey    = lang === "jp" ? "jp" : "en";
+  const songName   = songNameEl?.dataset[nameKey] ?? songNameEl?.textContent ?? "";
+  const artist     = artistEl?.dataset[nameKey]   ?? artistEl?.textContent   ?? "";
+
   const grade = computeGrade(stats);
   const accuracy = computeAccuracy(stats);
   const pct = (accuracy * 100).toFixed(2);
-  const songName = document.querySelector<HTMLElement>(".song-name")?.textContent ?? "";
 
-  const labels = lang === "jp"
-    ? { title: "リザルト", score: "スコア", accuracy: "精度", perfect: "パーフェクト", good: "グッド", miss: "ミス", share: "シェア", copied: "コピー済み！", failed: "失敗", tryAgain: "やり直す", back: "戻る" }
-    : { title: "Results", score: "Score", accuracy: "Accuracy", perfect: "Perfect", good: "Good", miss: "Miss", share: "Share", copied: "Copied!", failed: "Failed", tryAgain: "Try Again", back: "Back" };
+  const labels = lang === "jp" ? LABELS_JP : LABELS_EN;
 
   const handleShare = (): void => {
-    shareResult({ accuracy: `${pct}%`, grade, songName, lang })
+    shareResult({ accuracy: `${pct}%`, grade, songName, artist, lang })
       .then(ok => {
         setShareStatus(ok ? "copied" : "failed");
-        setTimeout(() => setShareStatus("idle"), 2000);
-      })
-      .catch(() => {
-        setShareStatus("failed");
         setTimeout(() => setShareStatus("idle"), 2000);
       });
   };

@@ -1,5 +1,5 @@
-import type { GameHandle, GameStats, Note } from "./game";
-import { loadVolume, subscribeVolume } from "./settings";
+import type { GameHandle, GameStats, Note } from "../game/engine";
+import { loadVolume, subscribeVolume, loadMusicOffset, subscribeMusicOffset } from "../core/settings";
 import { createStoryboardRenderer } from "./storyboard";
 import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
 
@@ -9,14 +9,16 @@ interface SongPageDeps {
   hideResult: () => void;
 }
 
-export interface SongPageHandle {
+interface SongPageHandle {
   stop(): void;
 }
 
 export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): SongPageHandle {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
-  const chart   = body.dataset.songChart ?? "";
+  const chartDir = body.dataset.songChartDir ?? "";
+  const difficulty = new URL(window.location.href).searchParams.get("d") ?? "expert";
+  const chartUrl = chartDir ? `${chartDir}chart-${difficulty}.json` : "";
   const token   = body.dataset.textaliveToken ?? "";
 
   const beatId               = parseInt(body.dataset.textaliveBeatId ?? "");
@@ -51,7 +53,10 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     }, 400);
   };
 
-  if (loadingBar) requestAnimationFrame(() => setProgress(30));
+  if (loadingBar) setProgress(30);
+
+  let musicOffsetMs = loadMusicOffset();
+  const unsubMusicOffset = subscribeMusicOffset(v => { musicOffsetMs = v; });
 
   let player: TextAlivePlayer | null = null;
   let playerReady = false;
@@ -114,7 +119,6 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     subscribeVolume(v => { if (player) player.volume = v; });
     player.addListener({
       onAppReady(app) {
-        console.info("[mimi] onAppReady — managed:", app.managed);
         if (!app.songUrl && player) {
           const videoOpts = hasVideoIds ? {
             video: { beatId, chordId, repetitiveSegmentId, lyricId, lyricDiffId }
@@ -132,8 +136,9 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
           const songNameEl   = document.querySelector(".song-name")   as HTMLElement | null;
           const songAuthorEl = document.querySelector(".song-author") as HTMLElement | null;
           const { name, artist } = player.data.song;
-          if (songNameEl)   { songNameEl.textContent   = name;        songNameEl.dataset.en   = name;        }
-          if (songAuthorEl) { songAuthorEl.textContent = artist.name; songAuthorEl.dataset.en = artist.name; }
+          const isJp = (localStorage.getItem("lang") ?? "en") === "jp";
+          if (songNameEl)   { songNameEl.dataset.jp   = name;        if (isJp) songNameEl.textContent   = name;        }
+          if (songAuthorEl) { songAuthorEl.dataset.jp = artist.name; if (isJp) songAuthorEl.textContent = artist.name; }
         }
       },
       onTimerReady() {
@@ -160,9 +165,12 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   }
 
   (async () => {
-    if (!chart) return;
+    if (!chartUrl) return;
     try {
-      const res = await fetch(chart);
+      let res = await fetch(chartUrl);
+      if (!res.ok && difficulty !== "expert") {
+        res = await fetch(`${chartDir}chart-expert.json`);
+      }
       if (!res.ok) return;
       const notes = await res.json() as Note[];
       game.setChart(notes);
@@ -171,9 +179,25 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     }
   })();
 
+  const btnFullscreen = document.getElementById("btn-fullscreen") as HTMLButtonElement | null;
+  if (btnFullscreen) {
+    const syncFullscreenIcon = (): void => {
+      btnFullscreen.classList.toggle("is-fullscreen", !!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", syncFullscreenIcon);
+    btnFullscreen.addEventListener("click", () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    });
+  }
+
   btnPlay.addEventListener("click", () => {
     if (!playerReady || !player) return;
     player.requestPlay();
+    game.start();
   });
 
   btnStop.addEventListener("click", () => {
@@ -186,8 +210,8 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   const loop = (): void => {
     const songMs = player?.timer.position ?? 0;
     if (songMs > 0) lastSongMs = songMs;
-    game.tick(songMs);
-    storyboard?.update(songMs);
+    game.tick(songMs + musicOffsetMs);
+    if (songMs > 0) storyboard?.update(songMs);
 
     if (songLengthMs > 0) {
       const pct = Math.max(0, Math.min(100, (songMs / songLengthMs) * 100));
@@ -203,6 +227,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
 
   return {
     stop(): void {
+      unsubMusicOffset();
       if (!playerReady || !player) return;
       dismissResult();
       resetPlayback();

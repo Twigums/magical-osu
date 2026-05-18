@@ -1,6 +1,7 @@
-import { angleDiff, clamp } from "./utils";
-import { drawArrow, NOTE_RADIUS } from "./draw";
-import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor } from "./settings";
+import { angleDiff, clamp } from "../core/utils";
+import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
+import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "../core/settings";
+import { createCursorRenderer, type CursorRenderer } from "./cursor";
 
 const PERFECT_MS           = 32;
 const GOOD_MS              = 100;
@@ -12,9 +13,9 @@ export const LOGICAL_H = 600;
 
 const ANGULAR_MARGIN = Math.PI / 6;
 
-export type NoteKind   = "click" | "stream";
+type NoteKind          = "click" | "stream";
 export type HitResult  = "perfect" | "good" | "miss";
-export type NoteState  = "pending" | "hit" | "missed";
+type NoteState         = "pending" | "hit" | "missed";
 
 export interface Note {
   kind: NoteKind;
@@ -26,36 +27,52 @@ export interface Note {
   hitResult?: HitResult;
 }
 
+interface HitAnimation {
+  x: number;
+  y: number;
+  kind: NoteKind;
+  startMs: number;
+  seed: number;
+}
+
 export interface GameStats {
   score: number;
   perfect: number;
   good: number;
   miss: number;
   total: number;
+  combo: number;
 }
 
 export interface GameHandle {
   setChart(notes: Note[]): void;
   reset(): void;
+  start(): void;
   tick(songMs: number): void;
   getStats(): GameStats;
   setApproachMs(ms: number): void;
+  destroy(): void;
 }
 
-export interface GameDeps {
-  canvas:       HTMLCanvasElement;
-  gameArea:     HTMLElement;
-  onScore:      (score: number) => void;
-  onFeedback:   (result: HitResult, x: number, y: number) => void;
-  hitSoundUrl?: string;
+interface GameDeps {
+  canvas:          HTMLCanvasElement;
+  gameArea:        HTMLElement;
+  onScore:         (score: number) => void;
+  onFeedback:      (result: HitResult, x: number, y: number) => void;
+  onComboChange:   (combo: number) => void;
+  onPlayingChange: (playing: boolean) => void;
+  hitSoundUrl?:    string;
 }
 
 export function createGame(deps: GameDeps): GameHandle {
-  const { canvas, gameArea, onScore, onFeedback } = deps;
+  const { canvas, gameArea, onScore, onFeedback, onComboChange, onPlayingChange } = deps;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
 
+  const cursor: CursorRenderer = createCursorRenderer(canvas);
+
   let approachMs = arToMs(loadAr());
+  let hiddenMod  = loadHiddenMod();
 
   let audioCtx: AudioContext | null = null;
   let hitSoundBuffer: AudioBuffer | null = null;
@@ -68,6 +85,8 @@ export function createGame(deps: GameDeps): GameHandle {
     source.connect(hitsoundGain);
     source.start();
   };
+
+  let audioLoadCleanup: (() => void) | null = null;
 
   if (deps.hitSoundUrl) {
     const url = deps.hitSoundUrl;
@@ -87,11 +106,17 @@ export function createGame(deps: GameDeps): GameHandle {
     };
     window.addEventListener("pointerdown", loadSound, { once: true });
     window.addEventListener("keydown",     loadSound, { once: true });
+    audioLoadCleanup = (): void => {
+      window.removeEventListener("pointerdown", loadSound);
+      window.removeEventListener("keydown",     loadSound);
+    };
   }
 
-  subscribeHitsoundVolume(v => {
+  const unsubHitsound = subscribeHitsoundVolume(v => {
     if (hitsoundGain) hitsoundGain.gain.value = volToFactor(v);
   });
+
+  const unsubHiddenMod = subscribeHiddenMod(v => { hiddenMod = v; });
 
   const resize = (): void => {
     const rect = gameArea.getBoundingClientRect();
@@ -100,7 +125,6 @@ export function createGame(deps: GameDeps): GameHandle {
     canvas.height = rect.height * dpr;
   };
   resize();
-  window.addEventListener("resize", resize);
 
   const getScale = (): number => canvas.width / LOGICAL_W;
 
@@ -114,24 +138,39 @@ export function createGame(deps: GameDeps): GameHandle {
     pointer.y = (clientY - rect.top)  * (LOGICAL_H / rect.height);
   };
 
-  canvas.addEventListener("mousemove",  e => setPointer(e.clientX, e.clientY));
-  canvas.addEventListener("mousedown",  e => { setPointer(e.clientX, e.clientY); pointer.held = true; });
-  window.addEventListener("mouseup",    () => { pointer.held = false; });
-  canvas.addEventListener("touchmove",  e => {
+  const onMouseMove  = (e: MouseEvent): void => setPointer(e.clientX, e.clientY);
+  const onMouseDown  = (e: MouseEvent): void => { setPointer(e.clientX, e.clientY); pointer.held = true; };
+  const onMouseUp    = (): void => { pointer.held = false; };
+  const onTouchMove  = (e: TouchEvent): void => {
     const t = e.touches[0]; if (t) setPointer(t.clientX, t.clientY); e.preventDefault();
-  }, { passive: false });
-  canvas.addEventListener("touchstart", e => {
+  };
+  const onTouchStart = (e: TouchEvent): void => {
     const t = e.touches[0]; if (t) { setPointer(t.clientX, t.clientY); pointer.held = true; } e.preventDefault();
-  }, { passive: false });
-  window.addEventListener("touchend", () => { pointer.held = false; });
-  window.addEventListener("keydown",  e => { if (!e.repeat) keysHeld.add(e.key); });
-  window.addEventListener("keyup",    e => { keysHeld.delete(e.key); });
+  };
+  const onTouchEnd   = (): void => { pointer.held = false; };
+  const onKeyDown    = (e: KeyboardEvent): void => { if (!e.repeat) keysHeld.add(e.key); };
+  const onKeyUp      = (e: KeyboardEvent): void => { keysHeld.delete(e.key); };
+
+  canvas.addEventListener("mousemove",  onMouseMove);
+  canvas.addEventListener("mousedown",  onMouseDown);
+  window.addEventListener("mouseup",    onMouseUp);
+  canvas.addEventListener("touchmove",  onTouchMove,  { passive: false });
+  canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+  window.addEventListener("touchend",   onTouchEnd);
+  window.addEventListener("keydown",    onKeyDown);
+  window.addEventListener("keyup",      onKeyUp);
+  window.addEventListener("resize",     resize);
 
   let notes: Note[] = [];
+  let pendingStart = 0;
+  let animations: HitAnimation[] = [];
+  let animStart = 0;
   let score = 0;
   let perfectCount = 0;
   let goodCount = 0;
   let missCount = 0;
+  let comboCount = 0;
+  let playing = false;
 
   // After reset(), skip expiry until the song confirms it has rewound to the lead-in window
   // preventing stale mid-song positions from triggering immediate misses.
@@ -148,7 +187,7 @@ export function createGame(deps: GameDeps): GameHandle {
 
   const tryHit = (note: Note, songMs: number): void => {
     if (note.state !== "pending") return;
-    if (!actionHeld()) return;
+    if (NOTE_STYLE[note.kind].requiresHold && !actionHeld()) return;
     if (Math.abs(songMs - note.time) > GOOD_MS) return;
 
     const dx = Math.cos(note.direction);
@@ -174,45 +213,78 @@ export function createGame(deps: GameDeps): GameHandle {
     note.hitResult = result;
     if (result === "perfect") perfectCount++;
     else if (result === "good") goodCount++;
-    if (points > 0) setScore(score + points);
+    if (points > 0) {
+      setScore(score + points);
+      comboCount++;
+      onComboChange(comboCount);
+      animations.push({
+        x: note.x, y: note.y, kind: note.kind, startMs: songMs,
+        seed: Math.floor(note.x * 7919 + note.y * 6271),
+      });
+    }
     onFeedback(result, note.x, note.y);
     playHitSound();
   };
 
   const expireMisses = (songMs: number): void => {
-    for (const n of notes) {
+    // Notes are time-sorted: break as soon as a pending note is within the hit window
+    for (let i = pendingStart; i < notes.length; i++) {
+      const n = notes[i];
       if (n.state !== "pending") continue;
-      if (songMs - n.time > GOOD_MS) {
-        n.state = "missed";
-        n.hitResult = "miss";
-        missCount++;
-        onFeedback("miss", n.x, n.y);
-      }
+      if (songMs - n.time <= GOOD_MS) break;
+      n.state = "missed";
+      n.hitResult = "miss";
+      missCount++;
+      comboCount = 0;
+      onComboChange(0);
+      onFeedback("miss", n.x, n.y);
     }
   };
 
   const draw = (songMs: number): void => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const scale = getScale();
-    for (const note of notes) {
+    // Notes are time-sorted: break once a pending note is past the approach window
+    for (let i = pendingStart; i < notes.length; i++) {
+      const note = notes[i];
       if (note.state !== "pending") continue;
       const dt = note.time - songMs;
-      if (dt > approachMs || dt < -GOOD_MS) continue;
+      if (dt > approachMs) break;
+      if (dt < -GOOD_MS) continue;
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
-      drawArrow(ctx, note, appearProgress, scale);
+      drawArrow(ctx, note, appearProgress, scale, hiddenMod);
     }
+    for (let i = animStart; i < animations.length; i++) {
+      const anim = animations[i];
+      const dt = songMs - anim.startMs;
+      if (dt < 0 || dt >= 300) continue;
+      drawFireworks(ctx, anim.x, anim.y, anim.kind, dt / 300, scale, anim.seed);
+    }
+    while (animStart < animations.length && songMs - animations[animStart].startMs >= 300) animStart++;
   };
 
   return {
-    setChart(n: Note[]): void { notes = n; },
+    setChart(n: Note[]): void { notes = n; pendingStart = 0; },
 
     reset(): void {
       skipExpiry = true;
+      pendingStart = 0;
       for (const n of notes) { n.state = "pending"; n.hitResult = undefined; }
+      animations = [];
+      animStart = 0;
       setScore(0);
       perfectCount = 0;
       goodCount    = 0;
       missCount    = 0;
+      comboCount   = 0;
+      playing      = false;
+      onComboChange(0);
+      onPlayingChange(false);
+    },
+
+    start(): void {
+      playing = true;
+      onPlayingChange(true);
     },
 
     getStats(): GameStats {
@@ -222,6 +294,7 @@ export function createGame(deps: GameDeps): GameHandle {
         good:    goodCount,
         miss:    missCount,
         total:   perfectCount + goodCount + missCount,
+        combo:   comboCount,
       };
     },
 
@@ -230,16 +303,39 @@ export function createGame(deps: GameDeps): GameHandle {
     },
 
     tick(songMs: number): void {
-      for (const note of notes) tryHit(note, songMs);
+      // Only check notes within the hit window; notes are time-sorted so break early
+      for (let i = pendingStart; i < notes.length; i++) {
+        const n = notes[i];
+        if (n.time > songMs + GOOD_MS) break;
+        if (n.state === "pending") tryHit(n, songMs);
+      }
       if (skipExpiry) {
-        // Once songMs confirms the song has rewound into the lead-in window, lift the guard
         if (songMs <= approachMs) skipExpiry = false;
       } else {
         expireMisses(songMs);
       }
+      // Advance past resolved notes (hit or missed) at the front
+      while (pendingStart < notes.length && notes[pendingStart].state !== "pending") pendingStart++;
       draw(songMs);
+      cursor.render(performance.now());
       pointer.prevX = pointer.x;
       pointer.prevY = pointer.y;
+    },
+
+    destroy(): void {
+      canvas.removeEventListener("mousemove",  onMouseMove);
+      canvas.removeEventListener("mousedown",  onMouseDown);
+      window.removeEventListener("mouseup",    onMouseUp);
+      canvas.removeEventListener("touchmove",  onTouchMove);
+      canvas.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend",   onTouchEnd);
+      window.removeEventListener("keydown",    onKeyDown);
+      window.removeEventListener("keyup",      onKeyUp);
+      window.removeEventListener("resize",     resize);
+      cursor.destroy();
+      unsubHitsound();
+      unsubHiddenMod();
+      audioLoadCleanup?.();
     },
   };
 }

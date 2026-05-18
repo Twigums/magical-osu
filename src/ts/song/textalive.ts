@@ -30,7 +30,7 @@ export interface TextAliveVideo {
   findChar(time: number): TextAliveChar | null;
 }
 
-export interface TextAliveTimer {
+interface TextAliveTimer {
   position: number;
 }
 
@@ -48,7 +48,7 @@ export interface TextAlivePlayer {
   requestMediaSeek(ms: number): void;
 }
 
-export interface TextAliveListener {
+interface TextAliveListener {
   onAppReady(app: { managed: boolean; songUrl: string | null }): void;
   onVideoReady(video: TextAliveVideo): void;
   onTimerReady(): void;

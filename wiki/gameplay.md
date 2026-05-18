@@ -22,6 +22,8 @@ There are two different types of notes in the game:
 
 Directions will have an acceptable margin of error window, so the player can hit the note successfully from a range of angles. A successful hit is defined as moving from behind the note to past the arrow in the specified direction while a key is held (or dragged for touchscreen devices). When the cursor reaches the center of the note is when the judgement is called and a score is obtained for that hit if it is a successful hit.
 
+The hold requirement differs between note types. Stream notes require the mouse button (or touch) to be held when the cursor crosses the note; click notes do not require holding.
+
 Both types will appear and disappear in the same way. They will gradually appear as the song progresses. Each note will appear as a faint outline at first, and the inside of the note will appear more and more opaque before becoming the note's color when its the perfect time to hit the note (defined by the judgement window).
 
 ## Judgement Window
@@ -34,6 +36,9 @@ The judgement window is the acceptable margin of error for valid hits. Score is 
 Scoring is simply defined as the sum of points obtained by the player according to the judgement window by the end of the song.
 
 A live score counter is displayed in the game area and updates on each hit.
+
+## Combo
+A combo counter tracks consecutive successful hits (perfect or good). It increments on each successful hit and resets to zero on a miss. The current combo is displayed in the bottom-left of the game area.
 
 ## Accuracy and Grade
 At the end of a song, an accuracy percentage and letter grade are computed.
@@ -57,13 +62,21 @@ accuracy = (perfect × 5 + good × 2) / (total × 5)
 ## Approach Rate (AR)
 The approach rate controls how far in advance notes become visible before their hit time. It is configurable by the player from the options panel.
 
-- **Range:** AR 1–20 (default: AR 12)
-- **Window formula:** `2000 - (ar - 1) × (1700 / 19)` milliseconds
-  - AR 1 → 2000 ms approach window
-  - AR 12 → ~1100 ms approach window
-  - AR 20 → ~300 ms approach window
+- **Range:** AR 1–20 (default: AR 10)
+- **Window formula (piecewise linear):**
+  - AR 1–10: `2000 - (ar - 1) × (1000 / 9)` ms → 2000 ms at AR 1, 1000 ms at AR 10
+  - AR 10–20: `1000 - (ar - 10) × (700 / 10)` ms → 1000 ms at AR 10, 300 ms at AR 20
 
 The setting persists across sessions.
+
+## Mods
+Mods are optional gameplay modifiers toggled from the options panel under the **Mods** section.
+
+| Mod    | Effect |
+|--------|--------|
+| Hidden | Notes show only their outline; the fill animation is suppressed. |
+
+Mod states persist across sessions via `localStorage`.
 
 ## Angular Tolerance
 The acceptable margin of error for swipe direction is **±30°** (π/6 radians) from the note's specified direction.

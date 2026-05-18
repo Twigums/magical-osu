@@ -12,7 +12,7 @@
 <body class="song-page"
     data-hit-sound-url="$path$/audio/snare.mp3"
     data-song-url="$song-url$"
-    data-song-chart="$song-chart$"
+    data-song-chart-dir="$song-chart-dir$"
     data-textalive-token="$textalive-token$"
     data-textalive-beat-id="$textalive-beat-id$"
     data-textalive-chord-id="$textalive-chord-id$"
@@ -24,7 +24,8 @@
         <div class="loading-bar-track">
             <div class="loading-bar-fill" id="loading-bar-fill"></div>
         </div>
-        <span class="loading-text" data-en="Loading..." data-jp="読み込み中...">Loading...</span>
+        <span class="loading-text" data-en="Loading..." data-jp="ローディング...">Loading...</span>
+        <span class="loading-hint" data-en="This is taking a while... try refreshing?" data-jp="少し時間がかかってる…　更新してみ？">This is taking a while... try refreshing?</span>
     </div>
 
     <div id="textalive-media"></div>
@@ -54,9 +55,28 @@
         <span class="song-mapper">$song-mapper$</span>
     </div>
 
+    <div class="small-screen-warning">
+        <p data-en="Please play in fullscreen or increase your window size."
+           data-jp="フルスクリーンで再生するか、ウィンドウサイズを大きくしてください。">Please play in fullscreen or increase your window size.</p>
+    </div>
+
     <div id="game-root"></div>
 
     <div class="song-page-footer">
+        <button class="btn-fullscreen" id="btn-fullscreen" title="Fullscreen">
+            <svg class="icon-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <g class="corner corner-tl"><path d="M3 9 L3 3 L9 3"/></g>
+                <g class="corner corner-tr"><path d="M15 3 L21 3 L21 9"/></g>
+                <g class="corner corner-br"><path d="M21 15 L21 21 L15 21"/></g>
+                <g class="corner corner-bl"><path d="M9 21 L3 21 L3 15"/></g>
+            </svg>
+            <svg class="icon-exit-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <g class="corner corner-tl"><path d="M3 9 L9 9 L9 3"/></g>
+                <g class="corner corner-tr"><path d="M15 3 L15 9 L21 9"/></g>
+                <g class="corner corner-br"><path d="M21 15 L15 15 L15 21"/></g>
+                <g class="corner corner-bl"><path d="M9 21 L9 15 L3 15"/></g>
+            </svg>
+        </button>
         <a href="$path$/" class="btn-back" data-en="Back" data-jp="戻る">Back</a>
     </div>
 

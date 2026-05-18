@@ -1,3 +1,27 @@
+// ── Sass variables ───────────────────────────────────────────────────────────
+
+// Home layout
+$layout-max-width: 400px;
+
+// Color picker canvas dimensions (must match SV_W/SV_H/HUE_H in ColorPicker.tsx)
+$color-picker-sv-w:  256;
+$color-picker-sv-h:  160;
+$color-picker-hue-h:  14;
+
+// Difficulty button
+$diff-btn-height:       3.6rem;
+$diff-level-width:      4rem;
+$diff-separator-angle: -14deg;
+
+$diff-colors: (
+  easy:   #4caf50,
+  medium: #f5c518,
+  hard:   #e53935,
+  expert: #9c27b0,
+);
+
+// ── CSS custom properties ─────────────────────────────────────────────────────
+
 :root {
   // base page colors
   --base-color: #f7f3f2;
@@ -23,11 +47,13 @@
   --bg-gradient-song: radial-gradient(ellipse at center, #120a24 0%, #060610 70%, #000 100%);
 
   // z-index stacking layers
-  --z-chrome:  10;
-  --z-hud:    100;
-  --z-results: 200;
-  --z-modal:   500;
-  --z-loading: 1000;
+  --z-chrome:          10;
+  --z-hud:            100;
+  --z-small-screen:   150;
+  --z-small-screen-ui: 160;
+  --z-results:         200;
+  --z-modal:           500;
+  --z-loading:        1000;
 
   // motion
   --motion-duration-fast: 160ms;
