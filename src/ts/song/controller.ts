@@ -7,13 +7,16 @@ interface SongPageDeps {
   game: GameHandle;
   onSongFinish: (stats: GameStats) => void;
   hideResult: () => void;
+  onSongInfo?: (nameJp: string, authorJp: string) => void;
+  onPlayerReady?: () => void;
 }
 
 interface SongPageHandle {
   stop(): void;
+  togglePlay(): void;
 }
 
-export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): SongPageHandle {
+export function initSongPage({ game, onSongFinish, hideResult, onSongInfo, onPlayerReady }: SongPageDeps): SongPageHandle {
   const body    = document.body;
   const songUrl = body.dataset.songUrl ?? "";
   const chartDir = body.dataset.songChartDir ?? "";
@@ -28,12 +31,22 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   const lyricDiffId          = parseInt(body.dataset.textaliveLyricDiffId ?? "");
   const hasVideoIds = !isNaN(beatId) && !isNaN(chordId) && !isNaN(repetitiveSegmentId) && !isNaN(lyricId) && !isNaN(lyricDiffId);
 
-  const btnPlay      = document.getElementById("btn-play-song")   as HTMLButtonElement | null;
-  const btnStop      = document.getElementById("btn-stop-song")   as HTMLButtonElement | null;
+  const btnHudToggle = document.getElementById("btn-hud-toggle")  as HTMLButtonElement | null;
+  const songHud      = document.querySelector<HTMLElement>(".song-hud");
   const progressFill = document.getElementById("progress-fill")   as HTMLElement       | null;
   const storyboardEl = document.getElementById("song-storyboard") as HTMLElement       | null;
 
-  if (!btnPlay || !btnStop || !progressFill) return { stop() { /* no-op */ } };
+  if (!progressFill) return { stop() { /* no-op */ }, togglePlay() { /* no-op */ } };
+
+  if (btnHudToggle && songHud) {
+    btnHudToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      songHud.classList.toggle("is-open");
+    });
+    document.addEventListener("click", (e) => {
+      if (!songHud.contains(e.target as Node)) songHud.classList.remove("is-open");
+    });
+  }
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
 
@@ -66,10 +79,15 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   let finishTimeout: ReturnType<typeof setTimeout> | null = null;
   let lastSongMs = 0;
 
+  let isPlaying = false;
+
+  const setPlayingState = (playing: boolean): void => {
+    isPlaying = playing;
+  };
+
   const setResultsActive = (active: boolean): void => {
     resultsActive = active;
-    btnPlay.disabled = active;
-    btnStop.disabled = active;
+    if (active) setPlayingState(false);
   };
 
   const triggerFinish = (): void => {
@@ -100,9 +118,8 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
   const TextAliveApp = window.TextAliveApp;
   if (!songUrl || !token) {
     dismissLoading();
+    onPlayerReady?.();
   } else if (TextAliveApp) {
-    btnPlay.disabled = true;
-
     const mediaElement = document.getElementById("textalive-media");
     const opts: TextAlivePlayerOptions = {
       app: { token },
@@ -111,7 +128,7 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
 
     const loadTimeout = setTimeout(() => {
       playerReady = true;
-      btnPlay.disabled = false;
+      onPlayerReady?.();
       dismissLoading();
     }, 15000);
 
@@ -133,23 +150,19 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
         storyboard?.setVideo(video);
         songLengthMs = video.duration;
         if (player?.data.song) {
-          const songNameEl   = document.querySelector(".song-name")   as HTMLElement | null;
-          const songAuthorEl = document.querySelector(".song-author") as HTMLElement | null;
           const { name, artist } = player.data.song;
-          const isJp = (localStorage.getItem("lang") ?? "en") === "jp";
-          if (songNameEl)   { songNameEl.dataset.jp   = name;        if (isJp) songNameEl.textContent   = name;        }
-          if (songAuthorEl) { songAuthorEl.dataset.jp = artist.name; if (isJp) songAuthorEl.textContent = artist.name; }
+          onSongInfo?.(name, artist.name);
         }
       },
       onTimerReady() {
         clearTimeout(loadTimeout);
         playerReady = true;
-        btnPlay.disabled = false;
+        onPlayerReady?.();
         dismissLoading();
         if (player) player.volume = loadVolume();
       },
       onPlay() {
-        btnPlay.disabled = true;
+        setPlayingState(true);
         finished = false;
         if (finishTimeout !== null) { clearTimeout(finishTimeout); finishTimeout = null; }
         if (songLengthMs > 0) {
@@ -157,8 +170,8 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
           finishTimeout = setTimeout(triggerFinish, remaining);
         }
       },
-      onPause() { btnPlay.disabled = false; },
-      onStop()  { if (!resultsActive) btnPlay.disabled = false; finished = false; },
+      onPause() { setPlayingState(false); },
+      onStop()  { setPlayingState(false); finished = false; },
     });
   } else {
     setTimeout(dismissLoading, 15000);
@@ -194,19 +207,6 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
     });
   }
 
-  btnPlay.addEventListener("click", () => {
-    if (!playerReady || !player) return;
-    player.requestPlay();
-    game.start();
-  });
-
-  btnStop.addEventListener("click", () => {
-    if (!playerReady || !player) return;
-    dismissResult();
-    resetPlayback();
-    player.requestStop();
-  });
-
   const loop = (): void => {
     const songMs = player?.timer.position ?? 0;
     if (songMs > 0) lastSongMs = songMs;
@@ -232,6 +232,17 @@ export function initSongPage({ game, onSongFinish, hideResult }: SongPageDeps): 
       dismissResult();
       resetPlayback();
       player.requestStop();
+    },
+    togglePlay(): void {
+      if (!playerReady || !player) return;
+      if (isPlaying) {
+        dismissResult();
+        resetPlayback();
+        player.requestStop();
+      } else {
+        player.requestPlay();
+        game.start();
+      }
     },
   };
 }
