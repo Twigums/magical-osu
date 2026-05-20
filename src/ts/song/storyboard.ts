@@ -3,6 +3,7 @@ import type { TextAliveChar, TextAlivePhrase, TextAliveVideo } from "./textalive
 interface StoryboardRenderer {
   setVideo(video: TextAliveVideo): void;
   update(songMs: number): void;
+  setApproachingLyricTime(timeMs: number | null): void;
   reset(): void;
 }
 
@@ -12,6 +13,7 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
   let lineEl: HTMLElement | null = null;
   let charEls: { ch: TextAliveChar; el: HTMLElement }[] = [];
   let clearTimer: ReturnType<typeof setTimeout> | null = null;
+  let approachTime: number | null = null;
 
   const renderPhrase = (phrase: TextAlivePhrase): void => {
     root.innerHTML = "";
@@ -46,6 +48,7 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
 
   return {
     setVideo(v): void { video = v; },
+    setApproachingLyricTime(timeMs): void { approachTime = timeMs; },
     update(songMs): void {
       if (!video) return;
       const phrase = video.findPhrase(songMs);
@@ -55,9 +58,15 @@ export function createStoryboardRenderer(root: HTMLElement): StoryboardRenderer 
         if (phrase) renderPhrase(phrase);
       }
       for (const { ch, el } of charEls) {
-        const cls = songMs < ch.startTime ? "storyboard-char"
-          : songMs <= ch.endTime          ? "storyboard-char active"
-          : "storyboard-char sung";
+        let cls: string;
+        if (songMs >= ch.startTime && songMs <= ch.endTime) {
+          cls = "storyboard-char active";
+        } else if (songMs > ch.endTime) {
+          cls = "storyboard-char sung";
+        } else {
+          const isApproach = approachTime !== null && approachTime >= ch.startTime && approachTime <= ch.endTime;
+          cls = isApproach ? "storyboard-char approach" : "storyboard-char";
+        }
         if (el.className !== cls) el.className = cls;
       }
     },

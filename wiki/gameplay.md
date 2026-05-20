@@ -16,15 +16,16 @@ The TextAlive song information should be from `/wiki/6W2N_chorus_timings.jsonc`.
 The TextAlive API token to use is: N6S7A1HvahiwDLUg.
 
 ## Notes
-There are two different types of notes in the game:
+There are three different types of notes in the game:
 - Click: A red note with a specified direction. The direction can be defined in any direction in the 360 degrees around the note.
-- Stream: A series of blue notes (> 1) with specified directions. The directions can be defined in any direction int he 360 degrees around each note. The notes in the stream should have directions orientated in a manner that would be feasible for a human player to properly hit them.
+- Stream: A series of blue notes (> 1) with specified directions. The directions can be defined in any direction in the 360 degrees around each note. The notes in the stream should have directions orientated in a manner that would be feasible for a human player to properly hit them.
+- Lyric: A directionless note displaying the Japanese character from the TextAlive lyrics closest in time to the note (within ±80 ms). If no vocal character falls within that window, the note is invisible and a warning is logged before play. The character appears first as a stroke outline, then fills inward from a growing radial clip — identical timing to the arrow fill animation. Hit by swiping through the character with the cursor (no direction requirement, no hold required).
 
 Directions will have an acceptable margin of error window, so the player can hit the note successfully from a range of angles. A successful hit is defined as moving from behind the note to past the arrow in the specified direction while a key is held (or dragged for touchscreen devices). When the cursor reaches the center of the note is when the judgement is called and a score is obtained for that hit if it is a successful hit.
 
-The hold requirement differs between note types. Stream notes require the mouse button (or touch) to be held when the cursor crosses the note; click notes do not require holding.
+The hold requirement differs between note types. Stream notes require the mouse button (or touch) to be held when the cursor crosses the note; click notes and lyric notes do not require holding.
 
-Both types will appear and disappear in the same way. They will gradually appear as the song progresses. Each note will appear as a faint outline at first, and the inside of the note will appear more and more opaque before becoming the note's color when its the perfect time to hit the note (defined by the judgement window).
+All types will appear and disappear in the same way. They will gradually appear as the song progresses. Each note will appear as a faint outline at first, and click/stream notes fill with color as the hit time approaches (defined by the judgement window). Lyric notes show only a circle outline throughout.
 
 ## Judgement Window
 The judgement window is the acceptable margin of error for valid hits. Score is determined by when a note is correctly hit relative to the judgement window. The judgement window and scores are defined as such:
@@ -74,7 +75,7 @@ Mods are optional gameplay modifiers toggled from the options panel under the **
 
 | Mod    | Effect |
 |--------|--------|
-| Hidden | Notes show only their outline; the fill animation is suppressed. |
+| Hidden | Notes show only their outline; the fill animation is suppressed. For lyric notes, only the character stroke outline is shown (no fill, no circle). |
 
 Mod states persist across sessions via `localStorage`.
 

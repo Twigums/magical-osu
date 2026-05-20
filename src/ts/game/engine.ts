@@ -1,19 +1,20 @@
 import { angleDiff, clamp } from "../core/utils";
-import { drawArrow, drawFireworks, NOTE_RADIUS, NOTE_STYLE } from "./draw";
+import { drawArrow, drawLyricNote, drawFireworks, NOTE_RADIUS, LYRIC_RADIUS, NOTE_STYLE } from "./draw";
 import { arToMs, loadAr, loadHitsoundVolume, subscribeHitsoundVolume, volToFactor, loadHiddenMod, subscribeHiddenMod } from "../core/settings";
 import { createCursorRenderer, type CursorRenderer } from "./cursor";
 
-const PERFECT_MS           = 32;
-const GOOD_MS              = 100;
-export const PERFECT_POINTS = 5;
-export const GOOD_POINTS    = 2;
+const PERFECT_MS             = 32;
+const GOOD_MS                = 100;
+const LYRIC_CHAR_MAX_DIST_MS = 80;
+export const PERFECT_POINTS  = 5;
+export const GOOD_POINTS     = 2;
 
 export const LOGICAL_W = 800;
 export const LOGICAL_H = 600;
 
 const ANGULAR_MARGIN = Math.PI / 6;
 
-type NoteKind          = "click" | "stream";
+type NoteKind          = "click" | "stream" | "lyric";
 export type HitResult  = "perfect" | "good" | "miss";
 type NoteState         = "pending" | "hit" | "missed";
 
@@ -25,6 +26,7 @@ export interface Note {
   direction: number;
   state: NoteState;
   hitResult?: HitResult;
+  lyricChar?: string;
 }
 
 interface HitAnimation {
@@ -46,6 +48,8 @@ export interface GameStats {
 
 export interface GameHandle {
   setChart(notes: Note[]): void;
+  setLyricVideo(findClosestChar: (timeMs: number) => { text: string; distMs: number } | null): void;
+  setLyricApproachCallback(fn: (timeMs: number | null) => void): void;
   reset(): void;
   start(): void;
   tick(songMs: number): void;
@@ -172,11 +176,30 @@ export function createGame(deps: GameDeps): GameHandle {
   let comboCount = 0;
   let playing = false;
 
-  // After reset(), skip expiry until the song confirms it has rewound to the lead-in window
+  let lyricCharLookup: ((timeMs: number) => { text: string; distMs: number } | null) | null = null;
+  let onLyricApproach: ((timeMs: number | null) => void) | null = null;
+  let lastLyricApproachTime: number | null = null;
+
+  // After reset(), skip expiry until the song confirms it has rewound to the lead-in window,
   // preventing stale mid-song positions from triggering immediate misses.
   let skipExpiry = false;
 
   const setScore = (v: number): void => { score = v; onScore(v); };
+
+  const populateLyricChars = (): void => {
+    if (!lyricCharLookup) return;
+    for (const note of notes) {
+      if (note.kind !== "lyric") continue;
+      if (note.lyricChar !== undefined) continue;
+      const result = lyricCharLookup(note.time);
+      if (result && result.distMs <= LYRIC_CHAR_MAX_DIST_MS) {
+        note.lyricChar = result.text;
+      } else {
+        note.lyricChar = "";
+        console.warn(`[mimi] lyric note at ${note.time}ms: no vocal char within ${LYRIC_CHAR_MAX_DIST_MS}ms`);
+      }
+    }
+  };
 
   const scoreFor = (deltaMs: number): { result: HitResult; points: number } => {
     const d = Math.abs(deltaMs);
@@ -187,26 +210,38 @@ export function createGame(deps: GameDeps): GameHandle {
 
   const tryHit = (note: Note, songMs: number): void => {
     if (note.state !== "pending") return;
-    if (NOTE_STYLE[note.kind].requiresHold && !actionHeld()) return;
     if (Math.abs(songMs - note.time) > GOOD_MS) return;
 
-    const dx = Math.cos(note.direction);
-    const dy = Math.sin(note.direction);
-    const pPrev = (pointer.prevX - note.x) * dx + (pointer.prevY - note.y) * dy;
-    const pCurr = (pointer.x     - note.x) * dx + (pointer.y     - note.y) * dy;
-    if (pPrev >= 0 || pCurr < 0) return;
-
-    const perpPrev = -(pointer.prevX - note.x) * dy + (pointer.prevY - note.y) * dx;
-    const perpCurr = -(pointer.x     - note.x) * dy + (pointer.y     - note.y) * dx;
-    const t = -pPrev / (pCurr - pPrev);
-    const perpAtCross = perpPrev + (perpCurr - perpPrev) * t;
-    if (Math.abs(perpAtCross) > NOTE_RADIUS) return;
-
-    const moveDx = pointer.x - pointer.prevX;
-    const moveDy = pointer.y - pointer.prevY;
-    if (moveDx * moveDx + moveDy * moveDy < 0.5) return;
-    const moveAngle = Math.atan2(moveDy, moveDx);
-    if (Math.abs(angleDiff(moveAngle, note.direction)) > ANGULAR_MARGIN) return;
+    if (note.kind === "lyric") {
+      const moveDx = pointer.x - pointer.prevX;
+      const moveDy = pointer.y - pointer.prevY;
+      const lenSq  = moveDx * moveDx + moveDy * moveDy;
+      if (lenSq < 0.5) return;
+      const t = clamp(
+        ((note.x - pointer.prevX) * moveDx + (note.y - pointer.prevY) * moveDy) / lenSq,
+        0, 1,
+      );
+      const closestX = pointer.prevX + t * moveDx;
+      const closestY = pointer.prevY + t * moveDy;
+      if ((closestX - note.x) ** 2 + (closestY - note.y) ** 2 > LYRIC_RADIUS * LYRIC_RADIUS) return;
+    } else {
+      if (NOTE_STYLE[note.kind].requiresHold && !actionHeld()) return;
+      const dx = Math.cos(note.direction);
+      const dy = Math.sin(note.direction);
+      const pPrev = (pointer.prevX - note.x) * dx + (pointer.prevY - note.y) * dy;
+      const pCurr = (pointer.x     - note.x) * dx + (pointer.y     - note.y) * dy;
+      if (pPrev >= 0 || pCurr < 0) return;
+      const perpPrev = -(pointer.prevX - note.x) * dy + (pointer.prevY - note.y) * dx;
+      const perpCurr = -(pointer.x     - note.x) * dy + (pointer.y     - note.y) * dx;
+      const t = -pPrev / (pCurr - pPrev);
+      const perpAtCross = perpPrev + (perpCurr - perpPrev) * t;
+      if (Math.abs(perpAtCross) > NOTE_RADIUS) return;
+      const moveDx = pointer.x - pointer.prevX;
+      const moveDy = pointer.y - pointer.prevY;
+      if (moveDx * moveDx + moveDy * moveDy < 0.5) return;
+      const moveAngle = Math.atan2(moveDy, moveDx);
+      if (Math.abs(angleDiff(moveAngle, note.direction)) > ANGULAR_MARGIN) return;
+    }
 
     const { result, points } = scoreFor(songMs - note.time);
     note.state = "hit";
@@ -244,6 +279,8 @@ export function createGame(deps: GameDeps): GameHandle {
   const draw = (songMs: number): void => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const scale = getScale();
+    let nearestLyricTime: number | null = null;
+    let nearestLyricDt = Infinity;
     // Notes are time-sorted: break once a pending note is past the approach window
     for (let i = pendingStart; i < notes.length; i++) {
       const note = notes[i];
@@ -252,7 +289,17 @@ export function createGame(deps: GameDeps): GameHandle {
       if (dt > approachMs) break;
       if (dt < -GOOD_MS) continue;
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
-      drawArrow(ctx, note, appearProgress, scale, hiddenMod);
+      if (note.kind === "lyric") {
+        drawLyricNote(ctx, note, appearProgress, scale, hiddenMod);
+        const absDt = Math.abs(dt);
+        if (absDt < nearestLyricDt) { nearestLyricDt = absDt; nearestLyricTime = note.time; }
+      } else {
+        drawArrow(ctx, note, appearProgress, scale, hiddenMod);
+      }
+    }
+    if (nearestLyricTime !== lastLyricApproachTime) {
+      lastLyricApproachTime = nearestLyricTime;
+      onLyricApproach?.(nearestLyricTime);
     }
     for (let i = animStart; i < animations.length; i++) {
       const anim = animations[i];
@@ -264,7 +311,20 @@ export function createGame(deps: GameDeps): GameHandle {
   };
 
   return {
-    setChart(n: Note[]): void { notes = n; pendingStart = 0; },
+    setChart(n: Note[]): void {
+      notes = n;
+      pendingStart = 0;
+      populateLyricChars();
+    },
+
+    setLyricVideo(findClosestChar): void {
+      lyricCharLookup = findClosestChar;
+      populateLyricChars();
+    },
+
+    setLyricApproachCallback(fn): void {
+      onLyricApproach = fn;
+    },
 
     reset(): void {
       skipExpiry = true;
@@ -280,6 +340,10 @@ export function createGame(deps: GameDeps): GameHandle {
       playing      = false;
       onComboChange(0);
       onPlayingChange(false);
+      if (lastLyricApproachTime !== null) {
+        lastLyricApproachTime = null;
+        onLyricApproach?.(null);
+      }
     },
 
     start(): void {

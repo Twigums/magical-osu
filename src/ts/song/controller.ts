@@ -1,7 +1,32 @@
 import type { GameHandle, GameStats, Note } from "../game/engine";
 import { loadVolume, subscribeVolume, loadMusicOffset, subscribeMusicOffset } from "../core/settings";
 import { createStoryboardRenderer } from "./storyboard";
-import type { TextAlivePlayer, TextAlivePlayerOptions } from "./textalive";
+import type { TextAliveChar, TextAlivePlayer, TextAlivePlayerOptions, TextAliveVideo } from "./textalive";
+
+function charDist(c: TextAliveChar, timeMs: number): number {
+  if (timeMs >= c.startTime && timeMs <= c.endTime) return 0;
+  return Math.min(Math.abs(c.startTime - timeMs), Math.abs(c.endTime - timeMs));
+}
+
+function makeCharLookup(video: TextAliveVideo): (timeMs: number) => { text: string; distMs: number } | null {
+  const chars: TextAliveChar[] = [];
+  let phrase = video.firstPhrase;
+  while (phrase) {
+    let c = phrase.firstChar;
+    while (c) { chars.push(c); c = c.next; }
+    phrase = phrase.next;
+  }
+  if (chars.length === 0) return () => null;
+  return (timeMs: number) => {
+    let best = chars[0];
+    let bestDist = charDist(best, timeMs);
+    for (let i = 1; i < chars.length; i++) {
+      const dist = charDist(chars[i], timeMs);
+      if (dist < bestDist) { bestDist = dist; best = chars[i]; }
+    }
+    return { text: best.text, distMs: bestDist };
+  };
+}
 
 interface SongPageDeps {
   game: GameHandle;
@@ -49,6 +74,7 @@ export function initSongPage({ game, onSongFinish, hideResult, onSongInfo, onPla
   }
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
+  game.setLyricApproachCallback((timeMs) => storyboard?.setApproachingLyricTime(timeMs));
 
   const loadingScreen = document.getElementById("loading-screen");
   const loadingBar    = document.getElementById("loading-bar-fill") as HTMLElement | null;
@@ -148,6 +174,7 @@ export function initSongPage({ game, onSongFinish, hideResult, onSongInfo, onPla
       onVideoReady(video) {
         setProgress(70);
         storyboard?.setVideo(video);
+        game.setLyricVideo(makeCharLookup(video));
         songLengthMs = video.duration;
         if (player?.data.song) {
           const { name, artist } = player.data.song;
