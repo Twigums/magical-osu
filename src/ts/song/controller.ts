@@ -1,6 +1,6 @@
 import type { GameHandle, GameStats, Note } from "../game/engine";
 import { loadVolume, subscribeVolume, loadMusicOffset, subscribeMusicOffset } from "../core/settings";
-import { createStoryboardRenderer } from "./storyboard";
+import { createStoryboardRenderer, type StoryEntry } from "./storyboard";
 import type { TextAliveChar, TextAlivePlayer, TextAlivePlayerOptions, TextAliveVideo } from "./textalive";
 
 function charDist(c: TextAliveChar, timeMs: number): number {
@@ -74,7 +74,6 @@ export function initSongPage({ game, onSongFinish, hideResult, onSongInfo, onPla
   }
 
   const storyboard = storyboardEl ? createStoryboardRenderer(storyboardEl) : null;
-  game.setLyricApproachCallback((timeMs) => storyboard?.setApproachingLyricTime(timeMs));
 
   const loadingScreen = document.getElementById("loading-screen");
   const loadingBar    = document.getElementById("loading-bar-fill") as HTMLElement | null;
@@ -218,6 +217,19 @@ export function initSongPage({ game, onSongFinish, hideResult, onSongInfo, onPla
       console.error("[mimi] chart load failed:", err);
     }
   })();
+
+  if (storyboard && chartDir) {
+    (async () => {
+      try {
+        const res = await fetch(`${chartDir}chart.json`);
+        if (!res.ok) return;
+        const entries = await res.json() as StoryEntry[];
+        storyboard.setStoryData(entries);
+      } catch (err) {
+        console.error("[mimi] story load failed:", err);
+      }
+    })();
+  }
 
   const btnFullscreen = document.getElementById("btn-fullscreen") as HTMLButtonElement | null;
   if (btnFullscreen) {

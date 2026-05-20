@@ -53,12 +53,13 @@ stack build --system-ghc
 | `src/Config.hs` | Site-wide constants: `siteRoot`, `templateDir`, `tabPaths`, `textaliveToken` |
 | `src/Compilers.hs` | `sassCompiler` (npx sass) and `tsCompiler` (npx esbuild) |
 | `src/ChartCompiler.hs` | `chartCompiler` — compiles `.mimi` chart files into `Note[]` JSON |
+| `src/StoryCompiler.hs` | `storyCompiler` — compiles `.story` storyboard files into JSON arrays of highlight/move entries |
 | `src/Context.hs` | `postCtx` — adds `root` and `date` fields to Hakyll context |
 
 ### Content Structure
 
 - `src/tabs/` — Top-level pages. `home.md` → `index.html`, `kotaete.md` → `kotaete/index.html`, etc.
-- `src/songs/<name>/` — Per-song assets. `.mimi` chart files compiled to `.json`; other files copied verbatim
+- `src/songs/<name>/` — Per-song assets. `.mimi` chart files compiled to `.json`; optional `story.story` compiled to `story.json`; other files copied verbatim
 - `src/templates/` — Hakyll HTML templates: `home.html`, `song.html`, `tutorial.html`, `lang_toggle.html`, `settings_toggle.html`, `imports.html`, `sitemap.xml`
 - `src/scss/` — SCSS partials; `default.scss` is the entry point, imports all `_*.scss` partials
 - `src/ts/main.ts` — TypeScript entry point, compiled to `js/main.js`
@@ -73,8 +74,8 @@ stack build --system-ghc
   - `cursor.ts` — Custom cursor renderer (`createCursorRenderer`): tracks pointer over the canvas, maintains a 64-slot ring-buffer particle trail, exposes `render(now)` / `destroy()`; subscribes to cursor settings
   - `grade.ts` — Grade and accuracy computation (`computeGrade`, `computeAccuracy`)
 - `src/ts/song/` — Song page / TextAlive island:
-  - `controller.ts` — Song page controller: TextAlive integration, chart loading, game loop, fullscreen toggle
-  - `storyboard.ts` — TextAlive lyrics storyboard renderer
+  - `controller.ts` — Song page controller: TextAlive integration, chart loading, story loading, game loop, fullscreen toggle
+  - `storyboard.ts` — TextAlive lyrics storyboard renderer; exports `StoryEntry`, `StoryHighlight`, `StoryMove` types; `setStoryData(entries)` applies highlight ranges and character position moves from the story file
   - `textalive.ts` — TypeScript type declarations for the TextAlive App API
   - `share.ts` — Share / clipboard fallback for result sharing
 - `src/ts/react/` — React components:
@@ -119,6 +120,19 @@ l, 5500,     0, 400.0, 300.0, か
 - `degrees`: direction in standard math convention (0 = right, 90 = up, CCW); converted to canvas radians on compile
 - `x`, `y`: logical game coordinates (800 × 600 space)
 - Blank lines and `#` comment lines are ignored
+
+### Story Format (`.story`)
+
+An optional `src/songs/<name>/story.story` file compiled by `StoryCompiler.hs` to `songs/<name>/story.json`. Loaded at runtime by `controller.ts` and applied via `storyboard.setStoryData()`.
+
+```
+# kind, args…
+h, 62500, 63200
+m, 63000, 550, 300
+```
+
+- `h, time1, time2` — highlight: while song position is in `[time1, time2]`, any storyboard character whose `startTime` is also in that range gets the technicolor `.approach` style
+- `m, time, x, y` — move: within the current phrase, characters with `startTime >= time` break into a separate vertical segment absolutely positioned at logical `(x, y)` (800 × 600 space); multiple `m` entries divide the phrase into multiple segments
 
 ### SCSS
 

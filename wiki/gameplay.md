@@ -85,6 +85,28 @@ The acceptable margin of error for swipe direction is **±30°** (π/6 radians) 
 ## Hitsound
 A short sound plays on every successful hit (perfect or good).
 
+## Story File (`.story`)
+
+An optional per-song `.story` file (`src/songs/<name>/story.story`) controls storyboard highlights and character position overrides. It is compiled by Hakyll to `songs/<name>/story.json` and loaded at runtime alongside the chart.
+
+Each non-blank, non-comment (`#`) line is one entry:
+
+| Format | Meaning |
+|--------|---------|
+| `h, time1, time2` | Highlight the storyboard character whose time falls within `[time1, time2]` with the technicolor effect while the song position is also in that range |
+| `m, time, x, y` | Within the current phrase, all characters at time ≥ `time` break off into a separate vertical segment positioned at logical coordinates `(x, y)` (800 × 600 space) |
+
+Times are in milliseconds. `x`/`y` use the same 800 × 600 logical coordinate space as chart notes.
+
+Example:
+```
+# highlight chorus lyric
+h, 62500, 63200
+
+# drop last two chars of phrase to center-right
+m, 63000, 550, 300
+```
+
 ## Completion Screen
 When the song ends, a results overlay appears inside the game area. It displays:
 - Letter grade (color-coded)

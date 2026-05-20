@@ -70,58 +70,76 @@ html body.song-page {
   background: var(--bg-gradient-song);
 }
 
+@keyframes technicolor-hue {
+  from { filter: hue-rotate(0deg); }
+  to   { filter: hue-rotate(360deg); }
+}
+
 .song-storyboard {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: -1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 2.5rem 1rem 1.5rem;
   pointer-events: none;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.35);
 
-  .storyboard-line {
+  .storyboard-line,
+  .storyboard-segment {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
     font-family: inherit;
-    font-size: clamp(1.6rem, 3.2vw, 3rem);
+    font-size: clamp(1.4rem, 2.6vw, 2.4rem);
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.88);
-    text-align: center;
-    padding: 0 2rem;
-    max-width: 90%;
-    line-height: 1.4;
-    letter-spacing: 0.04em;
-    text-shadow: 0 0 16px rgba(150, 120, 255, 0.45);
+    color: #fff;
+    line-height: 1.6;
+    letter-spacing: 0.08em;
     opacity: 0;
-    transform: translateY(8px);
     transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .storyboard-line {
+    max-height: calc(100% - 4rem);
+    transform: translateX(12px);
 
     &.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
+  }
 
-    .storyboard-char {
+  .storyboard-segment {
+    position: absolute;
+    transform: translate(-50%, -50%);
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  .storyboard-line .storyboard-char,
+  .storyboard-segment .storyboard-char {
       display: inline-block;
-      opacity: 0.25;
-      transition: opacity 0.12s ease, color 0.12s ease;
+      opacity: 0.15;
+      transition: opacity 0.12s ease, color 0.15s ease;
 
       &.active {
-        opacity: 1;
-        color: #fff;
-        text-shadow: 0 0 22px rgba(200, 170, 255, 0.8);
+        opacity: 0.30;
       }
 
       &.sung {
-        opacity: 0.85;
+        opacity: 0.15;
       }
 
       &.approach {
-        opacity: 0.65;
-        color: rgba(255, 230, 120, 0.95);
-        text-shadow: 0 0 16px rgba(255, 210, 60, 0.5);
+        opacity: 1;
+        color: hsl(0, 100%, 72%);
+        text-shadow: 0 0 10px currentColor;
+        animation: technicolor-hue 0.5s linear infinite;
       }
-    }
   }
 }
 
@@ -336,7 +354,7 @@ html body.song-page {
 
   &:hover:not(:disabled) { opacity: 0.9; }
   &:disabled { opacity: 0.25; cursor: not-allowed; }
-  &.faded { opacity: 0; }
+  &.faded { opacity: 0.25; }
 }
 
 .game-area.playing .btn-play-stop {

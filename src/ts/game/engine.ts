@@ -49,7 +49,6 @@ export interface GameStats {
 export interface GameHandle {
   setChart(notes: Note[]): void;
   setLyricVideo(findClosestChar: (timeMs: number) => { text: string; distMs: number } | null): void;
-  setLyricApproachCallback(fn: (timeMs: number | null) => void): void;
   reset(): void;
   start(): void;
   tick(songMs: number): void;
@@ -177,8 +176,6 @@ export function createGame(deps: GameDeps): GameHandle {
   let playing = false;
 
   let lyricCharLookup: ((timeMs: number) => { text: string; distMs: number } | null) | null = null;
-  let onLyricApproach: ((timeMs: number | null) => void) | null = null;
-  let lastLyricApproachTime: number | null = null;
 
   // After reset(), skip expiry until the song confirms it has rewound to the lead-in window,
   // preventing stale mid-song positions from triggering immediate misses.
@@ -279,8 +276,6 @@ export function createGame(deps: GameDeps): GameHandle {
   const draw = (songMs: number): void => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const scale = getScale();
-    let nearestLyricTime: number | null = null;
-    let nearestLyricDt = Infinity;
     // Notes are time-sorted: break once a pending note is past the approach window
     for (let i = pendingStart; i < notes.length; i++) {
       const note = notes[i];
@@ -291,15 +286,9 @@ export function createGame(deps: GameDeps): GameHandle {
       const appearProgress = clamp(1 - dt / approachMs, 0, 1);
       if (note.kind === "lyric") {
         drawLyricNote(ctx, note, appearProgress, scale, hiddenMod);
-        const absDt = Math.abs(dt);
-        if (absDt < nearestLyricDt) { nearestLyricDt = absDt; nearestLyricTime = note.time; }
       } else {
         drawArrow(ctx, note, appearProgress, scale, hiddenMod);
       }
-    }
-    if (nearestLyricTime !== lastLyricApproachTime) {
-      lastLyricApproachTime = nearestLyricTime;
-      onLyricApproach?.(nearestLyricTime);
     }
     for (let i = animStart; i < animations.length; i++) {
       const anim = animations[i];
@@ -322,10 +311,6 @@ export function createGame(deps: GameDeps): GameHandle {
       populateLyricChars();
     },
 
-    setLyricApproachCallback(fn): void {
-      onLyricApproach = fn;
-    },
-
     reset(): void {
       skipExpiry = true;
       pendingStart = 0;
@@ -340,10 +325,6 @@ export function createGame(deps: GameDeps): GameHandle {
       playing      = false;
       onComboChange(0);
       onPlayingChange(false);
-      if (lastLyricApproachTime !== null) {
-        lastLyricApproachTime = null;
-        onLyricApproach?.(null);
-      }
     },
 
     start(): void {

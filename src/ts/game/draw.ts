@@ -111,11 +111,12 @@ export function drawLyricNote(
 
   const { base, darkBase } = NOTE_STYLE.lyric.colors;
 
+  const dotR = r * 0.62;
   ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
   ctx.setLineDash([3 * scale, 4 * scale]);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
   ctx.lineWidth = 1.5 * scale;
   ctx.stroke();
   ctx.setLineDash([]);

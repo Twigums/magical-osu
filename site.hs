@@ -8,8 +8,9 @@ import Control.Monad        (filterM, forM)
 
 import Hakyll
 
-import ChartCompiler (chartCompiler)
-import Compilers     (sassCompiler, tsCompiler)
+import ChartCompiler  (chartCompiler)
+import StoryCompiler  (storyCompiler)
+import Compilers      (sassCompiler, tsCompiler)
 import Config        (hakyllConfig, siteRoot, tabPaths, templateDir, textaliveToken)
 import Context       (postCtx)
 
@@ -158,7 +159,12 @@ rules sitePath = do
         route   $ gsubRoute "src/" (const "") `composeRoutes` setExtension "json"
         compile chartCompiler
 
-    -- song data (audio, timing json, etc.) — excludes .mimi (matched above)
+    -- story files: compile .story -> .json
+    match "src/songs/**/*.story" $ do
+        route   $ gsubRoute "src/" (const "") `composeRoutes` setExtension "json"
+        compile storyCompiler
+
+    -- song data (audio, timing json, etc.) — excludes .mimi and .story (matched above)
     match "src/songs/**" $ do
         route   $ gsubRoute "src/" (const "")
         compile copyFileCompiler

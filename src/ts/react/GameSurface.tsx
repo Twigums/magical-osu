@@ -139,6 +139,7 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
       <OptionsPanel isSongPage={true} />
 
       <div className={`game-area${playing ? " playing" : ""}`} ref={gameAreaRef}>
+        <div id="song-storyboard" className="song-storyboard" />
         <canvas className="game-canvas" ref={canvasRef} />
 
         <button
@@ -191,6 +192,8 @@ export function GameSurface({ onReady, returnHref, onTryAgain }: Props) {
             stats={result}
             returnHref={returnHref}
             onTryAgain={handleTryAgain}
+            songName={lang === "jp" && songInfo.nameJp ? songInfo.nameJp : songInfo.name}
+            artist={lang === "jp" && songInfo.authorJp ? songInfo.authorJp : songInfo.author}
           />
         )}
       </div>
